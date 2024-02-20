@@ -17,8 +17,7 @@
           buildInputs = with pkgs; [
             flink
             jdk11
-            gradle
-            maven
+            # gradle
           ];
 
           /* INFO:

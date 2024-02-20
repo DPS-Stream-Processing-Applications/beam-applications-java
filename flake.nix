@@ -1,5 +1,5 @@
 {
-  description = "Bsc project on improved scheduling / resource management for stream processing";
+  description = "Apache Beam applications to be run with Apache Flink";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
@@ -17,7 +17,6 @@
           buildInputs = with pkgs; [
             flink
             jdk11
-            # gradle
           ];
 
           /* INFO:

@@ -7,4 +7,4 @@
 
 rootProject.name = "beam-applications-java"
 
-include("app1")
+include("etl")

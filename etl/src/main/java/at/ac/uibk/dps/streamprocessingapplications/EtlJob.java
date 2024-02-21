@@ -6,16 +6,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-package com.example;
+package at.ac.uibk.dps.streamprocessingapplications;
 
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.GenerateSequence;
-import org.apache.beam.sdk.options.Default;
-import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.options.StreamingOptions;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.MapElements;
@@ -23,15 +20,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
-public class App {
-
-    public interface Options extends StreamingOptions {
-        @Description("Input text to print.")
-        @Default.String("My input text")
-        String getInputText();
-
-        void setInputText(String value);
-    }
+public class EtlJob {
 
     public static void main(String[] args) {
         var options =
@@ -43,25 +32,18 @@ public class App {
 
         var pipeline = Pipeline.create(options);
 
-        // PCollection<Integer> numbers = pipeline.apply(CreateSequence.from(1).to(10));
         PCollection<Long> numbers = pipeline.apply(GenerateSequence.from(1).to(10));
 
-        // Filter out even numbers
         PCollection<Long> filteredNumbers = numbers.apply(Filter.by(number -> number % 2 != 0));
 
         PCollection<Long> filteredNumbersLT = filteredNumbers.apply(Filter.by(n -> n > 5));
 
-        // Convert integers to strings for writing to output
         PCollection<String> output =
                 filteredNumbersLT.apply(
                         MapElements.into(TypeDescriptors.strings()).via(Object::toString));
 
-        // Write output to a text file
-        // output.apply(TextIO.write().to("output.txt").withoutSharding());
-
         output.apply(ParDo.of(new PrintFn()));
 
-        // Run the Pipeline
         pipeline.run();
     }
 

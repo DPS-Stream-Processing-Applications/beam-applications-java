@@ -4,8 +4,10 @@ plugins {
     id("flink-job-conventions")
 }
 
+val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.EtlJob"
+
 application {
-    mainClass = "com.example.App"
+    mainClass = mainClassName
 }
 
 tasks.named<Test>("test") {
@@ -13,11 +15,11 @@ tasks.named<Test>("test") {
 }
 
 tasks.named<Jar>("jar") {
-    archiveBaseName.set("app1")
+    archiveBaseName.set("EtlJob")
     destinationDirectory.set(file("build"))
     manifest {
         attributes(
-            "Main-Class" to "com.example.App",
+            "Main-Class" to mainClassName,
         )
     }
     exclude("META-INF/*.SF")

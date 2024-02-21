@@ -16,7 +16,6 @@ repositories {
 
 dependencies {
     implementation("org.json:json:20240205")
-
 }
 
 tasks.named<Test>("test") {

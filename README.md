@@ -39,8 +39,11 @@ Each subproject has a `jar` build task that builds the `.jar` file of the job th
 
 For example:
 ```bash
+nix develop # INFO: Not needed if already in a nix shell or using direnv.
 ./gradlew build
+start-cluster.sh
 flink run -m localhost:8081 ./etl/build/EtlJob.jar
+stop-cluster.sh
 ```
 Will submit the `etl` job to a Flink cluster running locally.
 

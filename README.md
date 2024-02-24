@@ -42,6 +42,12 @@ Use the `gradlew` binary for every Gradle command.
 # Running a Job with Flink
 The nix development environment provides a Flink binary installation to be used for deploying flink jobs.
 Each subproject has a `jar` build task that builds the `.jar` file of the job that can then be submitted to a Flink cluster.
+>[!IMPORTANT]
+>Running the `start-cluster.sh` command for the first time might lead to the following error:
+>```bash
+> /nix/store/hai1b6r3l172yp49pbyj5z4zpmn8i9k1-flink-1.18.1/opt/flink/bin/flink-daemon.sh: line 139: /tmp/flink-logs/flink-<user-name>-standalonesession-0-<host-name>.out: No such file or directory
+>```
+> Invoking `flink --version` once appears to solve this issue.
 
 For example:
 ```bash

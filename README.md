@@ -28,7 +28,7 @@ After successfully installing Nix and enabling Flakes, you will be able to use t
 development shell managed by Nix. To exit the dev shell, use the `exit` command or hit `Ctrl+d`.
 
 ## Direnv
-Using [Direnv](https://direnv.net/) will allow you to automatically launch the nix `devShell` whenever you change into the project directory.
+Using [Direnv](https://direnv.net/) will allow you to automatically launch the Nix `devShell` whenever you change into the project directory.
 Direnv can also be detected by your IDE if a plugin exists.
 You might also want to install [nix-direnv](https://github.com/nix-community/nix-direnv) to improve the Direnv experience with Nix.
 

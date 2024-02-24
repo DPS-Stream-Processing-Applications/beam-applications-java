@@ -20,7 +20,7 @@ with the Nix package manager instead. The Nix Shell will provide an installation
 To install Nix follow the [official instructions](https://nixos.org/download).
 Following this, you need to enable `flakes` and `nix-command` for the Nix package manager that you just installed.
 The "Other Distros, without Home-Manager" section of the [Flake Wiki](https://nixos.wiki/wiki/Flakes) will explain how to do this.
-> [!NOTE]
+> [!TIP]
 > If the `~/.config/nix` folder and `nix.conf` file do not already exist after installing, you need to create them manually.
 
 ## Nix Develop
@@ -28,7 +28,7 @@ After successfully installing Nix and enabling Flakes, you will be able to use t
 development shell managed by Nix. To exit the dev shell, use the `exit` command or hit `Ctrl+d`.
 
 ## Direnv
-> [!INFO]
+> [!NOTE]
 > This step is entirely optional but may improve your development experience.
 Using [Direnv](https://direnv.net/) will allow you to automatically launch the Nix `devShell` whenever you change into the project directory.
 Direnv can also be detected by your IDE if a plugin exists.

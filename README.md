@@ -66,7 +66,7 @@ plugins {
     id("flink-job-conventions")
 }
 
-val mainClassName = // TODO: Add java main class name.
+val mainClassName = // TODO: Add the java main class name string.
 
 application {
     mainClass = mainClassName

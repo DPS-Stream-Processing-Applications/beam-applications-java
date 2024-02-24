@@ -26,6 +26,7 @@
            */
           shellHook = ''
             export PATH=$PATH:${pkgs.flink}/opt/flink/bin
+            export PS1="(nix-shell) $PS1"
           '';
         };
       };

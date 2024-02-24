@@ -25,45 +25,45 @@ public class EtlJob {
 
         List<String> sensorValues =
                 Arrays.asList(
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 25.3, \"t\": 1645467200}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 25.7, \"t\": 1645467500}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 26.2, \"t\": 1645467800}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 26.8, \"t\": 1645468100}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 27.1, \"t\": 1645468400}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 27.5, \"t\": 1645468700}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 27.9, \"t\": 1645469000}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 28.3, \"t\": 1645469300}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 28.7, \"t\": 1645469600}",
-                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"°C\","
+                        "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
                                 + " \"v\": 29.2, \"t\": 1645469900}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 50, \"t\": 1645467200}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 51, \"t\": 1645467500}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 52, \"t\": 1645467800}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 53, \"t\": 1645468100}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 54, \"t\": 1645468400}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 55, \"t\": 1645468700}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 56, \"t\": 1645469000}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 57, \"t\": 1645469300}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 58, \"t\": 1645469600}",
-                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%\", \"v\":"
+                        "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                                 + " 59, \"t\": 1645469900}");
 
         Pipeline pipeline = Pipeline.create(options);

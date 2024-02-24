@@ -25,7 +25,7 @@ The "Other Distros, without Home-Manager" section of the [Flake Wiki](https://ni
 
 ## Nix Develop
 After successfully installing nix and enabling flakes, you will be able to use the `nix develop` command in the root of the project to enter a
-development shell managed by nix. To exit the dev shell run `exit` or hit `Ctrl+d`.
+development shell managed by nix. To exit the dev shell, use the `exit` command or hit `Ctrl+d`.
 
 ## Direnv
 Using [direnv](https://direnv.net/) will allow you to automatically launch the nix `devShell` whenever you change into the project directory.

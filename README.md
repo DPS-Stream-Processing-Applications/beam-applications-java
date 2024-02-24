@@ -57,7 +57,7 @@ For Flink applications there exists a [Gradle conventions plugin](https://docs.g
 The root `build.gradle.kts` file contains the config for the [Spotless](https://github.com/diffplug/spotless) formatter.
 
 Each subproject has its own `build.gradle.kts` file and needs to be added to the `settings.gradle.kts` file.
-For a Flink application subproject a minimal `build.gradle.kts` file looks as follows:
+For a Flink application subproject a minimal `build.gradle.kts` file might look like this:
 
 ```kotlin
 plugins {

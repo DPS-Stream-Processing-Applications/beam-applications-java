@@ -14,22 +14,23 @@ The applications are targeted to be run with `Apache Flink` but should be reusab
 
 # Setup
 This project contains a `flake.nix` file to manage all the dependencies that would usually need to be installed through a regular package manager
-with nix. The nix shell will provide an installation of Flink as well as the OpenJDK needed for the Gradle wrapper to work.
+with the Nix package manager instead. The Nix Shell will provide an installation of Flink as well as the OpenJDK needed for the Gradle wrapper to work.
 
 ## Installing Nix
-To install nix follow the [official instructions](https://nixos.org/download).
-Following this, you need to enable `flakes` and `nix-command` for the nix package manager that you just installed.
+To install Nix follow the [official instructions](https://nixos.org/download).
+Following this, you need to enable `flakes` and `nix-command` for the Nix package manager that you just installed.
 The "Other Distros, without Home-Manager" section of the [Flake Wiki](https://nixos.wiki/wiki/Flakes) will explain how to do this.
 > [!NOTE]
 > If the `~/.config/nix` folder and `nix.conf` file do not already exist after installing, you need to create them manually.
 
 ## Nix Develop
-After successfully installing nix and enabling flakes, you will be able to use the `nix develop` command in the root of the project to enter a
-development shell managed by nix. To exit the dev shell, use the `exit` command or hit `Ctrl+d`.
+After successfully installing Nix and enabling Flakes, you will be able to use the `nix develop` command in the root of the project to enter a
+development shell managed by Nix. To exit the dev shell, use the `exit` command or hit `Ctrl+d`.
 
 ## Direnv
-Using [direnv](https://direnv.net/) will allow you to automatically launch the nix `devShell` whenever you change into the project directory.
-Direnv can also be detected by your IDE if a plugin exists. 
+Using [Direnv](https://direnv.net/) will allow you to automatically launch the nix `devShell` whenever you change into the project directory.
+Direnv can also be detected by your IDE if a plugin exists.
+You might also want to install [nix-direnv](https://github.com/nix-community/nix-direnv) to improve the Direnv experience with Nix.
 
 ## Gradle
 This project makes use of the Gradle wrapper to provide every developer with the same version of Gradle. No global Gradle installation is needed.

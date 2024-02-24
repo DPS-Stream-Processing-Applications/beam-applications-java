@@ -47,7 +47,7 @@ start-cluster.sh
 flink run -m localhost:8081 ./etl/build/EtlJob.jar
 stop-cluster.sh
 ```
-Will submit the `etl` job to a Flink cluster running locally.
+Will build all applications, start a local Flink cluster and submit the `ETLJob.jar` job to the locally running cluster.
 
 # Developing an Application
  TODO: add development workflow

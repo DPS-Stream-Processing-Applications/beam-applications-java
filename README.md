@@ -17,7 +17,7 @@ This project contains a `flake.nix` file to manage all the dependencies that wou
 with the Nix package manager instead. The Nix Shell will provide an installation of Flink as well as the OpenJDK needed for the Gradle wrapper to work.
 
 ## Installing Nix
-To install Nix follow the [official instructions](https://nixos.org/download).
+To install Nix follow the [official instructions](https://nixos.org/download) for your platform.
 Following this, you need to enable `flakes` and `nix-command` for the Nix package manager that you just installed.
 The "Other Distros, without Home-Manager" section of the [Flake Wiki](https://nixos.wiki/wiki/Flakes) will explain how to do this.
 > [!TIP]

@@ -21,7 +21,7 @@ To install nix follow the [official instructions](https://nixos.org/download).
 Following this, you need to enable `flakes` and `nix-command` for the nix package manager that you just installed.
 The "Other Distros, without Home-Manager" section of the [Flake Wiki](https://nixos.wiki/wiki/Flakes) will explain how to do this.
 > [!NOTE]
-> If the `~/.config/nix` folder and `nix.conf` file do not already exist, you need to create them manually.
+> If the `~/.config/nix` folder and `nix.conf` file do not already exist after installing, you need to create them manually.
 
 ## Nix Develop
 After successfully installing nix and enabling flakes, you will be able to use the `nix develop` command in the root of the project to enter a

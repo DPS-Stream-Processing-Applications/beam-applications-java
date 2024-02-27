@@ -1,8 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications;
 
+import java.io.Serializable;
 import java.time.Instant;
-import org.apache.beam.sdk.coders.DefaultCoder;
-import org.apache.beam.sdk.extensions.avro.coders.AvroCoder;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.json.JSONObject;
 
 /**
@@ -18,14 +19,13 @@ import org.json.JSONObject;
  *   <li>t
  * </ul>
  */
-@DefaultCoder(AvroCoder.class)
-public class SenMLRecord {
-    private String baseName;
+public class SenMLRecord implements Serializable {
+    @Nullable private String baseName;
 
-    private String name;
-    private String unit;
-    private Float value;
-    private Instant time;
+    @Nullable private String name;
+    @Nullable private String unit;
+    @Nullable private Float value;
+    @Nullable private Instant time;
 
     public SenMLRecord(String senMLString) {
         JSONObject record = new JSONObject(senMLString);
@@ -57,5 +57,26 @@ public class SenMLRecord {
 
     public Instant getTime() {
         return time;
+    }
+
+    public String getFullName() {
+        return this.getBaseName() + this.getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SenMLRecord)) return false;
+        SenMLRecord that = (SenMLRecord) o;
+        return Objects.equals(getBaseName(), that.getBaseName())
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(getUnit(), that.getUnit())
+                && Objects.equals(getValue(), that.getValue())
+                && Objects.equals(getTime(), that.getTime());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBaseName(), getName(), getUnit(), getValue(), getTime());
     }
 }

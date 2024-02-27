@@ -71,7 +71,7 @@ For a Flink application subproject a minimal `build.gradle.kts` file might look 
 
 ```kotlin
 plugins {
-    id("application")
+    id("java")
     // INFO: This plugin is in `buildSrc` and manages shared dependencies.
     id("flink-job-conventions")
 }
@@ -88,10 +88,6 @@ repositories {
 
 dependencies {
     // TODO: Add application specific dependencies.
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
 }
 
 tasks.named<Jar>("jar") {

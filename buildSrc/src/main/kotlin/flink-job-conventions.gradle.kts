@@ -23,4 +23,9 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
     }
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
+
 }

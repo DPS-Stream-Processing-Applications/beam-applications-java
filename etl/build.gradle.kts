@@ -1,14 +1,10 @@
 plugins {
-    id("application")
+    id("java")
     // INFO: This plugin is in `buildSrc` and manages shared dependencies.
     id("flink-job-conventions")
 }
 
 val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.EtlJob"
-
-application {
-    mainClass = mainClassName
-}
 
 repositories {
     mavenCentral()
@@ -16,10 +12,6 @@ repositories {
 
 dependencies {
     implementation("org.json:json:20240205")
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
 }
 
 tasks.named<Jar>("jar") {

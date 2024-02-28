@@ -1,14 +1,10 @@
 plugins {
-    id("application")
+    id("java")
     // INFO: This plugin is in `buildSrc` and manages shared dependencies.
     id("flink-job-conventions")
 }
 
-val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.EtlJob"
-
-application {
-    mainClass = mainClassName
-}
+val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
 
 repositories {
     mavenCentral()
@@ -18,12 +14,8 @@ dependencies {
     implementation("org.json:json:20240205")
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
-
 tasks.named<Jar>("jar") {
-    archiveBaseName.set("EtlJob")
+    archiveBaseName.set("FlinkJob")
     destinationDirectory.set(file("build"))
     manifest {
         attributes(

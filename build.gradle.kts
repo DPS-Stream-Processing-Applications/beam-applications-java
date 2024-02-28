@@ -19,7 +19,7 @@ subprojects {
         java {
             removeUnusedImports()
                 importOrder()
-                googleJavaFormat().aosp().reflowLongStrings()
+                googleJavaFormat().reflowLongStrings()
                 formatAnnotations()
         }
     }

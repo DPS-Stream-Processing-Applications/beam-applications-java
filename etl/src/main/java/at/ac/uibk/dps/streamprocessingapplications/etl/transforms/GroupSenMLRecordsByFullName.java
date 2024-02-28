@@ -1,5 +1,6 @@
-package at.ac.uibk.dps.streamprocessingapplications;
+package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
+import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecord;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.PTransform;

@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications;
+package at.ac.uibk.dps.streamprocessingapplications.etl.model;
 
 import java.io.Serializable;
 import java.time.Instant;

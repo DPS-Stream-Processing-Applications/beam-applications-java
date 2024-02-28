@@ -1,10 +1,13 @@
-package at.ac.uibk.dps.streamprocessingapplications;
+package at.ac.uibk.dps.streamprocessingapplications.etl;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.GroupSenMLRecordsByFullName;
+import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecord;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;

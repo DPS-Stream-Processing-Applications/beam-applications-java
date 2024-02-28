@@ -22,6 +22,7 @@ public class GroupSenMLRecordsByFullName
                     TypeDescriptors.kvs(
                         TypeDescriptors.strings(), TypeDescriptor.of(SenMLRecord.class)))
                 .via(senMLRecord -> KV.of(senMLRecord.getFullName(), senMLRecord)))
+            // FIX: Window needs to be applied for unbounded data before `GroupByKey`
         .apply("Group SenML records by full name", GroupByKey.create())
         .apply(Values.create());
   }

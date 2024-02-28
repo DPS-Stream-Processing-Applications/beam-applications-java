@@ -54,7 +54,7 @@ For example:
 nix develop # INFO: Not needed if already in a nix shell or using direnv.
 ./gradlew build
 start-cluster.sh
-flink run -m localhost:8081 ./etl/build/EtlJob.jar
+flink run -m localhost:8081 ./etl/build/FlinkJob.jar
 stop-cluster.sh
 ```
 Will build all applications, start a local Flink cluster and submit the `ETLJob.jar` job to the locally running cluster.

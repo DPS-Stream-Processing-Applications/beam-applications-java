@@ -15,7 +15,7 @@ dependencies {
 }
 
 tasks.named<Jar>("jar") {
-    archiveBaseName.set("EtlJob")
+    archiveBaseName.set("FlinkJob")
     destinationDirectory.set(file("build"))
     manifest {
         attributes(

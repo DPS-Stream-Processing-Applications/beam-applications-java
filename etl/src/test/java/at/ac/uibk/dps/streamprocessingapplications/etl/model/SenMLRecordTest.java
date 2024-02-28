@@ -3,8 +3,6 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
-
-import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecord;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

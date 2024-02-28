@@ -10,7 +10,6 @@ import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
@@ -72,19 +71,13 @@ public class EtlJob {
         .apply(
             "Parse SenMLRecord POJO",
             MapElements.into(TypeDescriptor.of(SenMLRecord.class)).via(SenMLRecord::new))
-        .apply(
-            "Map to KV(getFullName(), SenMLRecord)",
-            MapElements.into(
-                    TypeDescriptors.kvs(
-                        TypeDescriptors.strings(), TypeDescriptor.of(SenMLRecord.class)))
-                .via(senMLRecord -> KV.of(senMLRecord.getFullName(), senMLRecord)))
-        .apply("Group SenML records by full name", GroupByKey.create())
+        .apply("Group records by full name", new GroupSenMLRecordsByFullName())
         .apply(
             "Get timestamp",
             MapElements.into(TypeDescriptors.iterables(TypeDescriptor.of(Instant.class)))
                 .via(
-                    recordsKV ->
-                        StreamSupport.stream(recordsKV.getValue().spliterator(), true)
+                    records ->
+                        StreamSupport.stream(records.spliterator(), true)
                             .map(SenMLRecord::getTime)
                             .collect(Collectors.toList())))
         .apply(ToString.elements())

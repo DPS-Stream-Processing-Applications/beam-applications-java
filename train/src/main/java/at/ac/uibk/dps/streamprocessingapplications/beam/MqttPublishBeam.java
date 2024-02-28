@@ -1,14 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
-
 import at.ac.uibk.dps.streamprocessingapplications.entity.BlobUploadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import org.apache.beam.sdk.transforms.DoFn;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTPublishTask;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

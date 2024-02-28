@@ -106,6 +106,7 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.logging;
 
 // import in.dream_lab.genevents.utils.GlobalConstants;
 
+import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -114,7 +115,6 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
 
 /** Created by anshushukla on 20/05/15. */
 public class BatchedFileLogging {

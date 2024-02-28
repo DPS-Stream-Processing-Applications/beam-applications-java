@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import at.ac.uibk.dps.streamprocessingapplications.entity.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.utils.FitDataGenerator;
 import com.google.common.collect.Lists;
 import com.microsoft.azure.storage.CloudStorageAccount;
@@ -7,7 +8,6 @@ import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
 import java.util.*;
-import at.ac.uibk.dps.streamprocessingapplications.entity.FIT_data;
 import org.slf4j.Logger;
 
 public class AzureTableRangeQueryTaskFIT extends AbstractTask {

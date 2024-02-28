@@ -1,7 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
-import java.util.Random;
 import at.ac.uibk.dps.streamprocessingapplications.entity.FIT_data;
+import java.util.Random;
 
 public class FitDataGenerator {
 

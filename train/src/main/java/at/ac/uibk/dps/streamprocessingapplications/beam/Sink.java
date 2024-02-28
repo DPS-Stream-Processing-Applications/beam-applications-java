@@ -1,8 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import java.util.Random;
-
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
+import java.util.Random;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

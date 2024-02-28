@@ -1,12 +1,11 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import java.util.HashMap;
-import java.util.Properties;
-
 import at.ac.uibk.dps.streamprocessingapplications.entity.DbEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskFIT;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

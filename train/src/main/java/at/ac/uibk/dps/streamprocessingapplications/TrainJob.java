@@ -1,11 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications;
 
+import at.ac.uibk.dps.streamprocessingapplications.beam.*;
+import at.ac.uibk.dps.streamprocessingapplications.entity.*;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
-
-import at.ac.uibk.dps.streamprocessingapplications.beam.*;
-import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -16,13 +17,10 @@ import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
-import org.example.beam.*;
-import org.example.entity.*;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
 
 public class TrainJob {
     public static void main(String[] args) throws Exception {
+
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
         if (argumentClass == null) {
             System.out.println("ERROR! INVALID NUMBER OF ARGUMENTS");
@@ -50,7 +48,7 @@ public class TrainJob {
                         // .withValidation()
                         .as(FlinkPipelineOptions.class);
         options.setRunner(FlinkRunner.class);
-        options.setParallelism(4);
+        options.setParallelism(3);
 
         // PipelineOptions options = PipelineOptionsFactory.create();
 

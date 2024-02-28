@@ -1,17 +1,16 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
+import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import org.apache.beam.sdk.transforms.DoFn;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 

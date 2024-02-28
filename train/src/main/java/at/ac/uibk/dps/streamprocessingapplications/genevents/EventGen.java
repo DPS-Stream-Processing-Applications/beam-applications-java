@@ -1,14 +1,14 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents;
 
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.CsvSplitter;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.JsonSplitter;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.TableClass;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.CsvSplitter;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.JsonSplitter;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.TableClass;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
 
 public class EventGen {
     ISyntheticEventGen iseg;
@@ -77,10 +77,7 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -135,10 +132,7 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

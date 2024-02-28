@@ -1,5 +1,5 @@
 <div align="center">
-<!-- NOTE: The empty line is required for center to work.-->
+<!-- INFO: The empty line is required for center to work.-->
 
 [![Nix](https://img.shields.io/badge/Nix_devShell-%235277C3?style=for-the-badge&logo=NixOS&logoColor=white)](https://nixos.wiki/wiki/Flakes)
 [![Gradle](https://img.shields.io/badge/Gradle%208.6-02303A?style=for-the-badge&logo=Gradle&logoColor=white)](https://docs.gradle.org/8.6/userguide/userguide.html)

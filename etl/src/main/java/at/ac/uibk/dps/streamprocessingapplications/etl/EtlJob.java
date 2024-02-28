@@ -1,20 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl;
 
-import java.time.Instant;
+import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.FilterAndInterpolateOutliers;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.GroupSenMLRecordsByFullName;
-import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecord;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
-import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class EtlJob {
 
@@ -71,20 +64,8 @@ public class EtlJob {
 
     pipeline
         .apply("Read data", Create.of(sensorValues))
-        .apply(
-            "Parse SenMLRecord POJO",
-            MapElements.into(TypeDescriptor.of(SenMLRecord.class)).via(SenMLRecord::new))
-        .apply("Group records by full name", new GroupSenMLRecordsByFullName())
-        .apply(
-            "Get timestamp",
-            MapElements.into(TypeDescriptors.iterables(TypeDescriptor.of(Instant.class)))
-                .via(
-                    records ->
-                        StreamSupport.stream(records.spliterator(), true)
-                            .map(SenMLRecord::getTime)
-                            .collect(Collectors.toList())))
-        .apply(ToString.elements())
-        .apply(ParDo.of(new PrintFn()));
+        .apply(new FilterAndInterpolateOutliers())
+        .apply(ParDo.of(new EtlJob.PrintFn()));
 
     pipeline.run();
   }

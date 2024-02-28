@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
@@ -18,6 +19,11 @@ public class FilterAndInterpolateOutliers
             "Parse SenMLRecord POJO",
             MapElements.into(TypeDescriptor.of(SenMLRecord.class)).via(SenMLRecord::new))
         .apply("Group records by full name", new GroupSenMLRecordsByFullName())
+        // .apply(
+        // "Batch into count of 5",
+        // Window.<Iterable<SenMLRecord>>into(new GlobalWindows())
+        // .triggering(Repeatedly.forever(AfterPane.elementCountAtLeast(5)))
+        // .discardingFiredPanes())
         .apply(
             "Get timestamp",
             MapElements.into(TypeDescriptors.iterables(TypeDescriptor.of(Instant.class)))

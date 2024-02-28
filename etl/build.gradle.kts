@@ -4,7 +4,7 @@ plugins {
     id("flink-job-conventions")
 }
 
-val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.etl.EtlJob"
+val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
 
 repositories {
     mavenCentral()

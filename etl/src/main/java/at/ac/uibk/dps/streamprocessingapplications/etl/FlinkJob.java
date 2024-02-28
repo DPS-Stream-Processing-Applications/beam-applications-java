@@ -9,7 +9,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 
-public class EtlJob {
+public class FlinkJob {
 
   public static void main(String[] args) {
     FlinkPipelineOptions options =
@@ -65,7 +65,7 @@ public class EtlJob {
     pipeline
         .apply("Read data", Create.of(sensorValues))
         .apply(new FilterAndInterpolateOutliers())
-        .apply(ParDo.of(new EtlJob.PrintFn()));
+        .apply(ParDo.of(new FlinkJob.PrintFn()));
 
     pipeline.run();
   }

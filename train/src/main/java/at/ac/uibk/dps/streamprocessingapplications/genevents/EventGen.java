@@ -144,7 +144,7 @@ class SubEventGen implements Runnable {
     TableClass eventList;
     Long experiStartTime; // in millis since epoch
     Semaphore sem1, sem2;
-    Long experiDuration = -1L;
+    Long experiDuration = 1000L;
 
     public SubEventGen(
             ISyntheticEventGen iseg, TableClass eventList, Semaphore sem1, Semaphore sem2) {

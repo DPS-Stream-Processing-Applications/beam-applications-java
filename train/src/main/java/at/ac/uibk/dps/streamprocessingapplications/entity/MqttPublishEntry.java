@@ -16,4 +16,9 @@ public class MqttPublishEntry implements Serializable {
     public MqttPublishEntry(String msgid) {
         this.msgid = msgid;
     }
+
+    @Override
+    public String toString() {
+        return "MqttPublishEntry{" + "msgid='" + msgid + '\'' + '}';
+    }
 }

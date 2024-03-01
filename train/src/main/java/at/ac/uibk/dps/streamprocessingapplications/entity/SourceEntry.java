@@ -62,4 +62,22 @@ public class SourceEntry implements Serializable {
     public int hashCode() {
         return Objects.hash(msgid);
     }
+
+    @Override
+    public String toString() {
+        return "SourceEntry{"
+                + "rowString='"
+                + rowString
+                + '\''
+                + ", msgid='"
+                + msgid
+                + '\''
+                + ", rowKeyStart='"
+                + rowKeyStart
+                + '\''
+                + ", rowKeyEnd='"
+                + rowKeyEnd
+                + '\''
+                + '}';
+    }
 }

@@ -2,7 +2,6 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import com.opencsv.CSVReader;
 import java.io.*;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -31,9 +30,6 @@ public class CsvSplitter {
                 headerList.add(s);
             }
             return headerList;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -169,6 +165,7 @@ public class CsvSplitter {
      * @throws ParseException
      * @throws IOException
      */
+    /*
     public static void main(String[] args) throws ParseException, IOException {
         // TODO Auto-generated method stub
         int defaultNumThreads = 4, defaultPeakRate = 100;
@@ -204,4 +201,6 @@ public class CsvSplitter {
 
         LOG.info("jkl");
     }
+
+     */
 }

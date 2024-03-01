@@ -82,12 +82,21 @@ public class MQTTPublishTask extends AbstractTask implements MqttCallback {
                             + ", using client "
                             + mqttClient,
                     e);
+            System.out.println(
+                    "Exception when publishing mqtt message "
+                            + input
+                            + ", to topic "
+                            + topic
+                            + ", using client "
+                            + mqttClient
+                            + e);
+            throw new RuntimeException(e.getMessage());
         }
 
         // set parent to have the actual predictions
         super.setLastResult(input);
 
-        return Float.valueOf(input.length());
+        return (float) input.length();
     }
 
     @Override

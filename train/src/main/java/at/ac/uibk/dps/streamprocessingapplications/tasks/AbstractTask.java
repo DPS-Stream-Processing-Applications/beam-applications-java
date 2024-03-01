@@ -33,7 +33,12 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
     public Float doTask(Map<String, T> map) throws IOException {
         sw.resume();
         ////////////////////////
-        Float result = doTaskLogic(map);
+        Float result;
+        try {
+            result = doTaskLogic(map);
+        } catch (IOException e) {
+            throw new IOException(e.getMessage());
+        }
         ////////////////////////
         sw.suspend();
         assert result >= 0;
@@ -74,6 +79,8 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
     public float tearDown() {
         sw.stop();
         l.debug("finished task tearDown");
+        // is needed for parallelism > 1, otherwise counter is 0
         return sw.getTime() / (counter + 1);
+        // return sw.getTime() / (counter);
     }
 }

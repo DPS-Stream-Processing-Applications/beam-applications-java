@@ -49,7 +49,13 @@ public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, filename);
-        Float res = mqttPublishTask.doTask(map);
+        Float res = 93f;
+        try {
+            res = mqttPublishTask.doTask(map);
+        } catch (IOException e) {
+            throw new IOException(e.getMessage());
+        }
+        System.out.println("res in mqttPublish " + res);
         out.output(new MqttPublishEntry(msgId));
     }
 }

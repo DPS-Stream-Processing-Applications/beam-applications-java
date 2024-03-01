@@ -113,7 +113,6 @@ public class EventGen {
             Semaphore sem1 = new Semaphore(0);
 
             Semaphore sem2 = new Semaphore(0);
-
             SubEventGen[] subEventGenArr = new SubEventGen[numThreads];
             for (int i = 0; i < numThreads; i++) {
                 // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));

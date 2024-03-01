@@ -48,7 +48,7 @@ public class TrainJob {
                         // .withValidation()
                         .as(FlinkPipelineOptions.class);
         options.setRunner(FlinkRunner.class);
-        options.setParallelism(3);
+        options.setParallelism(2);
 
         // PipelineOptions options = PipelineOptionsFactory.create();
 

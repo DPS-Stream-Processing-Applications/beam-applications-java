@@ -19,6 +19,7 @@ public class Sink extends DoFn<MqttPublishEntry, String> {
     @ProcessElement
     public void processElement(@Element MqttPublishEntry input, OutputReceiver<String> out) {
         String msgId = input.getMsgid();
+        System.out.println("In Sink " + msgId);
         out.output(msgId);
     }
 }

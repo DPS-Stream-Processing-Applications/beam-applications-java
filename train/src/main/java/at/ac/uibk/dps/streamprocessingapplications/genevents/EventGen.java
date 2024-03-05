@@ -49,6 +49,7 @@ public class EventGen {
                 datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
             }
 
+            System.out.println("Dataset-Type: " + datasetType);
             List<TableClass> nestedList =
                     CsvSplitter.roundRobinSplitCsvToMemory(
                             csvFileName, numThreads, scalingFactor, datasetType);
@@ -77,12 +78,22 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
+    /***
+     * not used
+     * @param csvFileName
+     * @param outCSVFileName
+     * @param experimentDurationMillis
+     * @param isJson
+     */
     public void launch(
             String csvFileName,
             String outCSVFileName,
@@ -104,15 +115,17 @@ public class EventGen {
             } else if (outCSVFileName.indexOf("SENML") != -1) {
                 datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
             }
+            System.out.println("Dataset-Type: " + datasetType);
+
             List<TableClass> nestedList =
                     JsonSplitter.roundRobinSplitJsonToMemory(
                             csvFileName, numThreads, scalingFactor, datasetType);
-
             this.executorService = Executors.newFixedThreadPool(numThreads);
 
             Semaphore sem1 = new Semaphore(0);
 
             Semaphore sem2 = new Semaphore(0);
+
             SubEventGen[] subEventGenArr = new SubEventGen[numThreads];
             for (int i = 0; i < numThreads; i++) {
                 // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));
@@ -131,7 +144,10 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -143,7 +159,7 @@ class SubEventGen implements Runnable {
     TableClass eventList;
     Long experiStartTime; // in millis since epoch
     Semaphore sem1, sem2;
-    Long experiDuration = 10L;
+    Long experiDuration = -1L;
 
     public SubEventGen(
             ISyntheticEventGen iseg, TableClass eventList, Semaphore sem1, Semaphore sem2) {
@@ -175,20 +191,26 @@ class SubEventGen implements Runnable {
                 Long deltaTs = timestamps.get(i);
                 List<String> event = rows.get(i);
                 Long currentTs = System.currentTimeMillis();
+                System.out.println("experiRestartTime " + experiRestartTime);
                 long delay =
                         deltaTs
                                 - (currentTs
                                         - experiRestartTime); // how long until this event should be
                 // sent?
+                // delay = 1000;
+                System.out.println("delay: " + delay);
                 if (delay > 10) { // sleep only if it is non-trivial time. We will catch up on sleep
                     // later.
                     try {
+                        System.out.println("Sleeping for " + delay);
                         Thread.sleep(delay);
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        throw new RuntimeException("Error in delay");
                     }
                 }
+
                 this.iseg.receive(event);
 
                 currentRuntime =

@@ -12,9 +12,7 @@ import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.Flatten;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
@@ -48,14 +46,13 @@ public class TrainJob {
                         // .withValidation()
                         .as(FlinkPipelineOptions.class);
         options.setRunner(FlinkRunner.class);
-        options.setParallelism(2);
+        options.setParallelism(1);
 
         // PipelineOptions options = PipelineOptionsFactory.create();
-
         Pipeline p = Pipeline.create(options);
 
         PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
-
+        inputFile = p.apply(Create.of("test"));
         PCollection<SourceEntry> timerSource =
                 inputFile.apply(
                         "Timer Source",
@@ -64,6 +61,7 @@ public class TrainJob {
                                         inputFileName,
                                         spoutLogFileName,
                                         argumentClass.getScalingFactor())));
+
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply("Table Read", ParDo.of(new TableReadBeam(p_)));
 
@@ -93,10 +91,19 @@ public class TrainJob {
                         new DoFn<MqttPublishEntry, Void>() {
                             @ProcessElement
                             public void processElement(ProcessContext c) {
-                                System.out.println(c.element());
+                                System.out.println("Print " + c.element());
+                            }
+                        }));
+        PCollection<Long> count = mqttPublish.apply("Count", Count.globally());
+        count.apply(
+                ParDo.of(
+                        new DoFn<Long, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
 
-        p.run();
+        p.run().waitUntilFinish();
     }
 }

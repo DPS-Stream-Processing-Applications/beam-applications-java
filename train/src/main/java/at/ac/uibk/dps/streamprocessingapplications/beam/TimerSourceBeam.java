@@ -217,6 +217,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
 
         ba = new BatchedFileLogging(uLogfilename, "test");
+        System.out.println("Timer has launched");
     }
 
     @ProcessElement
@@ -227,9 +228,15 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         // allow multiple tuples to be emitted per next tuple.
         // Discouraged? https://groups.google.com/forum/#!topic/storm-user/SGwih7vPiDE
         int count = 0, MAX_COUNT = 10; // FIXME?
-        while (count < MAX_COUNT) {
+        int sendMessages = 0;
+        while (sendMessages < 7) {
+            // while (count < MAX_COUNT) {
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
-            if (entry == null) return;
+            if (entry == null) {
+                // System.out.println("I am exiting");
+                // return;
+                continue;
+            }
             count++;
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
@@ -240,7 +247,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
             String ROWKEYSTART = rowString.split(",")[2];
             String ROWKEYEND = rowString.split(",")[3];
             ;
-            System.out.println("rowString:" + rowString.split(",")[2]);
+            // System.out.println("rowString:" + rowString.split(",")[2]);
 
             values.setRowString(rowString);
             msgId++;
@@ -256,6 +263,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
             //
 
             out.output(values);
+            sendMessages++;
             try {
                 //				msgId++;
                 ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId);
@@ -269,6 +277,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
             //			e.printStackTrace();
             //		}
         }
+        System.out.println("Exiting");
     }
 
     @Override
@@ -277,6 +286,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         // System.out.println("Called IN SPOUT### ");
         try {
             this.eventQueue.put(event);
+            System.out.println("Got this event " + event);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

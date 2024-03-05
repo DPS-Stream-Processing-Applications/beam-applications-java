@@ -5,8 +5,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,17 +79,29 @@ public class CsvSplitter {
             int timestampColIndex = 0;
             DateTime date = null;
             if (datasetType.equals("TAXI")) {
+                /*
                 timestampColIndex = 3;
                 date =
                         DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
                                 .parseDateTime(nextLine[timestampColIndex]);
+
+                 */
+                timestampColIndex = 2;
+                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
+                date = new DateTime(unixEpochMillis);
+
             } else if (datasetType.equals("SYS")) {
+                /*
                 timestampColIndex = 0;
                 date =
                         ISODateTimeFormat.dateTimeParser()
                                 .parseDateTime(nextLine[timestampColIndex]);
                 // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
                 //		nextLine[timestampColIndex]);
+
+                 */
+                timestampColIndex = 1;
+                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
             } else if (datasetType.equals("PLUG")) {
                 timestampColIndex = 1;
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);

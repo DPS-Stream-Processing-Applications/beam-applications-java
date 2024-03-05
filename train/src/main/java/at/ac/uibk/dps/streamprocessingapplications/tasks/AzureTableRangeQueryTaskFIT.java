@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.FIT_data;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.utils.FitDataGenerator;
 import com.google.common.collect.Lists;
 import com.microsoft.azure.storage.CloudStorageAccount;

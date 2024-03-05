@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications.entity;
+package at.ac.uibk.dps.streamprocessingapplications.entity.azure;
 
 import com.microsoft.azure.storage.table.TableServiceEntity;
 

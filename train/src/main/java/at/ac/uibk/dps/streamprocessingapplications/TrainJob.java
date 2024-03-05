@@ -63,7 +63,7 @@ public class TrainJob {
                                         argumentClass.getScalingFactor())));
 
         PCollection<DbEntry> dataFromAzureDB =
-                timerSource.apply("Table Read", ParDo.of(new TableReadBeam(p_)));
+                timerSource.apply("Table Read", ParDo.of(new TableReadBeam(p_, spoutLogFileName)));
 
         PCollection<TrainEntry> linearRegressionTrain =
                 dataFromAzureDB.apply(

@@ -2,10 +2,18 @@ package at.ac.uibk.dps.streamprocessingapplications.entity.azure;
 
 import com.microsoft.azure.storage.table.TableServiceEntity;
 
-import java.util.Random;
-
-public class SYS_data  extends TableServiceEntity {
-    private String ts, source, longitude, latitude, temperature, humidity, light, dust, airquality_raw, location, type;
+public class SYS_City extends TableServiceEntity {
+    private String ts,
+            source,
+            longitude,
+            latitude,
+            temperature,
+            humidity,
+            light,
+            dust,
+            airquality_raw,
+            location,
+            type;
     private long rangeKey;
 
     public long getRangeKey() {
@@ -103,6 +111,4 @@ public class SYS_data  extends TableServiceEntity {
     private void setType(String type) {
         this.type = type;
     }
-
 }
-

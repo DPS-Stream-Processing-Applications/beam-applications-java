@@ -47,6 +47,10 @@ public class EventGen {
                 datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
             } else if (outCSVFileName.indexOf("PLUG") != -1) {
                 datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
+            } else if (outCSVFileName.indexOf("FIT") != -1) {
+                datasetType = "FIT";
+            } else if (outCSVFileName.indexOf("GRID") != -1) {
+                datasetType = "GRID";
             }
 
             System.out.println("Dataset-Type: " + datasetType);

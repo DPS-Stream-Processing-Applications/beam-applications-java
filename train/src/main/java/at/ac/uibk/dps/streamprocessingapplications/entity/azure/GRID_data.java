@@ -2,7 +2,7 @@ package at.ac.uibk.dps.streamprocessingapplications.entity.azure;
 
 import com.microsoft.azure.storage.table.TableServiceEntity;
 
-public class GRID_data  extends TableServiceEntity {
+public final class GRID_data extends TableServiceEntity {
     private String meterid, ts, energyconsumed;
     private long rangeTs;
 

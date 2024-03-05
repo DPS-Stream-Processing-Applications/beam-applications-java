@@ -1,16 +1,20 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
-import at.ac.uibk.dps.streamprocessingapplications.utils.CityDataGenerator;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.GRID_data;
+import at.ac.uibk.dps.streamprocessingapplications.utils.GridDataGenerator;
 import com.google.common.collect.Lists;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 import org.slf4j.Logger;
 
-public class AzureTableRangeQueryTaskSYS extends AbstractTask {
+public class AzureTableRangeQueryTaskGRID extends AbstractTask {
 
     private static final Object SETUP_LOCK = new Object();
     // TODO: remove init values after config.properties has been initialized
@@ -20,7 +24,6 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
     private static boolean doneSetup = false;
     private static int startRowKey;
     private static int endRowKey;
-
     private static int useMsgField;
     private static Random rn;
 
@@ -65,14 +68,14 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
             rowKeyEnd = (String) map.get("ROWKEYEND");
             assert Integer.parseInt(rowKeyStart) >= startRowKey;
             assert Integer.parseInt(rowKeyEnd) <= endRowKey;
-            if (l.isInfoEnabled()) l.info("1-row key accesed till - " + rowKeyEnd);
+            if (l.isInfoEnabled()) l.info("1-row key accessed till - " + rowKeyEnd);
         } else {
             rowKeyStart = String.valueOf(rn.nextInt(endRowKey));
             rowKeyEnd = String.valueOf(rn.nextInt(endRowKey));
             if (l.isInfoEnabled()) l.info("2-row key accesed - " + rowKeyEnd);
         }
-        Iterable<SYS_City> result =
-                getAzTableRangeByKeySYS(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
+        Iterable<GRID_data> result =
+                getAzTableRangeByKeyTAXI(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
         System.out.println("Row key = " + rowKeyEnd);
         System.out.println("Result = " + result);
 
@@ -113,7 +116,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
      * @param l
      * @return
      */
-    public static Iterable<SYS_City> getAzTableRangeByKeySYS(
+    public static Iterable<GRID_data> getAzTableRangeByKeyTAXI(
             CloudTable cloudTable,
             String partitionKey,
             String rowkeyStart,
@@ -132,12 +135,12 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
 
             String filter2 =
                     TableQuery.generateFilterCondition(
-                            "RangeTs",
+                            "rangeTs",
                             TableQuery.QueryComparisons.GREATER_THAN_OR_EQUAL,
                             Long.parseLong(rowkeyStart)); // recordStart i.e.: "123"
             String filter3 =
                     TableQuery.generateFilterCondition(
-                            "RangeTs",
+                            "rangeTs",
                             TableQuery.QueryComparisons.LESS_THAN,
                             Long.parseLong(rowkeyEnd)); // recordEnd i.e.: "567"
 
@@ -149,12 +152,26 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
                     TableQuery.combineFilters(
                             partitionFilter, TableQuery.Operators.AND, filterRange);
 
-            TableQuery<SYS_City> rangeQuery = TableQuery.from(SYS_City.class).where(combinedFilter);
+            //			TableQuery<TaxiDropoffEntity> rangeQuery =
+            //					TableQuery.from(TaxiDropoffEntity.class)
+            //							.where(combinedFilter);
 
-            Iterable<SYS_City> queryRes = cloudTable.execute(rangeQuery);
+            //					Iterable<TaxiDropoffEntity> queryRes = cloudTable.execute(rangeQuery);
+            //			// Loop through the results, displaying information about the entity
+            //			for (TaxiDropoffEntity entity : queryRes) {
+            //				System.out.println(entity.getPartitionKey() +
+            //						" " + entity.getRowKey() +
+            //						"\t" + entity.Temperature
+            //						);
+            //			}
 
-            // Loop through the results, displaying information about the entity
-            //			for (SYS_City entity : queryRes) {
+            TableQuery<GRID_data> rangeQuery =
+                    TableQuery.from(GRID_data.class).where(combinedFilter);
+
+            Iterable<GRID_data> queryRes = cloudTable.execute(rangeQuery);
+
+            //			// Loop through the results, displaying information about the entity
+            //			for (GRID_data entity : queryRes) {
             //				System.out.println(entity.getPartitionKey() +
             //						" " + entity.getRangeKey() +
             //						"\t" + entity.getAirquality_raw()
@@ -176,7 +193,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
         long start = Long.parseLong(rowKeyStart);
         long end = Long.parseLong(rowKeyEnd);
 
-        List<SYS_City> resultList = new ArrayList<>();
+        List<GRID_data> resultList = new ArrayList<>();
         /*
         for (long i = start; start <= end; i++) {
             resultList.add(FitDataGenerator.generateRandomFITData());
@@ -185,10 +202,10 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
          */
         for (long i = 0; i <= 10; i++) {
             // FIXME!
-            resultList.add(CityDataGenerator.generateRandomCityData());
+            resultList.add(GridDataGenerator.generateRandomGridData());
         }
 
-        Iterable<SYS_City> result = resultList;
+        Iterable<GRID_data> result = resultList;
 
         super.setLastResult(result);
 

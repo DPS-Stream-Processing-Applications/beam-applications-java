@@ -107,6 +107,14 @@ public class CsvSplitter {
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
                 // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
                 //		nextLine[timestampColIndex]);
+            } else if (datasetType.equals("FIT")) {
+                timestampColIndex = 1;
+                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
+                date = new DateTime(unixEpochMillis);
+            } else if (datasetType.equals("GRID")) {
+                timestampColIndex = 1;
+                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
+                date = new DateTime(unixEpochMillis);
             }
 
             long ts = date.getMillis();

@@ -1,7 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
-import at.ac.uibk.dps.streamprocessingapplications.utils.CityDataGenerator;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
+import at.ac.uibk.dps.streamprocessingapplications.utils.TaxiDataGenerator;
 import com.google.common.collect.Lists;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
@@ -10,7 +10,7 @@ import com.microsoft.azure.storage.table.TableQuery;
 import java.util.*;
 import org.slf4j.Logger;
 
-public class AzureTableRangeQueryTaskSYS extends AbstractTask {
+public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
 
     private static final Object SETUP_LOCK = new Object();
     // TODO: remove init values after config.properties has been initialized
@@ -56,25 +56,50 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
     protected Float doTaskLogic(Map map) {
         String rowKeyStart, rowKeyEnd;
         CloudTable cloudTbl = connectToAzTable(storageConnStr, tableName, l);
-        l.warn("Table name is - " + cloudTbl.getName());
+        if (l.isInfoEnabled()) l.info("Table name is - " + cloudTbl.getName());
         // FIXME: How do you advance the rowkey. Have a start and end for row key as input property?
         //		String rowKeyStart,rowKeyEnd;
         if (useMsgField > 0) {
             //			rowKey = m.split(",")[useMsgField - 1];
             rowKeyStart = (String) map.get("ROWKEYSTART");
             rowKeyEnd = (String) map.get("ROWKEYEND");
-            assert Integer.parseInt(rowKeyStart) >= startRowKey;
-            assert Integer.parseInt(rowKeyEnd) <= endRowKey;
+            //			assert Integer.parseInt(rowKeyStart)>=startRowKey;
+            //			assert Integer.parseInt(rowKeyEnd)<=endRowKey;
             if (l.isInfoEnabled()) l.info("1-row key accesed till - " + rowKeyEnd);
         } else {
             rowKeyStart = String.valueOf(rn.nextInt(endRowKey));
             rowKeyEnd = String.valueOf(rn.nextInt(endRowKey));
             if (l.isInfoEnabled()) l.info("2-row key accesed - " + rowKeyEnd);
         }
-        Iterable<SYS_City> result =
-                getAzTableRangeByKeySYS(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
-        System.out.println("Row key = " + rowKeyEnd);
-        System.out.println("Result = " + result);
+        Iterable<Taxi_Trip> result =
+                getAzTableRangeByKeyTAXI(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
+        //		System.out.println("Row key = "+ rowKeyEnd);
+        //		System.out.println("Result = "+ result);
+
+        super.setLastResult(result);
+
+        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
+    }
+
+    public Float doTaskLogicDummy(Map map) {
+        String rowKeyStart = (String) map.get("ROWKEYSTART");
+        String rowKeyEnd = (String) map.get("ROWKEYEND");
+        long start = Long.parseLong(rowKeyStart);
+        long end = Long.parseLong(rowKeyEnd);
+
+        List<Taxi_Trip> resultList = new ArrayList<>();
+        /*
+        for (long i = start; start <= end; i++) {
+            resultList.add(FitDataGenerator.generateRandomFITData());
+
+        }
+         */
+        for (long i = 0; i <= 10; i++) {
+            // FIXME!
+            resultList.add(TaxiDataGenerator.generateRandomTaxiData());
+        }
+
+        Iterable<Taxi_Trip> result = resultList;
 
         super.setLastResult(result);
 
@@ -113,7 +138,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
      * @param l
      * @return
      */
-    public static Iterable<SYS_City> getAzTableRangeByKeySYS(
+    public static Iterable<Taxi_Trip> getAzTableRangeByKeyTAXI(
             CloudTable cloudTable,
             String partitionKey,
             String rowkeyStart,
@@ -128,7 +153,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
             // Create a filter condition where the partition key is "Smith".
             String partitionFilter =
                     TableQuery.generateFilterCondition(
-                            "PartitionKey", TableQuery.QueryComparisons.EQUAL, "sys_range");
+                            "PartitionKey", TableQuery.QueryComparisons.EQUAL, "taxi_range");
 
             String filter2 =
                     TableQuery.generateFilterCondition(
@@ -149,12 +174,26 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
                     TableQuery.combineFilters(
                             partitionFilter, TableQuery.Operators.AND, filterRange);
 
-            TableQuery<SYS_City> rangeQuery = TableQuery.from(SYS_City.class).where(combinedFilter);
+            //			TableQuery<TaxiDropoffEntity> rangeQuery =
+            //					TableQuery.from(TaxiDropoffEntity.class)
+            //							.where(combinedFilter);
 
-            Iterable<SYS_City> queryRes = cloudTable.execute(rangeQuery);
+            //					Iterable<TaxiDropoffEntity> queryRes = cloudTable.execute(rangeQuery);
+            //			// Loop through the results, displaying information about the entity
+            //			for (TaxiDropoffEntity entity : queryRes) {
+            //				System.out.println(entity.getPartitionKey() +
+            //						" " + entity.getRowKey() +
+            //						"\t" + entity.Temperature
+            //						);
+            //			}
 
-            // Loop through the results, displaying information about the entity
-            //			for (SYS_City entity : queryRes) {
+            TableQuery<Taxi_Trip> rangeQuery =
+                    TableQuery.from(Taxi_Trip.class).where(combinedFilter);
+
+            Iterable<Taxi_Trip> queryRes = cloudTable.execute(rangeQuery);
+
+            //			// Loop through the results, displaying information about the entity
+            //			for (Taxi_Trip entity : queryRes) {
             //				System.out.println(entity.getPartitionKey() +
             //						" " + entity.getRangeKey() +
             //						"\t" + entity.getAirquality_raw()
@@ -170,28 +209,54 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
         return null;
     }
 
-    public Float doTaskLogicDummy(Map map) {
-        String rowKeyStart = (String) map.get("ROWKEYSTART");
-        String rowKeyEnd = (String) map.get("ROWKEYEND");
-        long start = Long.parseLong(rowKeyStart);
-        long end = Long.parseLong(rowKeyEnd);
+    /***
+     *
+     */
 
-        List<SYS_City> resultList = new ArrayList<>();
-        /*
-        for (long i = start; start <= end; i++) {
-            resultList.add(FitDataGenerator.generateRandomFITData());
+    //	public static  final class TaxiDropoffEntity extends TableServiceEntity { // FIXME: This is
+    // specific to the input data in table
+    //
+    //		public TaxiDropoffEntity(){}
+    //
+    //		String Dropoff_datetime;
+    //	    String Dropoff_longitude;
+    //		String Fare_amount;
+    //		String Airquality_raw;
+    //
+    //
+    //	    public String getDropoff_datetime() {
+    //	        return this.Dropoff_datetime;
+    //	    }
+    //	    public String getDropoff_longitude() {
+    //	        return this.Dropoff_longitude;
+    //	    }
+    //		public String getFare_amount() {
+    //			return this.Fare_amount;
+    //		}
+    //		public String getAirquality_raw() {
+    //			return this.Airquality_raw;
+    //		}
+    //
+    //	    public void setDropoff_datetime(String Dropoff_datetime) {
+    //	        this.Dropoff_datetime = Dropoff_datetime;
+    //	    }
+    //	    public void setDropoff_longitude(String Dropoff_longitude) {
+    //	        this.Dropoff_longitude = Dropoff_longitude;
+    //	    }
+    //		public void setFare_amount(String Fare_amount) {
+    //			this.Fare_amount = Fare_amount;
+    //		}
+    //		public void setAirquality_raw(String Airquality_raw) {
+    //			this.Airquality_raw = Airquality_raw;
+    //		}
+    //
+    //		String Temperature;
+    //		public String getTemperature() {
+    //			return this.Temperature;
+    //		}
+    //		public void setTemperature(String Temperature) {
+    //			this.Temperature = Temperature;
+    //		}
+    //	}
 
-        }
-         */
-        for (long i = 0; i <= 10; i++) {
-            // FIXME!
-            resultList.add(CityDataGenerator.generateRandomCityData());
-        }
-
-        Iterable<SYS_City> result = resultList;
-
-        super.setLastResult(result);
-
-        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
-    }
 }

@@ -2,7 +2,7 @@ package at.ac.uibk.dps.streamprocessingapplications.entity.azure;
 
 import com.microsoft.azure.storage.table.TableServiceEntity;
 
-public class TAXI_data  extends TableServiceEntity {
+public class Taxi_Trip extends TableServiceEntity {
     private String taxi_identifier, hack_license, pickup_datetime, drop_datetime;
     private long rangeTs;
 
@@ -23,7 +23,11 @@ public class TAXI_data  extends TableServiceEntity {
     }
 
     private String trip_time_in_secs, trip_distance;
-    private String pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, payment_type;
+    private String pickup_longitude,
+            pickup_latitude,
+            dropoff_longitude,
+            dropoff_latitude,
+            payment_type;
     private String fare_amount, surcharge, mta_tax, tip_amount, tolls_amount, total_amount;
 
     public String getTaxi_identifier() {

@@ -1,14 +1,17 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.DbEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.azure.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.FIT_data;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskFIT;
-
+import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskGRID;
+import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskSYS;
+import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskTAXI;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
-
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,12 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     private String datatype;
 
     private AzureTableRangeQueryTaskFIT azureTableRangeQueryTaskFIT;
+
+    private AzureTableRangeQueryTaskSYS azureTableRangeQueryTaskSYS;
+
+    private AzureTableRangeQueryTaskGRID azureTableRangeQueryTaskGRID;
+
+    private AzureTableRangeQueryTaskTAXI azureTableRangeQueryTaskTAXI;
 
     // private TupleTag<String> trainData = new TupleTag<>();
     // private TupleTag<String> msgId = new TupleTag<>();
@@ -33,14 +42,18 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     private static String checkDatatype(String outCSVFileName) {
         String datasetType = "";
         if (outCSVFileName.indexOf("TAXI") != -1) {
-            datasetType = "TAXI";// GlobalConstants.dataSetType = "TAXI";
+            datasetType = "TAXI"; // GlobalConstants.dataSetType = "TAXI";
         } else if (outCSVFileName.indexOf("SYS") != -1) {
-            datasetType = "SYS";// GlobalConstants.dataSetType = "SYS";
+            datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
         } else if (outCSVFileName.indexOf("PLUG") != -1) {
-            datasetType = "PLUG";// GlobalConstants.dataSetType = "PLUG";
+            datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
+        } else if (outCSVFileName.indexOf("FIT") != -1) {
+            datasetType = "FIT";
+        } else if (outCSVFileName.indexOf("GRID") != -1) {
+            datasetType = "GRID";
         }
         if (datasetType.isEmpty()) {
-            throw new RuntimeException("Datatype could not be detected");
+            throw new RuntimeException("Datatype could not be detected in " + outCSVFileName);
         }
         return datasetType;
     }
@@ -54,6 +67,12 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
         azureTableRangeQueryTaskFIT = new AzureTableRangeQueryTaskFIT();
         initLogger(LoggerFactory.getLogger("APP"));
         azureTableRangeQueryTaskFIT.setup(l, p);
+        azureTableRangeQueryTaskGRID = new AzureTableRangeQueryTaskGRID();
+        azureTableRangeQueryTaskGRID.setup(l, p);
+        azureTableRangeQueryTaskSYS = new AzureTableRangeQueryTaskSYS();
+        azureTableRangeQueryTaskSYS.setup(l, p);
+        azureTableRangeQueryTaskTAXI = new AzureTableRangeQueryTaskTAXI();
+        azureTableRangeQueryTaskTAXI.setup(l, p);
     }
 
     @ProcessElement
@@ -68,11 +87,6 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
         HashMap<String, String> map = new HashMap();
         map.put("ROWKEYSTART", ROWKEYSTART);
         map.put("ROWKEYEND", ROWKEYEND);
-
-        //        Stopwatch stopwatch=null;
-        //        if(l.isInfoEnabled()) {
-        //            stopwatch = Stopwatch.createStarted(); //
-        //        }
 
         azureTableRangeQueryTaskFIT.doTaskLogicDummy(map);
         StringBuilder bf = new StringBuilder();
@@ -108,26 +122,58 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
                         .append("\n");
             }
         } else if (Objects.equals(datatype, "SYS")) {
+            azureTableRangeQueryTaskSYS.doTaskLogicDummy(map);
+
+            Iterable<SYS_City> result =
+                    (Iterable<SYS_City>) azureTableRangeQueryTaskSYS.getLastResult();
+
+            // Loop through the results, displaying information about the entity
+            for (SYS_City entity : result) {
+                //            System.out.println(entity.getPartitionKey() + " " +
+                // entity.getRangeKey() + "\t" + entity.getAirquality_raw() );
+                bf.append(entity.getTemperature())
+                        .append(",")
+                        .append(entity.getHumidity())
+                        .append(",")
+                        .append(entity.getLight())
+                        .append(",")
+                        .append(entity.getDust())
+                        .append(",")
+                        .append(entity.getAirquality_raw())
+                        .append("\n");
+            }
 
         } else if (Objects.equals(datatype, "TAXI")) {
+            azureTableRangeQueryTaskTAXI.doTaskLogicDummy(map);
 
+            Iterable<Taxi_Trip> result =
+                    (Iterable<Taxi_Trip>) azureTableRangeQueryTaskTAXI.getLastResult();
+
+            // Loop through the results, displaying information about the entity
+            for (Taxi_Trip entity : result) {
+                //            if(l.isInfoEnabled())
+                //            l.info("partition key {} and
+                // fareamount{}",entity.getPartitionKey(),entity.getFare_amount());
+
+                bf.append(entity.getTrip_time_in_secs())
+                        .append(",")
+                        .append(entity.getTrip_distance())
+                        .append(",")
+                        .append(entity.getFare_amount())
+                        .append("\n");
+            }
         }
-
-
         //        if(l.isInfoEnabled()) {
         //            stopwatch.stop(); // optional
         //            l.info("Time elapsed for azureTableRangeQueryTask() is {}",
         // stopwatch.elapsed(MILLISECONDS)); //
         //        }
-
         if (l.isInfoEnabled()) l.info("data for annotation {}", bf);
-
         String outputString = bf + "," + msgId + "," + ROWKEYEND;
         DbEntry entry = new DbEntry();
         entry.setMgsid(msgId);
         entry.setTrainData(bf.toString());
         entry.setRowKeyEnd(ROWKEYEND);
-
         out.output(entry);
     }
 }

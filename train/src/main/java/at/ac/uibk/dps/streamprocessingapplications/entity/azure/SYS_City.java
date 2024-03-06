@@ -11,9 +11,7 @@ public class SYS_City extends TableServiceEntity {
             humidity,
             light,
             dust,
-            airquality_raw,
-            location,
-            type;
+            airquality_raw;
     private long rangeKey;
 
     public long getRangeKey() {
@@ -96,19 +94,5 @@ public class SYS_City extends TableServiceEntity {
         this.airquality_raw = airquality_raw;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    private String getType() {
-        return type;
-    }
-
-    private void setType(String type) {
-        this.type = type;
-    }
+    public SYS_City() {}
 }

@@ -185,7 +185,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
          */
         for (long i = 0; i <= 10; i++) {
             // FIXME!
-            resultList.add(CityDataGenerator.generateRandomCityData());
+            resultList.add(CityDataGenerator.getNextDataEntry());
         }
 
         Iterable<SYS_City> result = resultList;

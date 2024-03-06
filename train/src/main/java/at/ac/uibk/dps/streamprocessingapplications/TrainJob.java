@@ -4,8 +4,7 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
@@ -17,6 +16,18 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
 public class TrainJob {
+
+    public static long countLines(String csvFile) {
+        long lines = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            while (reader.readLine() != null) lines++;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error when counting lines in csv-file");
+        }
+        return lines;
+    }
+
     public static void main(String[] args) throws Exception {
 
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
@@ -36,6 +47,8 @@ public class TrainJob {
         String taskPropFilename = argumentClass.getTasksPropertiesFilename();
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
         String inputFileName = argumentClass.getInputDatasetPathName();
+
+        long linesCount = countLines(inputFileName);
 
         Properties p_ = new Properties();
         InputStream input = new FileInputStream(taskPropFilename);
@@ -60,7 +73,8 @@ public class TrainJob {
                                 new TimerSourceBeam(
                                         inputFileName,
                                         spoutLogFileName,
-                                        argumentClass.getScalingFactor())));
+                                        argumentClass.getScalingFactor(),
+                                        (linesCount - 1))));
 
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply("Table Read", ParDo.of(new TableReadBeam(p_, spoutLogFileName)));

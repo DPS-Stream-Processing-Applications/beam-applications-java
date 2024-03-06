@@ -4,12 +4,14 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.apache.beam.sdk.transforms.DoFn;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
@@ -23,20 +25,24 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
     BatchedFileLogging ba;
     long msgId;
 
+    long numberLines;
+
     public TimerSourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
             double scalingFactor,
-            String experiRunId) {
+            String experiRunId,
+            long lines) {
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.scalingFactor = scalingFactor;
         this.experiRunId = experiRunId;
+        this.numberLines = lines;
     }
 
     public TimerSourceBeam(
-            String csvFileName, String outSpoutCSVLogFileName, double scalingFactor) {
-        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "");
+            String csvFileName, String outSpoutCSVLogFileName, double scalingFactor, long lines) {
+        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines);
     }
 
     @Setup
@@ -229,7 +235,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         // Discouraged? https://groups.google.com/forum/#!topic/storm-user/SGwih7vPiDE
         int count = 0, MAX_COUNT = 10; // FIXME?
         int sendMessages = 0;
-        while (sendMessages < 7) {
+        while (sendMessages < numberLines) {
             // while (count < MAX_COUNT) {
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
             if (entry == null) {

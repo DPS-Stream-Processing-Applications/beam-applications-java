@@ -8,9 +8,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
- * Splits the CSV file in round-robin manner and stores it to individual files
- * based on the number of threads
+/**
+ * Splits the CSV file in round-robin manner and stores it to individual files based on the number
+ * of threads
  */
 public class CsvSplitter {
     public static Logger LOG = LoggerFactory.getLogger(CsvSplitter.class);
@@ -86,10 +86,8 @@ public class CsvSplitter {
                                 .parseDateTime(nextLine[timestampColIndex]);
 
                  */
-                timestampColIndex = 2;
-                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
-                date = new DateTime(unixEpochMillis);
-
+                timestampColIndex = 1;
+                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
             } else if (datasetType.equals("SYS")) {
                 /*
                 timestampColIndex = 0;

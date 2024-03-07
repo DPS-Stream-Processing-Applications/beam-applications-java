@@ -1,0 +1,30 @@
+@relation FIT_data
+
+@attribute subjectId numeric
+@attribute acc_chest_x numeric
+@attribute acc_chest_y numeric
+@attribute acc_chest_z numeric
+@attribute ecg_lead_1 numeric
+@attribute ecg_lead_2 numeric
+@attribute acc_ankle_x numeric
+@attribute acc_ankle_y numeric
+@attribute acc_ankle_z numeric
+@attribute gyro_ankle_x numeric
+@attribute gyro_ankle_y numeric
+@attribute gyro_ankle_z numeric
+@attribute magnetometer_ankle_x numeric
+@attribute magnetometer_ankle_y numeric
+@attribute magnetometer_ankle_z numeric
+@attribute acc_arm_x numeric
+@attribute acc_arm_y numeric
+@attribute acc_arm_z numeric
+@attribute gyro_arm_x numeric
+@attribute gyro_arm_y numeric
+@attribute gyro_arm_z numeric
+@attribute magnetometer_arm_x numeric
+@attribute magnetometer_arm_y numeric
+@attribute magnetometer_arm_z numeric
+@attribute label {label_value_1, label_value_2, label_value_3}  % Assuming label is nominal
+
+@data
+% Insert data instances here

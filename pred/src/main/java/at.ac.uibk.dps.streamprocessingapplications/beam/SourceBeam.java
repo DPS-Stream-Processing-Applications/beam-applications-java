@@ -49,7 +49,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             e.printStackTrace();
         }
         this.eventGen = new EventGen(this, this.scalingFactor);
-        this.eventQueue = new LinkedBlockingQueue<List<String>>();
+        this.eventQueue = new LinkedBlockingQueue<>();
         String uLogfilename = this.outSpoutCSVLogFileName + msgId;
         this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); // Launch threads
     }
@@ -77,6 +77,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             values.setPayLoad(newRow);
             out.output(values);
         }
+        System.out.println("left loop");
     }
 
     @Override
@@ -86,10 +87,5 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @Teardown
-    public void cleanUp() {
-        this.eventGen.tearDown();
     }
 }

@@ -8,16 +8,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.apache.beam.runners.flink.FlinkPipelineOptions;
+import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
-import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -47,7 +46,13 @@ public class PredJob {
         InputStream input = new FileInputStream(taskPropFilename);
         p_.load(input);
 
-        PipelineOptions options = PipelineOptionsFactory.create();
+        FlinkPipelineOptions options =
+                PipelineOptionsFactory.create()
+                        // .withValidation()
+                        .as(FlinkPipelineOptions.class);
+        options.setRunner(FlinkRunner.class);
+        options.setParallelism(1);
+
         // Create pipeline
         Pipeline p = Pipeline.create(options);
 
@@ -56,6 +61,7 @@ public class PredJob {
 
         PCollection<MqttSubscribeEntry> sourceDataMqtt =
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
+
         PCollection<BlobReadEntry> blobRead =
                 sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
@@ -77,6 +83,7 @@ public class PredJob {
                                 System.out.println(c.element());
                             }
                         }));
+        /*
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_)));
 
@@ -131,9 +138,20 @@ public class PredJob {
             }
         }));
 
+
+        out.apply(
+                "Print Result",
+                ParDo.of(
+                        new DoFn<String, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Print " + c.element());
+                            }
+                        }));
+
          */
 
-        out.apply("Write to File", TextIO.write().to("build/output/output.txt"));
+        // out.apply("Write to File", TextIO.write().to("build/output/output.txt"));
 
         p.run().waitUntilFinish();
     }

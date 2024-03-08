@@ -54,7 +54,7 @@ public class MqttSubscribeEntry implements Serializable {
     @Override
     public String toString() {
         return "MqttSubscribeEntry{"
-                + "Analaytictype='"
+                + "Analytictype='"
                 + Analaytictype
                 + '\''
                 + ", BlobModelPath='"

@@ -106,7 +106,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
                 obsVal.append((String) resultMap.get((String) observableFields.get(j)));
                 obsVal.append(",");
             }
-            obsVal.substring(0, obsVal.length() - 1);
+            // obsVal.substring(0, obsVal.length() - 1);
 
             out.output(
                     new SenMlEntry(

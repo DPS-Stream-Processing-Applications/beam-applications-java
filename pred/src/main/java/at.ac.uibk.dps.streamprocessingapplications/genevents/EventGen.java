@@ -191,7 +191,6 @@ class SubEventGen implements Runnable {
                 Long deltaTs = timestamps.get(i);
                 List<String> event = rows.get(i);
                 Long currentTs = System.currentTimeMillis();
-                System.out.println("experiRestartTime " + experiRestartTime);
                 long delay =
                         deltaTs
                                 - (currentTs

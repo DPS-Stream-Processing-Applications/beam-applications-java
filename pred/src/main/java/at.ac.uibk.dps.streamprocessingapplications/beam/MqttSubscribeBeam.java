@@ -55,6 +55,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         map.put(AbstractTask.DEFAULT_KEY, "dummy");
         mqttSubscribeTask.doTask(map);
         String arg1 = (String) mqttSubscribeTask.getLastResult();
+        // FIXME!
         arg1 = "12-test";
 
         //        if(l.isInfoEnabled())
@@ -68,8 +69,10 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
                 // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException("Exception in processElement of MqttBeam " + e);
             }
             if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
+            System.out.println("arg " + arg1);
             out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
         }
     }

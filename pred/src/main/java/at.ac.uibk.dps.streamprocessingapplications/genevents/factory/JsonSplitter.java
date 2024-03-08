@@ -26,14 +26,11 @@ public class JsonSplitter {
             CSVReader reader = new CSVReader(new FileReader(inputFileName));
             String[] headers = reader.readNext(); // use .intern() later
             reader.close();
-            List<String> headerList = new ArrayList<String>();
+            List<String> headerList = new ArrayList<>();
             for (String s : headers) {
                 headerList.add(s);
             }
             return headerList;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -72,7 +69,7 @@ public class JsonSplitter {
         MyJSONReader jsonReader = new MyJSONReader(inputSortedCSVFileName);
         nextLine = jsonReader.readLine();
         while ((nextLine = jsonReader.readLine()) != null) {
-            List<String> row = new ArrayList<String>();
+            List<String> row = new ArrayList<>();
             for (int i = 0; i < nextLine.length; i++) {
                 row.add(nextLine[i]);
             }
@@ -82,6 +79,7 @@ public class JsonSplitter {
 
             int timestampColIndex = 0;
             DateTime date = null;
+            // FIXME!
             datasetType = "SENML";
             if (datasetType.equals("TAXI")) {
                 timestampColIndex = 3;

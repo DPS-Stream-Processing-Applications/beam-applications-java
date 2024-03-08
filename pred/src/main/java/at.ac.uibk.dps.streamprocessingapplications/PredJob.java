@@ -15,8 +15,10 @@ import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -62,9 +64,6 @@ public class PredJob {
         PCollection<MqttSubscribeEntry> sourceDataMqtt =
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
 
-        PCollection<BlobReadEntry> blobRead =
-                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
-
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
                         "Source",
@@ -74,16 +73,19 @@ public class PredJob {
                                         spoutLogFileName,
                                         argumentClass.getScalingFactor())));
 
-        sourceData.apply(
+        sourceDataMqtt.apply(
                 "Print Result",
                 ParDo.of(
-                        new DoFn<SourceEntry, Void>() {
-                            @DoFn.ProcessElement
+                        new DoFn<MqttSubscribeEntry, Void>() {
+                            @ProcessElement
                             public void processElement(ProcessContext c) {
                                 System.out.println(c.element());
                             }
                         }));
-        /*
+
+        PCollection<BlobReadEntry> blobRead =
+                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
+
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_)));
 

@@ -19,19 +19,24 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     EventGen eventGen;
     long msgId;
 
+    long numberLines;
+
     public SourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
             double scalingFactor,
-            String experiRunId) {
+            String experiRunId,
+            long lines) {
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.scalingFactor = scalingFactor;
         this.experiRunId = experiRunId;
+        this.numberLines = lines;
     }
 
-    public SourceBeam(String csvFileName, String outSpoutCSVLogFileName, double scalingFactor) {
-        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "");
+    public SourceBeam(
+            String csvFileName, String outSpoutCSVLogFileName, double scalingFactor, long lines) {
+        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines);
     }
 
     @Setup
@@ -58,13 +63,15 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     public void processElement(@Element String input, OutputReceiver<SourceEntry> out)
             throws IOException {
         int count = 0, MAX_COUNT = 100; // FIXME?
-        while (count < MAX_COUNT) {
+        while (count < numberLines) {
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
             if (entry == null) {
                 // return;
                 continue;
             }
             count++;
+            System.out.println("Count: " + count);
+            System.out.println(count);
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
             for (String s : entry) {

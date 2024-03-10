@@ -120,6 +120,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error in SenMlParseBeam");
         }
     }
 

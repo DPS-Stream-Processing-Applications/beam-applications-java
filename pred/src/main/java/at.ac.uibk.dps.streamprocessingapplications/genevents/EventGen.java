@@ -151,6 +151,7 @@ public class EventGen {
             e.printStackTrace();
             throw new RuntimeException("Error in launching EventGen " + e);
         }
+        System.out.println("out of launch");
     }
 }
 
@@ -205,6 +206,7 @@ class SubEventGen implements Runnable {
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 }
                 this.iseg.receive(event);

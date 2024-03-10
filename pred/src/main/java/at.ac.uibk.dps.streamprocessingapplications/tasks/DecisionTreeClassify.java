@@ -118,7 +118,8 @@ public class DecisionTreeClassify extends AbstractTask {
             return Float.valueOf(classification);
         } catch (Exception e) {
             l.warn("error with clasification of testInstance: " + testInstance, e);
-            return Float.valueOf(Float.MIN_VALUE);
+            throw new RuntimeException(e);
+            // return Float.valueOf(Float.MIN_VALUE);
         }
     }
 }

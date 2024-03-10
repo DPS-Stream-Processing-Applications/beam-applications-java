@@ -4,25 +4,44 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.Flatten;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class PredJob {
+
+    public static long countLines(String csvFile) {
+        long lines = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            while (reader.readLine() != null) lines++;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error when counting lines in csv-file " + e);
+        }
+        return lines;
+    }
+
+    public static String checkDataType(String fileName) {
+        if (fileName.contains("SYS")) {
+            return "SYS";
+        } else if (fileName.contains("FIT")) {
+            return "FIT";
+        } else if (fileName.contains("TAXI")) {
+            return "TAXI";
+
+        } else if (fileName.contains("GRID")) {
+            return "GRID";
+        }
+        return null;
+    }
+
     public static void main(String[] args) throws IOException {
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
         if (argumentClass == null) {
@@ -47,6 +66,13 @@ public class PredJob {
         Properties p_ = new Properties();
         InputStream input = new FileInputStream(taskPropFilename);
         p_.load(input);
+        long lines = countLines(inputFileName);
+        System.out.println("lines: " + lines);
+        String dataSetType = checkDataType(inputFileName);
+        System.out.println("Datatype: " + dataSetType);
+        if (dataSetType == null) {
+            throw new RuntimeException("Type could not be detected");
+        }
 
         FlinkPipelineOptions options =
                 PipelineOptionsFactory.create()
@@ -58,11 +84,24 @@ public class PredJob {
         // Create pipeline
         Pipeline p = Pipeline.create(options);
 
-        PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
-        inputFile = p.apply(Create.of("test"));
-
+        // PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
+        PCollection<String> inputFile = p.apply(Create.of("test"));
+        /*
         PCollection<MqttSubscribeEntry> sourceDataMqtt =
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
+
+        PCollection<BlobReadEntry> blobRead =
+                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
+
+        blobRead.apply(
+                "Print Result",
+                ParDo.of(
+                        new DoFn<BlobReadEntry, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println(c.element());
+                            }
+                        }));
 
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
@@ -71,20 +110,8 @@ public class PredJob {
                                 new SourceBeam(
                                         inputFileName,
                                         spoutLogFileName,
-                                        argumentClass.getScalingFactor())));
-
-        sourceDataMqtt.apply(
-                "Print Result",
-                ParDo.of(
-                        new DoFn<MqttSubscribeEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println(c.element());
-                            }
-                        }));
-
-        PCollection<BlobReadEntry> blobRead =
-                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
+                                        argumentClass.getScalingFactor(),
+                                        lines)));
 
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_)));
@@ -98,7 +125,7 @@ public class PredJob {
         PCollection<LinearRegressionEntry> linearRegression =
                 PCollectionList.of(linearRegression1)
                         .and(linearRegression2)
-                        .apply("Merge PCollections", Flatten.<LinearRegressionEntry>pCollections());
+                        .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<DecisionTreeEntry> decisionTree1 =
                 blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_)));
@@ -107,7 +134,7 @@ public class PredJob {
         PCollection<DecisionTreeEntry> decisionTree =
                 PCollectionList.of(decisionTree1)
                         .and(decisionTree2)
-                        .apply("Merge PCollections", Flatten.<DecisionTreeEntry>pCollections());
+                        .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<AverageEntry> average =
                 mlParseData.apply("Average", ParDo.of(new AverageBeam(p_)));
@@ -119,7 +146,7 @@ public class PredJob {
         PCollection<ErrorEstimateEntry> errorEstimate =
                 PCollectionList.of(errorEstimate1)
                         .and(errorEstimate2)
-                        .apply("Merge PCollections", Flatten.<ErrorEstimateEntry>pCollections());
+                        .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<MqttPublishEntry> publish1 =
                 errorEstimate.apply("MQTT Publish", ParDo.of(new MqttPublishBeam1(p_)));
@@ -128,7 +155,7 @@ public class PredJob {
         PCollection<MqttPublishEntry> publish =
                 PCollectionList.of(publish1)
                         .and(publish2)
-                        .apply("Merge PCollections", Flatten.<MqttPublishEntry>pCollections());
+                        .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
 
@@ -151,10 +178,20 @@ public class PredJob {
                             }
                         }));
 
-         */
+
 
         // out.apply("Write to File", TextIO.write().to("build/output/output.txt"));
 
-        p.run().waitUntilFinish();
+        PCollection<Long> count = out.apply("Count", Count.globally());
+        count.apply(
+                ParDo.of(
+                        new DoFn<Long, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Length of PCollection: " + c.element());
+                            }
+                        }));
+        */
+        p.run();
     }
 }

@@ -53,7 +53,7 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
         byte[] BlobModelObject = azureBlobDownloadTask.getLastResult();
 
         if (l.isInfoEnabled())
-            l.info("downloded updated model file {} with size {}", BlobModelPath, 23);
+            l.info("downloaded updated model file {} with size {}", BlobModelPath, 23);
 
         // FIXME: read and emit model for DTC
         out.output(new BlobReadEntry(BlobModelObject, msgId, "modelupdate", analyticsType, "meta"));

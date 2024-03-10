@@ -62,14 +62,13 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     @ProcessElement
     public void processElement(@Element String input, OutputReceiver<SourceEntry> out)
             throws IOException {
-        int count = 0, MAX_COUNT = 100; // FIXME?
+        long count = 1, MAX_COUNT = 100; // FIXME?
         while (count < numberLines) {
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
             if (entry == null) {
                 // return;
                 continue;
             }
-            count++;
             System.out.println("Count: " + count);
             System.out.println(count);
             SourceEntry values = new SourceEntry();
@@ -83,6 +82,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             values.setMsgid(Long.toString(msgId));
             values.setPayLoad(newRow);
             out.output(values);
+            count++;
         }
         System.out.println("left loop");
     }

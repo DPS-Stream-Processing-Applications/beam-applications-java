@@ -12,6 +12,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -69,7 +70,7 @@ public class PredJob {
         long lines = countLines(inputFileName);
         System.out.println("lines: " + lines);
         String dataSetType = checkDataType(inputFileName);
-        System.out.println("Datatype: " + dataSetType);
+        // System.out.println("Datatype: " + dataSetType);
         if (dataSetType == null) {
             throw new RuntimeException("Type could not be detected");
         }
@@ -86,7 +87,7 @@ public class PredJob {
 
         // PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
         PCollection<String> inputFile = p.apply(Create.of("test"));
-        /*
+
         PCollection<MqttSubscribeEntry> sourceDataMqtt =
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
 
@@ -159,14 +160,15 @@ public class PredJob {
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
 
-        /*
-        out.apply("Print Result", ParDo.of(new DoFn<String, Void>() {
-            @ProcessElement
-            public void processElement(ProcessContext c) {
-                System.out.println(c.element());
-            }
-        }));
-
+        out.apply(
+                "Print Result",
+                ParDo.of(
+                        new DoFn<String, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println(c.element());
+                            }
+                        }));
 
         out.apply(
                 "Print Result",
@@ -178,11 +180,9 @@ public class PredJob {
                             }
                         }));
 
-
-
         // out.apply("Write to File", TextIO.write().to("build/output/output.txt"));
 
-        PCollection<Long> count = out.apply("Count", Count.globally());
+        PCollection<Long> count = sourceData.apply("Count", Count.globally());
         count.apply(
                 ParDo.of(
                         new DoFn<Long, Void>() {
@@ -191,7 +191,7 @@ public class PredJob {
                                 System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
-        */
+
         p.run();
     }
 }

@@ -21,12 +21,12 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
     private static int useMsgField;
 
     private static String modelFilePath;
-    private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
+    // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
     // for taxi dataset
-    //	private static final String SAMPLE_INPUT = "420,1.95,8.00";
+    private static final String SAMPLE_INPUT = "420,1.95,8.00";
 
     // private static String SAMPLE_HEADER = "";
-    //			"@RELATION sys_data\n" +
+    //			"@RELATION city_data\n" +
     //			"\n" +
     ////			"@ATTRIBUTE Longi            NUMERIC\n" +
     ////			"@ATTRIBUTE Lat              NUMERIC\n" +
@@ -40,7 +40,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
     //			"%header format";
 
     private static String SAMPLE_HEADER =
-            "@RELATION sys_data\n"
+            "@RELATION taxi_data\n"
                     + "\n"
                     + "@ATTRIBUTE triptimeInSecs             NUMERIC\n"
                     + "@ATTRIBUTE tripDistance            NUMERIC\n"
@@ -98,6 +98,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 } catch (Exception e) {
                     l.warn("error loading decision tree model from file: " + modelFilePath, e);
                     doneSetup = false;
+                    throw new RuntimeException("Error loading decision tree model from file " + e);
                 }
             }
         }
@@ -116,13 +117,17 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 testTuple = SAMPLE_INPUT.split(",");
             }
             //			testTuple="22.7,49.3,0,1955.22,27".split(","); //dummy
-            if (instanceHeader == null) {
-                throw new RuntimeException("instanceHeader is null");
-            }
 
             instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
+            if (instanceHeader == null) {
+                throw new RuntimeException("InstanceHeader is null");
+            }
+
+            // FIXME!
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
+
             int prediction = (int) lr.classifyInstance(testInstance);
+            // int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);
@@ -135,7 +140,8 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
         } catch (Exception e) {
             l.warn("error with classification of testInstance: " + testInstance, e);
             // set parent to have the actual predictions
-            return super.setLastResult(Float.MIN_VALUE);
+            throw new RuntimeException("Exception in doTaskLogic of Linear_Reg_Pred " + e);
+            // return super.setLastResult(Float.MIN_VALUE);
         }
     }
 }

@@ -12,7 +12,6 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -68,7 +67,6 @@ public class PredJob {
         p_.load(input);
         long lines = countLines(inputFileName);
         String dataSetType = checkDataType(inputFileName);
-        // System.out.println("Datatype: " + dataSetType);
         if (dataSetType == null) {
             throw new RuntimeException("Type could not be detected");
         }
@@ -108,6 +106,7 @@ public class PredJob {
         PCollection<LinearRegressionEntry> linearRegression1 =
                 mlParseData.apply(
                         "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam1(p_)));
+        /*
         PCollection<LinearRegressionEntry> linearRegression2 =
                 blobRead.apply(
                         "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam2(p_)));
@@ -115,7 +114,6 @@ public class PredJob {
                 PCollectionList.of(linearRegression1)
                         .and(linearRegression2)
                         .apply("Merge PCollections", Flatten.pCollections());
-
         PCollection<DecisionTreeEntry> decisionTree1 =
                 blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_)));
         PCollection<DecisionTreeEntry> decisionTree2 =
@@ -147,7 +145,7 @@ public class PredJob {
                         .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
-
+        */
         p.run();
     }
 }

@@ -35,9 +35,15 @@ public class WekaUtil {
     public static Instance prepareInstance(Instances instanceHeader, String[] testTuple, Logger l) {
         Instance instance = new Instance(testTuple.length);
         instance.setDataset(instanceHeader);
+        System.out.println("length: " + testTuple.length);
 
-        for (int m = 0; m < testTuple.length; m++) {
-            instance.setValue(instanceHeader.attribute(m), Double.parseDouble(testTuple[m]));
+        try {
+            for (int m = 0; m < testTuple.length; m++) {
+                instance.setValue(instanceHeader.attribute(m), Double.parseDouble(testTuple[m]));
+                System.out.println("m: " + m);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error in prepareInstance " + e);
         }
 
         return instance;
@@ -71,10 +77,12 @@ public class WekaUtil {
             // Read the training data
             trainingData = new Instances(reader);
             // Setting class attribute to last field
+            System.out.println("num " + trainingData.numAttributes());
             trainingData.setClassIndex(trainingData.numAttributes() - 1);
         } catch (IOException e) {
             l.warn("error loading training instances", e);
-            return null;
+            throw new RuntimeException("Error loading training instances " + e);
+            // return null;
         }
         return trainingData;
     }

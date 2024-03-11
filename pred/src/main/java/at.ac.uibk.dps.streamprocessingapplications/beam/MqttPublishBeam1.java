@@ -70,7 +70,7 @@ public class MqttPublishBeam1 extends DoFn<ErrorEstimateEntry, MqttPublishEntry>
     }
 
     @Teardown
-    public void clearUp() {
+    public void cleanUp() {
         mqttPublishTask.tearDown();
     }
 }

@@ -50,8 +50,9 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        // Float res; = linearRegressionPredictor.doTask(map);
-        Float res = Float.valueOf("1");
+        // FIXME!
+        Float res = linearRegressionPredictor.doTask(map);
+        // Float res = Float.valueOf("1");
 
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 

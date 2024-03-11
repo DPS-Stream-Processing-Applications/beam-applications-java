@@ -18,7 +18,6 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
     public void setup() throws MqttException {
         linearRegressionPredictor = new LinearRegressionPredictor();
         initLogger(LoggerFactory.getLogger("APP"));
-        System.out.println(l);
         linearRegressionPredictor.setup(l, p);
     }
 
@@ -56,9 +55,10 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        // Float res; = linearRegressionPredictor.doTask(map);
-        Float res = Float.valueOf("1");
+        Float res = linearRegressionPredictor.doTask(map);
+        res = Float.valueOf("1");
 
+        // out.output(new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR"));
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
         if (res != null) {

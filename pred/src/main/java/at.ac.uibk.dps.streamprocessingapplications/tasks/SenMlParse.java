@@ -21,6 +21,8 @@ public class SenMlParse extends AbstractTask<String, Map> {
     private static int useMsgField;
     private String sampledata;
 
+    private String dataSetType;
+
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
         synchronized (SETUP_LOCK) {
@@ -30,6 +32,10 @@ public class SenMlParse extends AbstractTask<String, Map> {
             }
             sampledata = p_.getProperty("PARSE.SENML.SAMPLEDATA");
         }
+    }
+
+    public SenMlParse(String dataSetType) {
+        this.dataSetType = dataSetType;
     }
 
     @Override
@@ -43,13 +49,19 @@ public class SenMlParse extends AbstractTask<String, Map> {
             else m = (String) map.get(AbstractTask.DEFAULT_KEY);
             jsonObject = (JSONObject) jsonParser.parse(m);
             /*this is for TAXI dataset*/
-            long baseTime =
-                    (long)
-                            (jsonObject.get("bt") == null
-                                    ? 0L
-                                    : jsonObject.get("bt")); // for sys and taxi
-            //			long baseTime =   Long.parseLong(((String)jsonObject.get("bt"))) ;     // for fit
-            // dataset
+            long baseTime = 0L;
+            if (dataSetType.equals("TAXI") | dataSetType.equals("SYS")) {
+                baseTime =
+                        (long)
+                                (jsonObject.get("bt") == null
+                                        ? 0L
+                                        : jsonObject.get("bt")); // for sys and taxi
+            }
+            if (dataSetType.equals("FIT")) {
+                baseTime = Long.parseLong(((String) jsonObject.get("bt"))); // for fit
+                // dataset
+            }
+
             String baseUnit =
                     (String) ((jsonObject.get("bu") == null) ? null : jsonObject.get("bu"));
             String baseName =
@@ -84,7 +96,7 @@ public class SenMlParse extends AbstractTask<String, Map> {
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return 0.0f;
     }
 }

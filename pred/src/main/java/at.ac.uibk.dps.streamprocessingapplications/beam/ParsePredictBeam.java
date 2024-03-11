@@ -17,9 +17,11 @@ import org.slf4j.LoggerFactory;
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
     private Properties p;
+    private String dataSetType;
 
-    public ParsePredictBeam(Properties p_) {
+    public ParsePredictBeam(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
 
     private static Logger l;
@@ -38,7 +40,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
         try {
             initLogger(LoggerFactory.getLogger("APP"));
-            senMLParseTask = new SenMlParse();
+            senMLParseTask = new SenMlParse(dataSetType);
             senMLParseTask.setup(l, p);
             observableFields = new ArrayList();
             String line;
@@ -58,7 +60,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             line = br.readLine();
             String[] obsType = line.split(",");
             for (int i = 0; i < obsType.length; i++) {
-                if (metaList.contains(obsType[i]) == false) {
+                if (!metaList.contains(obsType[i])) {
                     observableFields.add(obsType[i]);
                 }
             }
@@ -120,7 +122,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error in SenMlParseBeam");
+            throw new RuntimeException("Error in ParsePredictBeam " + e);
         }
     }
 

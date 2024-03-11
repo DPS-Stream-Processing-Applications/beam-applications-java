@@ -60,7 +60,6 @@ public class PredJob {
         String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
         // String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
         String taskPropFilename = argumentClass.getTasksPropertiesFilename();
-        System.out.println("taskPropFilename-" + taskPropFilename);
         String inputFileName = argumentClass.getInputDatasetPathName();
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
 
@@ -68,7 +67,6 @@ public class PredJob {
         InputStream input = new FileInputStream(taskPropFilename);
         p_.load(input);
         long lines = countLines(inputFileName);
-        System.out.println("lines: " + lines);
         String dataSetType = checkDataType(inputFileName);
         // System.out.println("Datatype: " + dataSetType);
         if (dataSetType == null) {
@@ -94,16 +92,6 @@ public class PredJob {
         PCollection<BlobReadEntry> blobRead =
                 sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
-        blobRead.apply(
-                "Print Result",
-                ParDo.of(
-                        new DoFn<BlobReadEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println(c.element());
-                            }
-                        }));
-
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
                         "Source",
@@ -115,7 +103,7 @@ public class PredJob {
                                         lines)));
 
         PCollection<SenMlEntry> mlParseData =
-                sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_)));
+                sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType)));
 
         PCollection<LinearRegressionEntry> linearRegression1 =
                 mlParseData.apply(
@@ -159,38 +147,6 @@ public class PredJob {
                         .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
-
-        out.apply(
-                "Print Result",
-                ParDo.of(
-                        new DoFn<String, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println(c.element());
-                            }
-                        }));
-
-        out.apply(
-                "Print Result",
-                ParDo.of(
-                        new DoFn<String, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("Print " + c.element());
-                            }
-                        }));
-
-        // out.apply("Write to File", TextIO.write().to("build/output/output.txt"));
-
-        PCollection<Long> count = sourceData.apply("Count", Count.globally());
-        count.apply(
-                ParDo.of(
-                        new DoFn<Long, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("Length of PCollection: " + c.element());
-                            }
-                        }));
 
         p.run();
     }

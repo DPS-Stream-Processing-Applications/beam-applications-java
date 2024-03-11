@@ -78,7 +78,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     }
 
     @Teardown
-    public void clearUp() {
+    public void cleanUp() {
         mqttSubscribeTask.tearDown();
     }
 }

@@ -16,7 +16,7 @@ public class Sink extends DoFn<MqttPublishEntry, String> {
         this.csvFileNameOutSink = csvFileNameOutSink;
     }
 
-    @DoFn.ProcessElement
+    @ProcessElement
     public void processElement(@Element MqttPublishEntry input, OutputReceiver<String> out) {
         String msgId = input.getMsgid();
         out.output(msgId);

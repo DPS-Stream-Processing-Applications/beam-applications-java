@@ -14,9 +14,11 @@ import org.slf4j.LoggerFactory;
 
 public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     private Properties p;
+    private String dataSetType;
 
-    public DecisionTreeBeam2(Properties p_) {
+    public DecisionTreeBeam2(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
 
     private static Logger l;
@@ -30,7 +32,7 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
-        decisionTreeClassify = new DecisionTreeClassify();
+        decisionTreeClassify = new DecisionTreeClassify(dataSetType);
         decisionTreeClassify.setup(l, p);
     }
 
@@ -42,8 +44,14 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
         String analyticsType = input.getAnalyticType();
         String sensorMeta = input.getMeta();
 
-        String obsVal = "10,1955.22,27"; // dummy
+        String obsVal = "0";
         String msgId = "0";
+        if (dataSetType.equals("FIT") | dataSetType.equals("TAXI")) {
+            obsVal = "10,1955.22,27"; // dummy
+        }
+        if (dataSetType.equals("SYS")) {
+            obsVal = "22.7,49.3,0,1955.22,27"; // dummy
+        }
 
         /* We are getting an model update message so we will update the model only*/
 
@@ -61,10 +69,10 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        Float res;
-        // Float res = decisionTreeClassify.doTask(map);  // index of result-class/enum as return
+        // FIXME !
+        Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
         //        System.out.println("TestS: DT res " +res);
-        res = Float.valueOf("1");
+        // res = Float.valueOf("1");
         if (res != null) {
             if (res != Float.MIN_VALUE)
                 out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));

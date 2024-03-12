@@ -129,9 +129,11 @@ public class PredJob {
                         }));
 
         PCollection<DecisionTreeEntry> decisionTree1 =
-                blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_)));
+                blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_, dataSetType)));
+        /*
         PCollection<DecisionTreeEntry> decisionTree2 =
-                mlParseData.apply("Decision Tree", ParDo.of(new DecisionTreeBeam2(p_)));
+                mlParseData.apply(
+                        "Decision Tree", ParDo.of(new DecisionTreeBeam2(p_, dataSetType)));
         PCollection<DecisionTreeEntry> decisionTree =
                 PCollectionList.of(decisionTree1)
                         .and(decisionTree2)
@@ -160,7 +162,11 @@ public class PredJob {
                         .and(publish2)
                         .apply("Merge PCollections", Flatten.pCollections());
 
+
+
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+
+         */
 
         p.run();
     }

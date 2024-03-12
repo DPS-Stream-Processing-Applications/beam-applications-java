@@ -48,13 +48,21 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             FileReader reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
             /* read meta field list from property */
             String meta = p.getProperty("PARSE.META_FIELD_SCHEMA");
+
             if (dataSetType.equals("TAXI")) {
-                idField = p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI");
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
                 reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
             }
             if (dataSetType.equals("SYS")) {
-                idField = p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS");
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
                 reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS"));
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
+            }
+            if (dataSetType.equals("FIT")) {
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
+                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS"));
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
             }
             metaFields = meta.split(",");
             for (int i = 0; i < metaFields.length; i++) {

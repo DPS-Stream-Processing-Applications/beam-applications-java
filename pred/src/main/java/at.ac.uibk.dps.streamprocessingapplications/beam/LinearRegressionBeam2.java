@@ -4,13 +4,17 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.LinearRegressionEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.LinearRegressionPredictor;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.classifiers.functions.LinearRegression;
+import weka.core.SerializationHelper;
 
 public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionEntry> {
 
@@ -18,14 +22,15 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
     public void setup() throws MqttException {
         linearRegressionPredictor = new LinearRegressionPredictor();
         initLogger(LoggerFactory.getLogger("APP"));
-        System.out.println(l);
         linearRegressionPredictor.setup(l, p);
     }
 
     private Properties p;
+    private String dataSetType;
 
-    public LinearRegressionBeam2(Properties p_) {
+    public LinearRegressionBeam2(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
 
     private static Logger l;
@@ -45,14 +50,45 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
         String msgtype = input.getMsgType();
         String analyticsType = input.getAnalyticType();
 
-        String obsVal = "10,1955.22,27";
+        String obsVal = "Jona";
         String msgId = "0";
+
+        if (dataSetType.equals("TAXI")) {
+            obsVal = "10,1955.22,27";
+        }
+        if (dataSetType.equals("SYS")) {
+            obsVal = "22.7,49.3,0,1955.22,27";
+        }
+
+        if (msgtype.equals("modelupdate") && analyticsType.equals("MLR")) {
+            byte[] BlobModelObject = (byte[]) input.getBlobModelObject();
+            InputStream bytesInputStream = new ByteArrayInputStream(BlobModelObject);
+            //            if(l.isInfoEnabled())
+            //                l.info("blob model size "+blobModelObject.toString());
+
+            // TODO:  1- Either write model file to local disk - no task code change
+            // TODO:  2- Pass it as bytestream , need to update the code for task
+
+            try {
+                LinearRegressionPredictor.lr =
+                        (LinearRegression) SerializationHelper.read(bytesInputStream);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error, when reading BlobObject " + e);
+            }
+            if (this.l.isInfoEnabled()) {
+                this.l.info("Model is updated MLR {} ", LinearRegressionPredictor.lr.toString());
+            }
+        }
+
+        if (!msgtype.equals("modelupdate")) {
+            msgId = input.getMsgid();
+        }
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        // FIXME!
+
         Float res = linearRegressionPredictor.doTask(map);
-        // Float res = Float.valueOf("1");
 
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 

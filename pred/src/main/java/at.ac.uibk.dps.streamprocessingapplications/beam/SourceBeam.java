@@ -69,8 +69,6 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
                 // return;
                 continue;
             }
-            System.out.println("Count: " + count);
-            System.out.println(count);
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
             for (String s : entry) {

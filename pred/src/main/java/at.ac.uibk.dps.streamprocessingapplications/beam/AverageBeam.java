@@ -28,11 +28,13 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
 
     private Properties p;
     private ArrayList<String> useMsgList;
+    private final String dataSetType;
 
     private static Logger l;
 
-    public AverageBeam(Properties p_) {
+    public AverageBeam(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
 
     public static void initLogger(Logger l_) {
@@ -49,8 +51,21 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
         String sensorID = input.getSensorID();
         String obsType = input.getObsType();
         String obsVal = input.getObsVal();
-        obsVal = "12,13,14";
-        String fare_amount = obsVal.split(",")[2]; // fare_amount as last obs. in input
+
+        // FIXME!
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        if (dataSetType.equals("TAXI")) {
+            // obsVal = "12,13,14";
+            String fare_amount = obsVal.split(",")[2]; // fare_amount as last obs. in input
+            map.put(AbstractTask.DEFAULT_KEY, fare_amount);
+        }
+
+        if (dataSetType.equals("SYS")) {
+            String airquality = obsVal.split(",")[4]; // airquality as last obs. in input
+            map.put(AbstractTask.DEFAULT_KEY, airquality);
+        }
+
         if (useMsgList.contains(obsType)) {
             String key = sensorID + obsType;
             BlockWindowAverage blockWindowAverage = blockWindowAverageMap.get(key);
@@ -60,16 +75,19 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
                 blockWindowAverageMap.put(key, blockWindowAverage);
             }
 
-            HashMap<String, String> map = new HashMap<String, String>();
-
-            map.put(AbstractTask.DEFAULT_KEY, fare_amount);
             blockWindowAverage.doTask(map);
 
             Float avgres =
                     blockWindowAverage
                             .getLastResult(); //  Avg of last window is used till next comes
             sensorMeta = sensorMeta.concat(",").concat(obsType);
-            obsType = "fare_amount";
+
+            if (dataSetType.equals("TAXI")) {
+                obsType = "fare_amount";
+            }
+            if (dataSetType.equals("SYS")) {
+                obsType = "AVG";
+            }
 
             if (avgres != null) {
                 if (avgres != Float.MIN_VALUE) {

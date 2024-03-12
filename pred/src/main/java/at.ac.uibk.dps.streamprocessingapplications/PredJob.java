@@ -12,6 +12,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -105,15 +106,28 @@ public class PredJob {
 
         PCollection<LinearRegressionEntry> linearRegression1 =
                 mlParseData.apply(
-                        "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam1(p_)));
-        /*
+                        "Multi Var Linear Regression",
+                        ParDo.of(new LinearRegressionBeam1(p_, dataSetType)));
+
         PCollection<LinearRegressionEntry> linearRegression2 =
                 blobRead.apply(
-                        "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam2(p_)));
+                        "Multi Var Linear Regression",
+                        ParDo.of(new LinearRegressionBeam2(p_, dataSetType)));
+
         PCollection<LinearRegressionEntry> linearRegression =
                 PCollectionList.of(linearRegression1)
                         .and(linearRegression2)
                         .apply("Merge PCollections", Flatten.pCollections());
+
+        linearRegression.apply(
+                ParDo.of(
+                        new DoFn<LinearRegressionEntry, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("LinReg: " + c.element()); // Log the element
+                            }
+                        }));
+
         PCollection<DecisionTreeEntry> decisionTree1 =
                 blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_)));
         PCollection<DecisionTreeEntry> decisionTree2 =
@@ -124,12 +138,14 @@ public class PredJob {
                         .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<AverageEntry> average =
-                mlParseData.apply("Average", ParDo.of(new AverageBeam(p_)));
+                mlParseData.apply("Average", ParDo.of(new AverageBeam(p_, dataSetType)));
 
         PCollection<ErrorEstimateEntry> errorEstimate1 =
-                linearRegression.apply("Error Estimate", ParDo.of(new ErrorEstimateBeam1(p_)));
+                linearRegression.apply(
+                        "Error Estimate", ParDo.of(new ErrorEstimateBeam1(p_, dataSetType)));
+
         PCollection<ErrorEstimateEntry> errorEstimate2 =
-                average.apply("Error Estimate", ParDo.of(new ErrorEstimateBeam2(p_)));
+                average.apply("Error Estimate", ParDo.of(new ErrorEstimateBeam2(p_, dataSetType)));
         PCollection<ErrorEstimateEntry> errorEstimate =
                 PCollectionList.of(errorEstimate1)
                         .and(errorEstimate2)
@@ -145,7 +161,7 @@ public class PredJob {
                         .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
-        */
+
         p.run();
     }
 }

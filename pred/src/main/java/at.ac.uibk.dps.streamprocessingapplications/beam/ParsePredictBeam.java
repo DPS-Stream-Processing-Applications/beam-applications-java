@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
     private Properties p;
-    private String dataSetType;
+    private final String dataSetType;
 
     public ParsePredictBeam(Properties p_, String dataSetType) {
         p = p_;
@@ -45,17 +45,23 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             observableFields = new ArrayList();
             String line;
             ArrayList<String> metaList = new ArrayList<String>();
-
+            FileReader reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
             /* read meta field list from property */
             String meta = p.getProperty("PARSE.META_FIELD_SCHEMA");
-            idField = p.getProperty("PARSE.ID_FIELD_SCHEMA");
+            if (dataSetType.equals("TAXI")) {
+                idField = p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI");
+                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
+            }
+            if (dataSetType.equals("SYS")) {
+                idField = p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS");
+                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS"));
+            }
             metaFields = meta.split(",");
             for (int i = 0; i < metaFields.length; i++) {
                 metaList.add(metaFields[i]);
             }
             /* read csv schema to read fields observable into a list
             excluding meta fields read above */
-            FileReader reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH"));
             BufferedReader br = new BufferedReader(reader);
             line = br.readLine();
             String[] obsType = line.split(",");
@@ -66,6 +72,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error when setting up ParsePredictBeam: " + e);
         }
     }
 
@@ -108,8 +115,8 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
                 obsVal.append((String) resultMap.get((String) observableFields.get(j)));
                 obsVal.append(",");
             }
+            System.out.println("Obs in parse predict: " + obsVal);
             // obsVal.substring(0, obsVal.length() - 1);
-
             out.output(
                     new SenMlEntry(
                             msgId,

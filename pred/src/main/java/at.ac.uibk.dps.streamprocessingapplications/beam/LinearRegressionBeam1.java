@@ -23,8 +23,11 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
     private Properties p;
 
-    public LinearRegressionBeam1(Properties p_) {
+    private final String dataSetType;
+
+    public LinearRegressionBeam1(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
 
     private static Logger l;
@@ -43,7 +46,14 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
         String msgtype = input.getMsgtype();
         String analyticsType = input.getAnalyticType();
 
-        String obsVal = "10,1955.22,27";
+        String obsVal = "";
+
+        if (dataSetType.equals("TAXI")) {
+            obsVal = "10,1955.22,27";
+        } else {
+            obsVal = "22.7,49.3,0,1955.22,27";
+        }
+
         String msgId = "0";
 
         if (!msgtype.equals("modelupdate")) {
@@ -56,9 +66,7 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
         Float res = linearRegressionPredictor.doTask(map);
-        res = Float.valueOf("1");
-
-        // out.output(new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR"));
+        System.out.println("obsVal in linREg: " + obsVal);
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
         if (res != null) {

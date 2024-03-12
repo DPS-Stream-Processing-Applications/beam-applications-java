@@ -117,7 +117,6 @@ public class EventGen {
             } else if (outCSVFileName.indexOf("SENML") != -1) {
                 datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
             }
-            System.out.println("Dataset-Type: " + datasetType);
 
             List<TableClass> nestedList =
                     JsonSplitter.roundRobinSplitJsonToMemory(

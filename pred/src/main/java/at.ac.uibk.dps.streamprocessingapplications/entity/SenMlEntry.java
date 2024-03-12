@@ -83,7 +83,7 @@ public class SenMlEntry implements Serializable {
         this.sensorID = sensorID;
         this.meta = meta;
         this.obsType = obsType;
-        obsVal = obsVal;
+        this.obsVal = obsVal;
         this.msgtype = msgtype;
         this.analyticType = analyticType;
     }

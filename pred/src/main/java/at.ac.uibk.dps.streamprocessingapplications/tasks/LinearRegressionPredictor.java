@@ -22,6 +22,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
     private static String modelFilePath;
     // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
+
     // for taxi dataset
     private static final String SAMPLE_INPUT = "420,1.95,8.00";
 
@@ -123,11 +124,9 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 throw new RuntimeException("InstanceHeader is null");
             }
 
-            // FIXME!
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
 
             int prediction = (int) lr.classifyInstance(testInstance);
-            // int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);

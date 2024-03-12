@@ -72,7 +72,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
                 throw new RuntimeException("Exception in processElement of MqttBeam " + e);
             }
             if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
-            System.out.println("arg " + arg1);
+            // System.out.println("arg " + arg1);
             out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
         }
     }

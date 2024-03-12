@@ -21,7 +21,7 @@ public class SenMlParse extends AbstractTask<String, Map> {
     private static int useMsgField;
     private String sampledata;
 
-    private String dataSetType;
+    private final String dataSetType;
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);

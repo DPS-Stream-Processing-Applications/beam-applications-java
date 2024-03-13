@@ -69,10 +69,7 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        // FIXME !
         Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
-        //        System.out.println("TestS: DT res " +res);
-        // res = Float.valueOf("1");
         if (res != null) {
             if (res != Float.MIN_VALUE)
                 out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));

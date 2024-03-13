@@ -52,8 +52,6 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
         String obsType = input.getObsType();
         String obsVal = input.getObsVal();
 
-        // FIXME!
-
         HashMap<String, String> map = new HashMap<String, String>();
         if (dataSetType.equals("TAXI")) {
             // obsVal = "12,13,14";

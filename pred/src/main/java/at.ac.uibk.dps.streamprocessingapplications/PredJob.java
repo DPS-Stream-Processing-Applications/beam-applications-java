@@ -119,18 +119,9 @@ public class PredJob {
                         .and(linearRegression2)
                         .apply("Merge PCollections", Flatten.pCollections());
 
-        linearRegression.apply(
-                ParDo.of(
-                        new DoFn<LinearRegressionEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("LinReg: " + c.element()); // Log the element
-                            }
-                        }));
-
         PCollection<DecisionTreeEntry> decisionTree1 =
                 blobRead.apply("Decision Tree", ParDo.of(new DecisionTreeBeam1(p_, dataSetType)));
-        /*
+
         PCollection<DecisionTreeEntry> decisionTree2 =
                 mlParseData.apply(
                         "Decision Tree", ParDo.of(new DecisionTreeBeam2(p_, dataSetType)));
@@ -162,11 +153,7 @@ public class PredJob {
                         .and(publish2)
                         .apply("Merge PCollections", Flatten.pCollections());
 
-
-
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
-
-         */
 
         p.run();
     }

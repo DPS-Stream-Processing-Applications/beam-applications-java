@@ -57,7 +57,7 @@ public class ErrorEstimateBeam1 extends DoFn<LinearRegressionEntry, ErrorEstimat
             String[] obsValSplit = obsVal.split(",");
             if (dataSetType.equals("TAXI")) {
                 if (obsValSplit.length > 3) {
-                    fareString = obsValSplit[10];
+                    fareString = obsValSplit[4];
                 } else {
                     fareString = obsValSplit[2];
                 }

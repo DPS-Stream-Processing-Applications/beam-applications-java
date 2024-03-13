@@ -35,7 +35,6 @@ public class WekaUtil {
     public static Instance prepareInstance(Instances instanceHeader, String[] testTuple, Logger l) {
         Instance instance = new Instance(testTuple.length);
         instance.setDataset(instanceHeader);
-
         try {
             for (int m = 0; m < testTuple.length; m++) {
                 instance.setValue(instanceHeader.attribute(m), Double.parseDouble(testTuple[m]));

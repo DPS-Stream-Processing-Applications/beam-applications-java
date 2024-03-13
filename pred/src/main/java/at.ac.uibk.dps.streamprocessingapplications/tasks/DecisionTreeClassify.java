@@ -146,10 +146,9 @@ public class DecisionTreeClassify extends AbstractTask {
             }
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
 
-
-            //FIXME: Fault is in the classifyInstance
+            // FIXME: Fault is in the classifyInstance
             int classification = (int) j48tree.classifyInstance(testInstance);
-            //int classification = 2;
+            // int classification = 2;
             System.out.println("DT result from task  " + classification);
             // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
 

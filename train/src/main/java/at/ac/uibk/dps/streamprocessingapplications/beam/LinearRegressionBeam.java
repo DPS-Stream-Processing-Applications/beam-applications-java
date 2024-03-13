@@ -17,12 +17,15 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
     private Properties p;
 
     LinearRegressionTrainBatched linearRegressionTrainBatched;
-    String datasetName = "";
+    String datasetName;
 
-    //    LinearRegression lr;
+    private final String dataSetType;
 
-    public LinearRegressionBeam(Properties p_) {
+    // LinearRegression lr;
+
+    public LinearRegressionBeam(Properties p_, String datasetName) {
         this.p = p_;
+        this.dataSetType = datasetName;
     }
 
     public static void initLogger(Logger l_) {
@@ -34,7 +37,6 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
 
         initLogger(LoggerFactory.getLogger("APP"));
         linearRegressionTrainBatched = new LinearRegressionTrainBatched();
-        datasetName = p.getProperty("TRAIN.DATASET_NAME");
         linearRegressionTrainBatched.setup(l, p);
     }
 
@@ -57,8 +59,22 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
         HashMap<String, String> map = new HashMap();
         //        obsVal="22.7,49.3,0,1955.22,27"; //dummy
         map.put(AbstractTask.DEFAULT_KEY, trainData);
+
+        if (dataSetType.equals("SYS")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_SYS");
+        }
+        if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_TAXI");
+        }
+
         String filename = datasetName + "-MLR-" + rowKeyEnd + ".model";
-        System.out.println("FIlename: " + filename);
+        if (datasetName.equals("SYS")) {
+            filename = datasetName + "-MLR-" + "-1422748810000" + ".model";
+        }
+        if (datasetName.equals("TAXI") | datasetName.equals("FIT")) {
+            filename = datasetName + "-MLR-" + "1358102664000.model";
+        }
+
         map.put("FILENAME", filename);
 
         Float res = linearRegressionTrainBatched.doTask(map);

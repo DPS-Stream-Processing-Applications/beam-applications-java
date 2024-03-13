@@ -34,28 +34,9 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
 
     private static Logger l;
 
-    public TableReadBeam(Properties p_, String outCSVFileName) {
+    public TableReadBeam(Properties p_, String outCSVFileName, String datatype) {
         this.p = p_;
-        this.datatype = checkDatatype(outCSVFileName);
-    }
-
-    private static String checkDatatype(String outCSVFileName) {
-        String datasetType = "";
-        if (outCSVFileName.indexOf("TAXI") != -1) {
-            datasetType = "TAXI"; // GlobalConstants.dataSetType = "TAXI";
-        } else if (outCSVFileName.indexOf("SYS") != -1) {
-            datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
-        } else if (outCSVFileName.indexOf("PLUG") != -1) {
-            datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
-        } else if (outCSVFileName.indexOf("FIT") != -1) {
-            datasetType = "FIT";
-        } else if (outCSVFileName.indexOf("GRID") != -1) {
-            datasetType = "GRID";
-        }
-        if (datasetType.isEmpty()) {
-            throw new RuntimeException("Datatype could not be detected in " + outCSVFileName);
-        }
-        return datasetType;
+        this.datatype = datatype;
     }
 
     public static void initLogger(Logger l_) {

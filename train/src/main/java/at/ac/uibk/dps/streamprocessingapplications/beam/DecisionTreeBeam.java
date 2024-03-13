@@ -17,9 +17,11 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
 
     DecisionTreeTrainBatched decisionTreeTrainBatched;
     String datasetName = "";
+    private final String dataSetType;
 
-    public DecisionTreeBeam(Properties p_) {
+    public DecisionTreeBeam(Properties p_, String dataSetType) {
         this.p = p_;
+        this.dataSetType = dataSetType;
     }
 
     public static void initLogger(Logger l_) {
@@ -29,11 +31,14 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
     @Setup
     public void setup() throws IOException {
         initLogger(LoggerFactory.getLogger("APP"));
-        datasetName = p.getProperty("TRAIN.DATASET_NAME").toString();
-
         decisionTreeTrainBatched = new DecisionTreeTrainBatched();
-
         decisionTreeTrainBatched.setup(l, p);
+        if (dataSetType.equals("SYS")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_SYS");
+        }
+        if (dataSetType.equals("TAXI")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_TAXI");
+        }
     }
 
     @ProcessElement
@@ -57,10 +62,17 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, annotData);
-        String filename = datasetName + "-DTC-" + rowKeyEnd + ".model";
-        filename = "/DecisionTreeClassify-SYS.model";
-        map.put("FILENAME", filename);
 
+        String filename = "";
+        if (dataSetType.equals("SYS")) {
+            filename = datasetName + "-DTC-1422748810000.model";
+        }
+
+        if (dataSetType.equals("TAXI")) {
+            filename = datasetName + "-DTC-1358102664000.model";
+        }
+
+        map.put("FILENAME", filename);
         Float res = decisionTreeTrainBatched.doTask(map); // index of result-class/enum as return
         //        ByteArrayOutputStream model= (ByteArrayOutputStream)
         // decisionTreeTrainBatched.getLastResult();

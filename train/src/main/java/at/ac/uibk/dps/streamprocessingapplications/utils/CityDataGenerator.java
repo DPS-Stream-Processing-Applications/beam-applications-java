@@ -35,9 +35,7 @@ public class CityDataGenerator {
     public static SYS_City getNextDataEntry() {
         System.out.println("RowTowParse" + rowToParse);
         // FIXME!
-        String csvFile =
-                "/home/jona/Documents/Bachelor_thesis/Test/riot-bench/modules/tasks/src/main/resources/SYS_sample_data_senml.csv";
-        // String csvFile = "./src/main/resources/SYS_sample_data_senml.csv";
+        String csvFile = "./train/src/main/resources/datasets/SYS_sample_data_senml.csv";
         SYS_City sysCity = new SYS_City();
         try {
             Gson gson = new Gson();

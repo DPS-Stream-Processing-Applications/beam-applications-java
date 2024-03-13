@@ -13,7 +13,6 @@ import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionList;
 
 public class TrainJob {
 
@@ -27,7 +26,21 @@ public class TrainJob {
         }
         return lines;
     }
-    
+
+    public static String checkDataType(String fileName) {
+        if (fileName.contains("SYS") | fileName.contains("CITY")) {
+            return "SYS";
+        } else if (fileName.contains("FIT")) {
+            return "FIT";
+        } else if (fileName.contains("TAXI")) {
+            return "TAXI";
+
+        } else if (fileName.contains("GRID")) {
+            return "GRID";
+        }
+        return null;
+    }
+
     public static void main(String[] args) throws Exception {
 
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
@@ -49,6 +62,7 @@ public class TrainJob {
         String inputFileName = argumentClass.getInputDatasetPathName();
 
         long linesCount = countLines(inputFileName);
+        String dataSetType = checkDataType(inputFileName);
 
         Properties p_ = new Properties();
         InputStream input = new FileInputStream(taskPropFilename);
@@ -77,46 +91,62 @@ public class TrainJob {
                                         (linesCount - 1))));
 
         PCollection<DbEntry> dataFromAzureDB =
-                timerSource.apply("Table Read", ParDo.of(new TableReadBeam(p_, spoutLogFileName)));
+                timerSource.apply(
+                        "Table Read",
+                        ParDo.of(new TableReadBeam(p_, spoutLogFileName, dataSetType)));
+
+        dataFromAzureDB.apply(
+                ParDo.of(
+                        new DoFn<DbEntry, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("DB: " + c.element()); // Log the element
+                            }
+                        }));
 
         PCollection<TrainEntry> linearRegressionTrain =
                 dataFromAzureDB.apply(
-                        "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam(p_)));
+                        "Multi Var Linear Regression",
+                        ParDo.of(new LinearRegressionBeam(p_, dataSetType)));
 
         PCollection<AnnotateEntry> annotatedData =
                 dataFromAzureDB.apply("Annotation", ParDo.of(new AnnotateBeam(p_)));
+
         PCollection<TrainEntry> decisionTreeData =
-                annotatedData.apply("Decision Tree Train", ParDo.of(new DecisionTreeBeam(p_)));
+                annotatedData.apply(
+                        "Decision Tree Train", ParDo.of(new DecisionTreeBeam(p_, dataSetType)));
+        /*
+               PCollection<TrainEntry> totalTrainData =
+                       PCollectionList.of(linearRegressionTrain)
+                               .and(decisionTreeData)
+                               .apply("Merge PCollections", Flatten.<TrainEntry>pCollections());
+               PCollection<BlobUploadEntry> blobUpload =
+                       totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
+               PCollection<MqttPublishEntry> mqttPublish =
+                       blobUpload.apply("MQTT Publish", ParDo.of(new MqttPublishBeam(p_)));
 
-        PCollection<TrainEntry> totalTrainData =
-                PCollectionList.of(linearRegressionTrain)
-                        .and(decisionTreeData)
-                        .apply("Merge PCollections", Flatten.<TrainEntry>pCollections());
-        PCollection<BlobUploadEntry> blobUpload =
-                totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
-        PCollection<MqttPublishEntry> mqttPublish =
-                blobUpload.apply("MQTT Publish", ParDo.of(new MqttPublishBeam(p_)));
+               mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
 
-        mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+               mqttPublish.apply(
+                       "Print Result",
+                       ParDo.of(
+                               new DoFn<MqttPublishEntry, Void>() {
+                                   @ProcessElement
+                                   public void processElement(ProcessContext c) {
+                                       System.out.println("Print " + c.element());
+                                   }
+                               }));
+               PCollection<Long> count = mqttPublish.apply("Count", Count.globally());
+               count.apply(
+                       ParDo.of(
+                               new DoFn<Long, Void>() {
+                                   @ProcessElement
+                                   public void processElement(ProcessContext c) {
+                                       System.out.println("Length of PCollection: " + c.element());
+                                   }
+                               }));
 
-        mqttPublish.apply(
-                "Print Result",
-                ParDo.of(
-                        new DoFn<MqttPublishEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("Print " + c.element());
-                            }
-                        }));
-        PCollection<Long> count = mqttPublish.apply("Count", Count.globally());
-        count.apply(
-                ParDo.of(
-                        new DoFn<Long, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("Length of PCollection: " + c.element());
-                            }
-                        }));
+        */
 
         p.run().waitUntilFinish();
     }

@@ -30,4 +30,19 @@ public class DbEntry implements Serializable {
     public void setRowKeyEnd(String rowKeyEnd) {
         this.rowKeyEnd = rowKeyEnd;
     }
+
+    @Override
+    public String toString() {
+        return "DbEntry{"
+                + "mgsid='"
+                + mgsid
+                + '\''
+                + ", trainData='"
+                + trainData
+                + '\''
+                + ", rowKeyEnd='"
+                + rowKeyEnd
+                + '\''
+                + '}';
+    }
 }

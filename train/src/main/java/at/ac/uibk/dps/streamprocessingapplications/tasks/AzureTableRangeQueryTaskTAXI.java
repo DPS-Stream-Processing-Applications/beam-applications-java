@@ -96,7 +96,7 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
          */
         for (long i = 0; i <= 10; i++) {
             // FIXME!
-            resultList.add(TaxiDataGenerator.generateRandomTaxiData());
+            resultList.add(TaxiDataGenerator.getNextDataEntry());
         }
 
         Iterable<Taxi_Trip> result = resultList;

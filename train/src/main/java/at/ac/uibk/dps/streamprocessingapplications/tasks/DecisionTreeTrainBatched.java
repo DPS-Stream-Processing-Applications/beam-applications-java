@@ -76,8 +76,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
         ByteArrayOutputStream model = new ByteArrayOutputStream();
         if (l.isInfoEnabled()) l.info("Range query res:{}", m);
         System.out.println(modelFilePath);
-        String fullFilePath =
-                modelFilePath + filename; //  model file updated with MLR-endRowkey.model
+        String fullFilePath = filename; //  model file updated with MLR-endRowkey.model
         int result = 0;
         try {
 
@@ -97,7 +96,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
             if (result >= 0) return Float.valueOf(0); // success
 
         } catch (Exception e) {
-            l.warn("error training decision tree", e);
+            l.warn("error training decision tree" + e);
             throw new RuntimeException(e);
         }
 

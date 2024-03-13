@@ -94,7 +94,8 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         }
          */
         for (long i = 0; i <= 10; i++) {
-            resultList.add(FitDataGenerator.generateRandomFITData());
+            // FIXME!
+            resultList.add(FitDataGenerator.getNextDataEntry());
         }
 
         Iterable<FIT_data> result = resultList;

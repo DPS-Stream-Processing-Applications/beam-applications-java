@@ -1,9 +1,18 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
+import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
+import com.google.gson.Gson;
+import com.opencsv.CSVReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public class TaxiDataGenerator {
+    private static long rowToParse = 0;
 
     public static Taxi_Trip generateRandomTaxiData() {
         Taxi_Trip sysData = new Taxi_Trip();
@@ -28,5 +37,54 @@ public class TaxiDataGenerator {
         sysData.setTotal_amount(String.valueOf(random.nextDouble()));
 
         return sysData;
+    }
+
+    public static Taxi_Trip getNextDataEntry() {
+        System.out.println("RowTowParse" + rowToParse);
+        // FIXME!
+        String csvFile = "./train/src/main/resources/datasets/TAXI_sample_data_senml.csv";
+        Taxi_Trip taxiTrip = new Taxi_Trip();
+        try {
+            Gson gson = new Gson();
+            CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+            String[] row;
+            int currentRow = 0;
+            while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                currentRow++;
+            }
+
+            long counter = 0;
+            if (row != null) {
+                String json = Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
+                json = json.replaceFirst("\\{", "");
+                json = "{ts:" + json;
+
+                // Parse JSON using Gson
+                Measurement measurement = gson.fromJson(json, Measurement.class);
+
+                for (SensorData entry : measurement.getSensorDataList()) {
+
+                    if (Objects.equals(entry.getN(), "trip_time_in_secs")) {
+                        taxiTrip.setTrip_time_in_secs(entry.getV());
+                        counter++;
+                    }
+                    if (Objects.equals(entry.getN(), "trip_distance")) {
+                        taxiTrip.setTrip_distance(entry.getV());
+                        counter++;
+                    }
+                    if (Objects.equals(entry.getN(), "fare_amount")) {
+                        taxiTrip.setFare_amount(entry.getV());
+                        counter++;
+                    }
+                }
+            }
+            if (counter != 3) {
+                throw new RuntimeException("Counter is not correct!");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error when reading row " + e);
+        }
+        rowToParse++;
+        return taxiTrip;
     }
 }

@@ -66,9 +66,13 @@ public class ErrorEstimateBeam1 extends DoFn<LinearRegressionEntry, ErrorEstimat
                 errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
             }
             if (dataSetType.equals("SYS")) {
-                System.out.println("SYS-input: " + input.getObsval());
                 float air_quality = Float.parseFloat((input.getObsval()).split(",")[4]);
                 errval = (air_quality - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
+            }
+
+            if (dataSetType.equals("FIT")) {
+                float fare_amount = Float.parseFloat((input.getObsval().split(",")[2]));
+                errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
             }
 
             if (l.isInfoEnabled()) l.info(("errval -" + errval));

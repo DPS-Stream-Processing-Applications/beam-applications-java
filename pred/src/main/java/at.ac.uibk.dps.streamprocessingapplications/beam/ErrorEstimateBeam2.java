@@ -61,6 +61,10 @@ public class ErrorEstimateBeam2 extends DoFn<AverageEntry, ErrorEstimateEntry> {
                 float air_quality = Float.parseFloat((input.getObsVal()).split(",")[4]);
                 errval = (air_quality - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
             }
+            if (dataSetType.equals("FIT")) {
+                float fare_amount = Float.parseFloat((input.getObsVal()).split(",")[7]);
+                errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
+            }
             if (l.isInfoEnabled()) l.info(("errval -" + errval));
             out.output(new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal));
         }

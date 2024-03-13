@@ -92,7 +92,6 @@ public class JsonSplitter {
                 date =
                         ISODateTimeFormat.dateTimeParser()
                                 .parseDateTime(nextLine[timestampColIndex]);
-                System.out.println("date " + date);
             } else if (datasetType.equals("PLUG")) {
                 timestampColIndex = 1;
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
@@ -133,7 +132,6 @@ public class JsonSplitter {
 
         BufferedReader bReader = new BufferedReader(new FileReader(inputFileName));
         String headerLine = bReader.readLine();
-        System.out.println(headerLine);
         String line;
 
         BufferedWriter[] bWriters = new BufferedWriter[numThreads];

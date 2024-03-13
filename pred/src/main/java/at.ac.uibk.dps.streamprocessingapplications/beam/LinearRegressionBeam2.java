@@ -50,10 +50,10 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
         String msgtype = input.getMsgType();
         String analyticsType = input.getAnalyticType();
 
-        String obsVal = "Jona";
+        String obsVal = "";
         String msgId = "0";
 
-        if (dataSetType.equals("TAXI")) {
+        if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
             obsVal = "10,1955.22,27";
         }
         if (dataSetType.equals("SYS")) {

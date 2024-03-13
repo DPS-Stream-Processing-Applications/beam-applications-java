@@ -48,15 +48,15 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
         String analyticsType = input.getAnalyticType();
         String sensorMeta = input.getMeta();
 
-        // FIXME!
         String obsVal = "0";
         String msgId = "0";
         if (dataSetType.equals("FIT") | dataSetType.equals("TAXI")) {
             obsVal = "10,1955.22,27"; // dummy
         }
-        if (dataSetType.equals("SYS")) {
+        if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
             obsVal = "22.7,49.3,0,1955.22,27"; // dummy
         }
+
         /* We are getting an model update message so we will update the model only*/
 
         if (msgtype.equals("modelupdate") && analyticsType.equals("DTC")) {

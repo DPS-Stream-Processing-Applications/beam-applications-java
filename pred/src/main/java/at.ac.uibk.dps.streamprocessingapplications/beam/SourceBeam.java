@@ -82,7 +82,6 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             out.output(values);
             count++;
         }
-        System.out.println("left loop");
     }
 
     @Override

@@ -54,7 +54,6 @@ public class EventGen {
                 datasetType = "GRID";
             }
 
-            System.out.println("Dataset-Type: " + datasetType);
             List<TableClass> nestedList =
                     CsvSplitter.roundRobinSplitCsvToMemory(
                             csvFileName, numThreads, scalingFactor, datasetType);
@@ -150,7 +149,6 @@ public class EventGen {
             e.printStackTrace();
             throw new RuntimeException("Error in launching EventGen " + e);
         }
-        System.out.println("out of launch");
     }
 }
 

@@ -61,7 +61,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             }
             if (dataSetType.equals("FIT")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
-                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS"));
+                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_FIT"));
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
             }
             metaFields = meta.split(",");
@@ -123,7 +123,6 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
                 obsVal.append((String) resultMap.get((String) observableFields.get(j)));
                 obsVal.append(",");
             }
-            System.out.println("Obs in parse predict: " + obsVal);
             // obsVal.substring(0, obsVal.length() - 1);
             out.output(
                     new SenMlEntry(

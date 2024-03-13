@@ -66,6 +66,11 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
             map.put(AbstractTask.DEFAULT_KEY, airquality);
         }
 
+        if (dataSetType.equals("FIT")) {
+            String fare_amount = obsVal.split(",")[7];
+            map.put(AbstractTask.DEFAULT_KEY, fare_amount);
+        }
+
         if (useMsgList.contains(obsType)) {
             String key = sensorID + obsType;
             BlockWindowAverage blockWindowAverage = blockWindowAverageMap.get(key);
@@ -82,7 +87,7 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
                             .getLastResult(); //  Avg of last window is used till next comes
             sensorMeta = sensorMeta.concat(",").concat(obsType);
 
-            if (dataSetType.equals("TAXI")) {
+            if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
                 obsType = "fare_amount";
             }
             if (dataSetType.equals("SYS")) {

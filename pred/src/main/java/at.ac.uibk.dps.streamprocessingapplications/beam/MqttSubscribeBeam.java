@@ -56,7 +56,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         mqttSubscribeTask.doTask(map);
         String arg1 = (String) mqttSubscribeTask.getLastResult();
         // FIXME!
-        arg1 = "12-test";
+        // arg1 = "12-test";
 
         //        if(l.isInfoEnabled())
         //            l.info("MQTTSubscribeSpout nextTuple {}",arg1);

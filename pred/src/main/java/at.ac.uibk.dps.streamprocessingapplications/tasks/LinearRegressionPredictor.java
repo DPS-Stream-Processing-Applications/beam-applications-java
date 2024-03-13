@@ -89,7 +89,6 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
                     instanceHeader =
                             WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
-                    System.out.println(instanceHeader);
                     if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
                     if (instanceHeader == null) {
                         throw new RuntimeException("instanceHeader is null");

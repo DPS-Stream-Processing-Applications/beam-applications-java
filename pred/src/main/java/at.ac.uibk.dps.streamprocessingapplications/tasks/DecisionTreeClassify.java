@@ -69,7 +69,7 @@ public class DecisionTreeClassify extends AbstractTask {
                 String sampleHeader = "";
                 try {
 
-                    if (dataSetType.equals("SYS")) {
+                    if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
                         useMsgField =
                                 Integer.parseInt(
                                         p_.getProperty(
@@ -96,6 +96,9 @@ public class DecisionTreeClassify extends AbstractTask {
                                         p_.getProperty(
                                                 "CLASSIFICATION.DECISION_TREE.CLASSIFY.RESULT_ATTRIBUTE_INDEX_TAXI"));
                         sampleHeader = SAMPLE_HEADER_TAXI;
+                    }
+                    if (dataSetType.equals("FIT")) {
+                        useMsgField = -1;
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Exception when setting up decisionTree " + e);
@@ -129,7 +132,7 @@ public class DecisionTreeClassify extends AbstractTask {
                 testTuple = m.split(",");
             } else {
                 //				System.out.println("TestS : in do task" );
-                if (dataSetType.equals("SYS")) {
+                if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
                     testTuple = SAMPLE_INPUT_SYS.split(",");
                 }
                 if (dataSetType.equals("TAXI")) {
@@ -140,7 +143,7 @@ public class DecisionTreeClassify extends AbstractTask {
                 instanceHeader =
                         WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_TAXI), l);
             }
-            if (dataSetType.equals("SYS")) {
+            if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
                 instanceHeader =
                         WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_SYS), l);
             }
@@ -149,7 +152,6 @@ public class DecisionTreeClassify extends AbstractTask {
             // FIXME: Fault is in the classifyInstance
             int classification = (int) j48tree.classifyInstance(testInstance);
             // int classification = 2;
-            System.out.println("DT result from task  " + classification);
             // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
 
             // System.out.println("DT result from task  " + result);

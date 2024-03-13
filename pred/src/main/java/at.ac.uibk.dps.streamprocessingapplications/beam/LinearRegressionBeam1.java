@@ -48,7 +48,7 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
         String obsVal = "";
 
-        if (dataSetType.equals("TAXI")) {
+        if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
             obsVal = "10,1955.22,27";
         } else {
             obsVal = "22.7,49.3,0,1955.22,27";
@@ -66,7 +66,6 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
         Float res = linearRegressionPredictor.doTask(map);
-        System.out.println("obsVal in linREg: " + obsVal);
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
         if (res != null) {

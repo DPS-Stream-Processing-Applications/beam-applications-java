@@ -27,7 +27,7 @@ public class TrainJob {
         }
         return lines;
     }
-
+    
     public static void main(String[] args) throws Exception {
 
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);

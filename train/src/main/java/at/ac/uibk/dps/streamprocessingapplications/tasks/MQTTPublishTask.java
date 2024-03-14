@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import org.eclipse.paho.client.mqttv3.*;
+import org.slf4j.Logger;
+
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import org.eclipse.paho.client.mqttv3.*;
-import org.slf4j.Logger;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.
@@ -161,8 +162,10 @@ public class MQTTPublishTask extends AbstractTask implements MqttCallback {
     }
 
     @Override
-    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {}
+    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    }
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {}
+    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+    }
 }

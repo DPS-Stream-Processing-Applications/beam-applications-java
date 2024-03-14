@@ -1,10 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,9 +35,10 @@ public class CityDataGenerator {
     }
 
     public static SYS_City getNextDataEntry() {
-        System.out.println("RowTowParse" + rowToParse);
         // FIXME!
         String csvFile = "./train/src/main/resources/datasets/SYS_sample_data_senml.csv";
+        long totalNumberLines = TrainJob.countLines(csvFile);
+        rowToParse = rowToParse % totalNumberLines;
         SYS_City sysCity = new SYS_City();
         try {
             Gson gson = new Gson();

@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import org.slf4j.Logger;
+import weka.classifiers.functions.LinearRegression;
+import weka.core.Instances;
+
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
-import org.slf4j.Logger;
-import weka.classifiers.functions.LinearRegression;
-import weka.core.Instances;
 
 /**
  * This task should only be run from a single thread to avoid overwriting output model file.
@@ -113,7 +114,7 @@ public class LinearRegressionTrainBatched extends AbstractTask {
      * @param instanceReader
      * @param modelFilePath
      * @param model
-     * @param l @return
+     * @param l              @return
      */
     private static int linearRegressionTrainAndSaveModel(
             StringReader instanceReader,

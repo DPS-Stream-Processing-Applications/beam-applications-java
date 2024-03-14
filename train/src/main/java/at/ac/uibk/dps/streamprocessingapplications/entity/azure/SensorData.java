@@ -38,4 +38,22 @@ public class SensorData {
     public void setSv(String sv) {
         this.sv = sv;
     }
+
+    @Override
+    public String toString() {
+        return "SensorData{"
+                + "u='"
+                + u
+                + '\''
+                + ", n='"
+                + n
+                + '\''
+                + ", v='"
+                + v
+                + '\''
+                + ", sv='"
+                + sv
+                + '\''
+                + '}';
+    }
 }

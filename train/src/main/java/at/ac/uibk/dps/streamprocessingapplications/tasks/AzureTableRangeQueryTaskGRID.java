@@ -7,12 +7,9 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
 import org.slf4j.Logger;
+
+import java.util.*;
 
 public class AzureTableRangeQueryTaskGRID extends AbstractTask {
 
@@ -76,9 +73,6 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
         }
         Iterable<GRID_data> result =
                 getAzTableRangeByKeyTAXI(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
-        System.out.println("Row key = " + rowKeyEnd);
-        System.out.println("Result = " + result);
-
         super.setLastResult(result);
 
         return Float.valueOf(Lists.newArrayList(result).size()); // may need updation

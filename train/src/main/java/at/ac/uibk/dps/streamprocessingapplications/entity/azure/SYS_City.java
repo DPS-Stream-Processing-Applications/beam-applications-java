@@ -94,5 +94,6 @@ public class SYS_City extends TableServiceEntity {
         this.airquality_raw = airquality_raw;
     }
 
-    public SYS_City() {}
+    public SYS_City() {
+    }
 }

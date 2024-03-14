@@ -4,6 +4,7 @@ import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.CsvSplitter
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.JsonSplitter;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.TableClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -53,7 +54,6 @@ public class EventGen {
                 datasetType = "GRID";
             }
 
-            System.out.println("Dataset-Type: " + datasetType);
             List<TableClass> nestedList =
                     CsvSplitter.roundRobinSplitCsvToMemory(
                             csvFileName, numThreads, scalingFactor, datasetType);
@@ -119,8 +119,6 @@ public class EventGen {
             } else if (outCSVFileName.indexOf("SENML") != -1) {
                 datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
             }
-            System.out.println("Dataset-Type: " + datasetType);
-
             List<TableClass> nestedList =
                     JsonSplitter.roundRobinSplitJsonToMemory(
                             csvFileName, numThreads, scalingFactor, datasetType);
@@ -195,14 +193,12 @@ class SubEventGen implements Runnable {
                 Long deltaTs = timestamps.get(i);
                 List<String> event = rows.get(i);
                 Long currentTs = System.currentTimeMillis();
-                System.out.println("experiRestartTime " + experiRestartTime);
                 long delay =
                         deltaTs
                                 - (currentTs
-                                        - experiRestartTime); // how long until this event should be
+                                - experiRestartTime); // how long until this event should be
                 // sent?
                 // delay = 1000;
-                System.out.println("delay: " + delay);
                 if (delay > 10) { // sleep only if it is non-trivial time. We will catch up on sleep
                     // later.
                     try {

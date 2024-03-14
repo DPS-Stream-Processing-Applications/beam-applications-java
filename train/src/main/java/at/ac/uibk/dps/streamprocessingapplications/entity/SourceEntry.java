@@ -48,7 +48,8 @@ public class SourceEntry implements Serializable {
         this.rowKeyEnd = rowKeyEnd;
     }
 
-    public SourceEntry() {}
+    public SourceEntry() {
+    }
 
     @Override
     public boolean equals(Object o) {

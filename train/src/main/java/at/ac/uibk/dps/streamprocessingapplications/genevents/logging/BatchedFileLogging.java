@@ -107,6 +107,7 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.logging;
 // import in.dream_lab.genevents.utils.GlobalConstants;
 
 import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -116,7 +117,9 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Created by anshushukla on 20/05/15. */
+/**
+ * Created by anshushukla on 20/05/15.
+ */
 public class BatchedFileLogging {
     int counter = 0;
     //    Map<Long,String> batch=new HashMap<Long,String>();
@@ -254,7 +257,6 @@ public class BatchedFileLogging {
         //        String ExpNumber=GlobalConstants.getExperimentNumber();
         //        System.out.println("ExpNumber-"+ExpNumber.split("-")[2]);
 
-        System.out.println("from batchedfile logging");
         File temp = null;
         //	String ExpNumber=GlobalConstants.getExperimentNumber();
         try {
@@ -268,7 +270,7 @@ public class BatchedFileLogging {
                                     + System.currentTimeMillis()
                                     + "-"
                                     + csvFileNameOut
-                                            .split("\\/")[csvFileNameOut.split("\\/").length - 1]
+                                    .split("\\/")[csvFileNameOut.split("\\/").length - 1]
                                     + "-BoltPID-"
                                     + ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
                                     + "-",
@@ -276,7 +278,6 @@ public class BatchedFileLogging {
                             f);
 
             // write it
-            System.out.println("TEMP FILE PATH" + temp);
             BufferedWriter tm = new BufferedWriter(new FileWriter(temp));
             String s =
                     "Hostname,"
@@ -294,7 +295,6 @@ public class BatchedFileLogging {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("TEMP LOGIC Done");
     }
 
     public static void writeToTempDB(Object o, String csvFileNameOut, String conne) {
@@ -303,7 +303,6 @@ public class BatchedFileLogging {
         //        String ExpNumber=GlobalConstants.getExperimentNumber();
         //        System.out.println("ExpNumber-"+ExpNumber.split("-")[2]);
 
-        System.out.println("from batchedfile logging");
         File temp = null;
         //	String ExpNumber=GlobalConstants.getExperimentNumber();
         try {
@@ -317,7 +316,7 @@ public class BatchedFileLogging {
                                     + System.currentTimeMillis()
                                     + "-"
                                     + csvFileNameOut
-                                            .split("\\/")[csvFileNameOut.split("\\/").length - 1]
+                                    .split("\\/")[csvFileNameOut.split("\\/").length - 1]
                                     + "-BoltPID-"
                                     + ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
                                     + "-",
@@ -325,7 +324,6 @@ public class BatchedFileLogging {
                             f);
 
             // write it
-            System.out.println("TEMP FILE PATH" + temp);
             BufferedWriter tm = new BufferedWriter(new FileWriter(temp));
             String s =
                     "Hostname,"
@@ -343,7 +341,6 @@ public class BatchedFileLogging {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("TEMP LOGIC Done");
     }
     //
 

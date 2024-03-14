@@ -2,6 +2,7 @@ package at.ac.uibk.dps.streamprocessingapplications.entity.azure;
 
 import com.google.gson.annotations.SerializedName;
 import com.microsoft.azure.storage.table.TableServiceEntity;
+
 import java.util.List;
 
 public class Measurement extends TableServiceEntity {
@@ -24,5 +25,10 @@ public class Measurement extends TableServiceEntity {
 
     public void setSensorDataList(List<SensorData> sensorDataList) {
         this.sensorDataList = sensorDataList;
+    }
+
+    @Override
+    public String toString() {
+        return "Measurement{" + "ts='" + ts + '\'' + ", sensorDataList=" + sensorDataList + '}';
     }
 }

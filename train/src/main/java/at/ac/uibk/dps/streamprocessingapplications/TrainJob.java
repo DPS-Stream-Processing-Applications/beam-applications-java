@@ -4,8 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.*;
-import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -13,6 +11,10 @@ import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
+
+import java.io.*;
+import java.util.Properties;
 
 public class TrainJob {
 
@@ -95,15 +97,6 @@ public class TrainJob {
                         "Table Read",
                         ParDo.of(new TableReadBeam(p_, spoutLogFileName, dataSetType)));
 
-        dataFromAzureDB.apply(
-                ParDo.of(
-                        new DoFn<DbEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("DB: " + c.element()); // Log the element
-                            }
-                        }));
-
         PCollection<TrainEntry> linearRegressionTrain =
                 dataFromAzureDB.apply(
                         "Multi Var Linear Regression",
@@ -115,38 +108,28 @@ public class TrainJob {
         PCollection<TrainEntry> decisionTreeData =
                 annotatedData.apply(
                         "Decision Tree Train", ParDo.of(new DecisionTreeBeam(p_, dataSetType)));
-        /*
-               PCollection<TrainEntry> totalTrainData =
-                       PCollectionList.of(linearRegressionTrain)
-                               .and(decisionTreeData)
-                               .apply("Merge PCollections", Flatten.<TrainEntry>pCollections());
-               PCollection<BlobUploadEntry> blobUpload =
-                       totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
-               PCollection<MqttPublishEntry> mqttPublish =
-                       blobUpload.apply("MQTT Publish", ParDo.of(new MqttPublishBeam(p_)));
 
-               mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+        PCollection<TrainEntry> totalTrainData =
+                PCollectionList.of(linearRegressionTrain)
+                        .and(decisionTreeData)
+                        .apply("Merge PCollections", Flatten.pCollections());
+        PCollection<BlobUploadEntry> blobUpload =
+                totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
 
-               mqttPublish.apply(
-                       "Print Result",
-                       ParDo.of(
-                               new DoFn<MqttPublishEntry, Void>() {
-                                   @ProcessElement
-                                   public void processElement(ProcessContext c) {
-                                       System.out.println("Print " + c.element());
-                                   }
-                               }));
-               PCollection<Long> count = mqttPublish.apply("Count", Count.globally());
-               count.apply(
-                       ParDo.of(
-                               new DoFn<Long, Void>() {
-                                   @ProcessElement
-                                   public void processElement(ProcessContext c) {
-                                       System.out.println("Length of PCollection: " + c.element());
-                                   }
-                               }));
+        PCollection<MqttPublishEntry> mqttPublish =
+                blobUpload.apply("MQTT Publish", ParDo.of(new MqttPublishBeam(p_)));
 
-        */
+        mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+
+        PCollection<Long> count = mqttPublish.apply("Count", Count.globally());
+        count.apply(
+                ParDo.of(
+                        new DoFn<Long, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Length of PCollection: " + c.element());
+                            }
+                        }));
 
         p.run().waitUntilFinish();
     }

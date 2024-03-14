@@ -1,10 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,9 +42,10 @@ public class TaxiDataGenerator {
     }
 
     public static Taxi_Trip getNextDataEntry() {
-        System.out.println("RowTowParse" + rowToParse);
         // FIXME!
         String csvFile = "./train/src/main/resources/datasets/TAXI_sample_data_senml.csv";
+        long totalNumberLines = TrainJob.countLines(csvFile);
+        rowToParse = rowToParse % totalNumberLines;
         Taxi_Trip taxiTrip = new Taxi_Trip();
         try {
             Gson gson = new Gson();

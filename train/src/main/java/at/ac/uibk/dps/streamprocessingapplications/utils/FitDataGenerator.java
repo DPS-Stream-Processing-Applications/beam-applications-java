@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -14,7 +15,6 @@ import java.util.Random;
 public class FitDataGenerator {
     private static long rowToParse = 0;
 
-    // Generate random FIT_data object
     public static FIT_data generateRandomFITData() {
         FIT_data fitData = new FIT_data();
         Random random = new Random();
@@ -38,12 +38,12 @@ public class FitDataGenerator {
         return fitData;
     }
 
-    // 10 attributes
-
     public static FIT_data getNextDataEntry() {
-        System.out.println("RowTowParse" + rowToParse);
         // FIXME!
         String csvFile = "./train/src/main/resources/datasets/FIT_sample_data_senml.csv";
+        long totalNumberLines = TrainJob.countLines(csvFile);
+        rowToParse = rowToParse % totalNumberLines;
+
         FIT_data fitData = new FIT_data();
         try {
             Gson gson = new Gson();
@@ -95,7 +95,7 @@ public class FitDataGenerator {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error when reading row " + e);
         }
         rowToParse++;

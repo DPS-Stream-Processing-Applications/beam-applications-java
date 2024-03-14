@@ -7,8 +7,9 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import java.util.*;
 import org.slf4j.Logger;
+
+import java.util.*;
 
 public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     private static final Object SETUP_LOCK = new Object();

@@ -1,6 +1,8 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
-/** Created by tarun on 28/5/15. */
+/**
+ * Created by tarun on 28/5/15.
+ */
 public class ArgumentClass {
     String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
     String topoName;

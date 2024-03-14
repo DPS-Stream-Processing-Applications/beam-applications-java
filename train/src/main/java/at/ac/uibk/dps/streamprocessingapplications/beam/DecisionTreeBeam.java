@@ -4,12 +4,13 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.AnnotateEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.TrainEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeTrainBatched;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 
 public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
     private static Logger l;
@@ -38,6 +39,9 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
         }
         if (dataSetType.equals("TAXI")) {
             datasetName = p.getProperty("TRAIN.DATASET_NAME_TAXI");
+        }
+        if (dataSetType.equals("FIT")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_FIT");
         }
     }
 
@@ -70,6 +74,9 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
 
         if (dataSetType.equals("TAXI")) {
             filename = datasetName + "-DTC-1358102664000.model";
+        }
+        if (dataSetType.equals("FIT")) {
+            filename = datasetName + "-DTC-1417890600200.model";
         }
 
         map.put("FILENAME", filename);

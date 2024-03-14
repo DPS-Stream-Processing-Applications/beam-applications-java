@@ -9,12 +9,13 @@ import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTas
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskGRID;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskSYS;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskTAXI;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Properties;
 
 public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     private Properties p;
@@ -69,9 +70,9 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
         map.put("ROWKEYSTART", ROWKEYSTART);
         map.put("ROWKEYEND", ROWKEYEND);
 
-        azureTableRangeQueryTaskFIT.doTaskLogicDummy(map);
         StringBuilder bf = new StringBuilder();
         if (Objects.equals(datatype, "FIT")) {
+            azureTableRangeQueryTaskFIT.doTaskLogicDummy(map);
             Iterable<FIT_data> result =
                     (Iterable<FIT_data>) azureTableRangeQueryTaskFIT.getLastResult();
 

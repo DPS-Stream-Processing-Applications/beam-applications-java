@@ -4,13 +4,14 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
+import org.apache.beam.sdk.transforms.DoFn;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.apache.beam.sdk.transforms.DoFn;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
@@ -221,7 +222,6 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
 
         ba = new BatchedFileLogging(uLogfilename, "test");
-        System.out.println("Timer has launched");
     }
 
     @ProcessElement
@@ -275,13 +275,11 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("values by source are -" + values);
             //		} catch (InterruptedException e) {
             //			// TODO Auto-generated catch block
             //			e.printStackTrace();
             //		}
         }
-        System.out.println("Exiting");
     }
 
     @Override
@@ -290,7 +288,6 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         // System.out.println("Called IN SPOUT### ");
         try {
             this.eventQueue.put(event);
-            System.out.println("Got this event " + event);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

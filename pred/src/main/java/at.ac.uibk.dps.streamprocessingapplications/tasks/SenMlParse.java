@@ -1,13 +1,14 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author simmhan, shilpa
@@ -17,11 +18,14 @@ public class SenMlParse extends AbstractTask<String, Map> {
     private static final Object SETUP_LOCK = new Object();
     // static fields common to all threads
     private static boolean doneSetup = false;
-    private ArrayList<String> senMLlist;
     private static int useMsgField;
+    private final String dataSetType;
+    private ArrayList<String> senMLlist;
     private String sampledata;
 
-    private final String dataSetType;
+    public SenMlParse(String dataSetType) {
+        this.dataSetType = dataSetType;
+    }
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
@@ -32,10 +36,6 @@ public class SenMlParse extends AbstractTask<String, Map> {
             }
             sampledata = p_.getProperty("PARSE.SENML.SAMPLEDATA");
         }
-    }
-
-    public SenMlParse(String dataSetType) {
-        this.dataSetType = dataSetType;
     }
 
     @Override

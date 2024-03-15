@@ -3,14 +3,11 @@
 * deploymentMode
 * topoName
 * input
-* experiRunId (FIT/SYS/GRID/TAXI- number)
+* experiRunId (FIT/SYS/TAXI/GRID- number)
 * scalingFactor
 * outputDir
 * taskProp 
 * taskName 
-
-
-
 
 
 Example command

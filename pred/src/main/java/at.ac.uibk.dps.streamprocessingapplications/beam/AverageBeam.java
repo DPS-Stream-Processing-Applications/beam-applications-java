@@ -4,16 +4,32 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.AverageEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.BlockWindowAverage;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.slf4j.Logger;
 
 public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
+
+    private static Logger l;
+    private final String dataSetType;
+    Map<String, BlockWindowAverage> blockWindowAverageMap;
+    private Properties p;
+    private ArrayList<String> useMsgList;
+
+    public AverageBeam(Properties p_, String dataSetType) {
+        p = p_;
+        this.dataSetType = dataSetType;
+    }
+
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     @Setup
     public void setup() throws MqttException {
@@ -25,23 +41,6 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
             useMsgList.add(s);
         }
     }
-
-    private Properties p;
-    private ArrayList<String> useMsgList;
-    private final String dataSetType;
-
-    private static Logger l;
-
-    public AverageBeam(Properties p_, String dataSetType) {
-        p = p_;
-        this.dataSetType = dataSetType;
-    }
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
-    Map<String, BlockWindowAverage> blockWindowAverageMap;
 
     @ProcessElement
     public void processElement(@Element SenMlEntry input, DoFn.OutputReceiver<AverageEntry> out)

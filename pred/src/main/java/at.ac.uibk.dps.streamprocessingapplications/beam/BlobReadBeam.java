@@ -4,26 +4,25 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureBlobDownloadTask;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
 
+    private static Logger l; // TODO: Ensure logger is initialized before use
     Properties p;
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
+    AzureBlobDownloadTask azureBlobDownloadTask;
 
     public BlobReadBeam(Properties p_) {
         this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
     }
-
-    AzureBlobDownloadTask azureBlobDownloadTask;
-
-    private static Logger l; // TODO: Ensure logger is initialized before use
 
     public static void initLogger(Logger l_) {
         l = l_;

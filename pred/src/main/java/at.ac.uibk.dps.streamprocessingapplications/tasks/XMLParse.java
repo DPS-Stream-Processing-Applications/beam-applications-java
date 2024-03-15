@@ -1,5 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import org.slf4j.Logger;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -8,13 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.slf4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.
@@ -27,29 +28,6 @@ public class XMLParse extends AbstractTask {
     // static fields common to all threads
     private static boolean doneSetup = false;
     private static String xmlFileAsString; // file contents as string
-
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                String xmlFilePath = p_.getProperty("PARSE.XML_FILEPATH");
-                try {
-                    xmlFileAsString = readFileAsString(xmlFilePath, StandardCharsets.UTF_8);
-                } catch (IOException e) {
-                    l.warn("Exception in reading xml file: " + xmlFilePath, e);
-                }
-                doneSetup = true;
-            }
-        }
-    }
-
-    @Override
-    protected Float doTaskLogic(Map map) {
-        String m = (String) map.get(AbstractTask.DEFAULT_KEY);
-        // for now code is independent of incoming message
-        int tot_length = doXMLparseOp(xmlFileAsString, l);
-        return Float.valueOf(tot_length);
-    }
 
     /***
      *
@@ -84,12 +62,35 @@ public class XMLParse extends AbstractTask {
         return new String(encoded, encoding).intern();
     }
 
+    public void setup(Logger l_, Properties p_) {
+        super.setup(l_, p_);
+        synchronized (SETUP_LOCK) {
+            if (!doneSetup) { // Do setup only once for this task
+                String xmlFilePath = p_.getProperty("PARSE.XML_FILEPATH");
+                try {
+                    xmlFileAsString = readFileAsString(xmlFilePath, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    l.warn("Exception in reading xml file: " + xmlFilePath, e);
+                }
+                doneSetup = true;
+            }
+        }
+    }
+
+    @Override
+    protected Float doTaskLogic(Map map) {
+        String m = (String) map.get(AbstractTask.DEFAULT_KEY);
+        // for now code is independent of incoming message
+        int tot_length = doXMLparseOp(xmlFileAsString, l);
+        return Float.valueOf(tot_length);
+    }
+
     public static final class StudentRecordHandler extends DefaultHandler {
+        public int valueLength = 0;
         boolean bFirstName = false;
         boolean bLastName = false;
         boolean bNickName = false;
         boolean bMarks = false;
-        public int valueLength = 0;
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)

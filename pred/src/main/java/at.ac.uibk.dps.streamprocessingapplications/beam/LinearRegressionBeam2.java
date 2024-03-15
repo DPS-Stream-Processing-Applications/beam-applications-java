@@ -4,11 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.LinearRegressionEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.LinearRegressionPredictor;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
@@ -16,15 +11,16 @@ import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.SerializationHelper;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionEntry> {
 
-    @Setup
-    public void setup() throws MqttException {
-        linearRegressionPredictor = new LinearRegressionPredictor();
-        initLogger(LoggerFactory.getLogger("APP"));
-        linearRegressionPredictor.setup(l, p);
-    }
-
+    private static Logger l;
+    LinearRegressionPredictor linearRegressionPredictor;
     private Properties p;
     private String dataSetType;
 
@@ -33,13 +29,16 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
         this.dataSetType = dataSetType;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    LinearRegressionPredictor linearRegressionPredictor;
+    @Setup
+    public void setup() throws MqttException {
+        linearRegressionPredictor = new LinearRegressionPredictor();
+        initLogger(LoggerFactory.getLogger("APP"));
+        linearRegressionPredictor.setup(l, p);
+    }
 
     @ProcessElement
     public void processElement(

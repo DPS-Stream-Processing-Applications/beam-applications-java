@@ -12,6 +12,19 @@ public class BlobReadEntry implements Serializable {
     private String analyticType;
     private String meta;
 
+    public BlobReadEntry(
+            byte[] blobModelObject,
+            String msgid,
+            String msgType,
+            String analyticType,
+            String meta) {
+        BlobModelObject = blobModelObject;
+        this.msgid = msgid;
+        this.msgType = msgType;
+        this.analyticType = analyticType;
+        this.meta = meta;
+    }
+
     public byte[] getBlobModelObject() {
         return BlobModelObject;
     }
@@ -49,19 +62,6 @@ public class BlobReadEntry implements Serializable {
     }
 
     public void setMeta(String meta) {
-        this.meta = meta;
-    }
-
-    public BlobReadEntry(
-            byte[] blobModelObject,
-            String msgid,
-            String msgType,
-            String analyticType,
-            String meta) {
-        BlobModelObject = blobModelObject;
-        this.msgid = msgid;
-        this.msgType = msgType;
-        this.analyticType = analyticType;
         this.meta = meta;
     }
 

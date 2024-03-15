@@ -4,36 +4,34 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
-    private Properties p;
+    private static Logger l;
     private final String dataSetType;
-
+    SenMlParse senMLParseTask;
+    private Properties p;
+    private ArrayList<String> observableFields;
+    private String[] metaFields;
+    private String idField;
     public ParsePredictBeam(Properties p_, String dataSetType) {
         p = p_;
         this.dataSetType = dataSetType;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
-
-    private ArrayList<String> observableFields;
-    private String[] metaFields;
-    private String idField;
-    SenMlParse senMLParseTask;
 
     @Setup
     public void setup() {

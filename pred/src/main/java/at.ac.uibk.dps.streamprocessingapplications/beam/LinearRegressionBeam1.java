@@ -4,15 +4,30 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.LinearRegressionEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.LinearRegressionPredictor;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntry> {
+
+    private static Logger l;
+    private final String dataSetType;
+    LinearRegressionPredictor linearRegressionPredictor;
+    private Properties p;
+
+    public LinearRegressionBeam1(Properties p_, String dataSetType) {
+        p = p_;
+        this.dataSetType = dataSetType;
+    }
+
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     @Setup
     public void setup() throws MqttException {
@@ -20,23 +35,6 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
         initLogger(LoggerFactory.getLogger("APP"));
         linearRegressionPredictor.setup(l, p);
     }
-
-    private Properties p;
-
-    private final String dataSetType;
-
-    public LinearRegressionBeam1(Properties p_, String dataSetType) {
-        p = p_;
-        this.dataSetType = dataSetType;
-    }
-
-    private static Logger l;
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
-    LinearRegressionPredictor linearRegressionPredictor;
 
     @ProcessElement
     public void processElement(@Element SenMlEntry input, OutputReceiver<LinearRegressionEntry> out)

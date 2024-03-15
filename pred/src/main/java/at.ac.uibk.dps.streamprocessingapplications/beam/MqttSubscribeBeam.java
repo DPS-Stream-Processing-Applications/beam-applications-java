@@ -3,33 +3,26 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTSubscribeTask;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
     private static long msgid = 1;
-
-    MQTTSubscribeTask mqttSubscribeTask;
-
     private static Logger l; // TODO: Ensure logger is initialized before use
-
-    public MqttSubscribeBeam() {}
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
+    MQTTSubscribeTask mqttSubscribeTask;
     String spoutLogFileName = null;
-
     Properties p;
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
 
+    public MqttSubscribeBeam() {
+    }
     public MqttSubscribeBeam(Properties p_, String spoutLogFileName) {
         this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
@@ -38,6 +31,10 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
     public MqttSubscribeBeam(Properties p_) {
         p = p_;
+    }
+
+    public static void initLogger(Logger l_) {
+        l = l_;
     }
 
     @Setup
@@ -55,12 +52,6 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         map.put(AbstractTask.DEFAULT_KEY, "dummy");
         mqttSubscribeTask.doTask(map);
         String arg1 = (String) mqttSubscribeTask.getLastResult();
-        // FIXME!
-
-        //        if(l.isInfoEnabled())
-        //            l.info("MQTTSubscribeSpout nextTuple {}",arg1);
-
-        // FIXME: split arg1 by colon in to BlobModelPath and analyticsType
 
         if (arg1 != null) {
             try {

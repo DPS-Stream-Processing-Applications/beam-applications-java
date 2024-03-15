@@ -4,11 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeClassify;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
@@ -16,23 +11,27 @@ import org.slf4j.LoggerFactory;
 import weka.classifiers.trees.J48;
 import weka.core.SerializationHelper;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
 
-    private Properties p;
+    private static Logger l;
     private final String dataSetType;
+    DecisionTreeClassify decisionTreeClassify;
+    private Properties p;
 
     public DecisionTreeBeam1(Properties p_, String dataSetType) {
         p = p_;
         this.dataSetType = dataSetType;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
-
-    DecisionTreeClassify decisionTreeClassify;
 
     @Setup
     public void setup() throws MqttException {

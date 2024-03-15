@@ -1,15 +1,24 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import com.opencsv.CSVReader;
-import java.io.*;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+interface MyReader {
+    String[] readLine() throws IOException;
+
+    void init() throws FileNotFoundException;
+
+    public void close() throws IOException;
+}
 
 /*
  * Splits the JSON file in round-robin manner and stores it to individual files
@@ -32,7 +41,6 @@ public class JsonSplitter {
             }
             return headerList;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -107,9 +115,9 @@ public class JsonSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                        * (1.0 / accFactor)
-                                        * 60
-                                        * 1000; // accFactor is actually the scaling factor or
+                                * (1.0 / accFactor)
+                                * 60
+                                * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
             }
 
@@ -200,14 +208,6 @@ public class JsonSplitter {
     }
 }
 
-interface MyReader {
-    String[] readLine() throws IOException;
-
-    void init() throws FileNotFoundException;
-
-    public void close() throws IOException;
-}
-
 class MyCSVReader implements MyReader {
     public CSVReader reader;
     public String inputFileName;
@@ -217,7 +217,6 @@ class MyCSVReader implements MyReader {
         try {
             init();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -246,7 +245,6 @@ class MyJSONReader implements MyReader {
         try {
             init();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

@@ -2,12 +2,13 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
+import org.apache.beam.sdk.transforms.DoFn;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.apache.beam.sdk.transforms.DoFn;
 
 public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 

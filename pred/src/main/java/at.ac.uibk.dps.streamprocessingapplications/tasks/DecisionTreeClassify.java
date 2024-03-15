@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import java.io.StringReader;
-import java.util.Map;
-import java.util.Properties;
 import org.slf4j.Logger;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.io.StringReader;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.
@@ -16,17 +17,10 @@ import weka.core.Instances;
 public class DecisionTreeClassify extends AbstractTask {
 
     private static final Object SETUP_LOCK = new Object();
-    // static fields common to all threads
-    private static boolean doneSetup = false;
-    private static int useMsgField;
-    private final String dataSetType;
-
     // Sample data, assuming arff file has headers for Sense-Your-City dataset
     private static final String SAMPLE_INPUT_SYS = "-71.10,42.37,10.1,65.3,0";
     // for taxi dataset
     private static final String SAMPLE_INPUT_TAXI = "420,1.95,8.00";
-    //	// Encode the arff header for SYS as a constant string
-
     private static final String SAMPLE_HEADER_SYS =
             "@RELATION SYS_data\n"
                     + "\n"
@@ -41,9 +35,6 @@ public class DecisionTreeClassify extends AbstractTask {
                     + "\n"
                     + "@DATA\n"
                     + "%header format";
-
-    //	// Sample data, assuming arff file has headers for TAXI dataset
-
     //	// Encode the arff header for SYS as a constant string
     private static final String SAMPLE_HEADER_TAXI =
             "@RELATION TAXI_data\n"
@@ -55,10 +46,20 @@ public class DecisionTreeClassify extends AbstractTask {
                     + "\n"
                     + "@DATA\n"
                     + "%header format";
+    public static J48 j48tree;
+    //	// Encode the arff header for SYS as a constant string
+    // static fields common to all threads
+    private static boolean doneSetup = false;
 
+    //	// Sample data, assuming arff file has headers for TAXI dataset
+    private static int useMsgField;
     private static Instances instanceHeader;
     private static int resultAttrNdx; // Index of result attribute in arff file
-    public static J48 j48tree;
+    private final String dataSetType;
+
+    public DecisionTreeClassify(String dataSetType) {
+        this.dataSetType = dataSetType;
+    }
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
@@ -165,9 +166,5 @@ public class DecisionTreeClassify extends AbstractTask {
             throw new RuntimeException(e);
             // return Float.valueOf(Float.MIN_VALUE);
         }
-    }
-
-    public DecisionTreeClassify(String dataSetType) {
-        this.dataSetType = dataSetType;
     }
 }

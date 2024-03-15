@@ -7,6 +7,14 @@ public class SourceEntry implements Serializable {
     private String msgid;
     private String payLoad;
 
+    public SourceEntry(String msgid, String payLoad) {
+        this.msgid = msgid;
+        this.payLoad = payLoad;
+    }
+
+    public SourceEntry() {
+    }
+
     public String getMsgid() {
         return msgid;
     }
@@ -22,13 +30,6 @@ public class SourceEntry implements Serializable {
     public void setPayLoad(String payLoad) {
         this.payLoad = payLoad;
     }
-
-    public SourceEntry(String msgid, String payLoad) {
-        this.msgid = msgid;
-        this.payLoad = payLoad;
-    }
-
-    public SourceEntry() {}
 
     @Override
     public String toString() {

@@ -4,15 +4,18 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeClassify;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+
 public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
+    private static Logger l;
+    DecisionTreeClassify decisionTreeClassify;
     private Properties p;
     private String dataSetType;
 
@@ -21,13 +24,9 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
         this.dataSetType = dataSetType;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
-
-    DecisionTreeClassify decisionTreeClassify;
 
     @Setup
     public void setup() throws MqttException {

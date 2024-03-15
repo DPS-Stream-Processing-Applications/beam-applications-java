@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import java.io.StringReader;
-import java.util.Map;
-import java.util.Properties;
 import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.io.StringReader;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.
@@ -16,15 +17,13 @@ import weka.core.Instances;
 public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
     private static final Object SETUP_LOCK = new Object();
-    // static fields common to all threads
-    private static boolean doneSetup = false;
-    private static int useMsgField;
-
-    private static String modelFilePath;
-    // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
-
     // for taxi dataset
     private static final String SAMPLE_INPUT = "420,1.95,8.00";
+    public static LinearRegression lr;
+    // static fields common to all threads
+    private static boolean doneSetup = false;
+    // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
+    private static int useMsgField;
 
     // private static String SAMPLE_HEADER = "";
     //			"@RELATION city_data\n" +
@@ -39,7 +38,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
     //			"\n" +
     //			"@DATA\n" +
     //			"%header format";
-
+    private static String modelFilePath;
     private static String SAMPLE_HEADER =
             "@RELATION taxi_data\n"
                     + "\n"
@@ -49,9 +48,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "\n"
                     + "@DATA\n"
                     + "%header format";
-
     private static Instances instanceHeader;
-    public static LinearRegression lr;
 
     /**
      * @param l_

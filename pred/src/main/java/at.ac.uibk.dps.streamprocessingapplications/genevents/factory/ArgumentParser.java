@@ -2,7 +2,9 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import org.apache.flink.api.java.utils.ParameterTool;
 
-/** Created by tarun on 28/5/15. */
+/**
+ * Created by tarun on 28/5/15.
+ */
 public class ArgumentParser {
 
     /*

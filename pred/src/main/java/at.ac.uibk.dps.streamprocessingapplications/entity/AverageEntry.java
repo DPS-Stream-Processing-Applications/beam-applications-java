@@ -12,6 +12,23 @@ public class AverageEntry implements Serializable {
     private String msgid;
     private String analyticType;
 
+    public AverageEntry(
+            String meta,
+            String sensorId,
+            String obsType,
+            String avGres,
+            String obsVal,
+            String msgid,
+            String analyticType) {
+        this.meta = meta;
+        this.sensorId = sensorId;
+        this.obsType = obsType;
+        this.avGres = avGres;
+        this.obsVal = obsVal;
+        this.msgid = msgid;
+        this.analyticType = analyticType;
+    }
+
     public String getMeta() {
         return meta;
     }
@@ -79,23 +96,6 @@ public class AverageEntry implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(msgid);
-    }
-
-    public AverageEntry(
-            String meta,
-            String sensorId,
-            String obsType,
-            String avGres,
-            String obsVal,
-            String msgid,
-            String analyticType) {
-        this.meta = meta;
-        this.sensorId = sensorId;
-        this.obsType = obsType;
-        this.avGres = avGres;
-        this.obsVal = obsVal;
-        this.msgid = msgid;
-        this.analyticType = analyticType;
     }
 
     @Override

@@ -5,11 +5,12 @@ import com.microsoft.azure.storage.blob.CloudBlob;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.ListBlobItem;
+import org.slf4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
-import org.slf4j.Logger;
 
 /**
  * Downloads a blob from Azure cloud to local memory
@@ -28,6 +29,39 @@ public class AzureBlobDownloadTask extends AbstractTask<String, byte[]> {
     private static String storageConnStr;
     private static String containerName;
     private static String[] fileNames;
+
+    /***
+     *
+     * @param azStorageConnStr
+     * @param containerName
+     * @param fileName
+     * @param l
+     * @return
+     */
+    static CloudBlob connectToAzBlob(
+            String azStorageConnStr, String containerName, String fileName, Logger l) {
+        try {
+            // Retrieve storage account from connection-string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
+
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = blobClient.getContainerReference(containerName);
+
+            ListBlobItem blobItem = container.getBlockBlobReference(fileName);
+
+            CloudBlob blob = (CloudBlob) blobItem;
+            //			blob.download(new FileOutputStream("/home/shilpa/Desktop/" + blob.getName()));
+            //			System.out.println("File saved");
+            return blob;
+        } catch (Exception e) {
+            l.warn("Exception in connectToAzBlob: " + containerName + "/" + fileName, e);
+        }
+
+        return null;
+    }
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
@@ -71,39 +105,6 @@ public class AzureBlobDownloadTask extends AbstractTask<String, byte[]> {
         // int result = getAzBlob(cloudBlob, l);
         int result = 1;
         return Float.valueOf(result);
-    }
-
-    /***
-     *
-     * @param azStorageConnStr
-     * @param containerName
-     * @param fileName
-     * @param l
-     * @return
-     */
-    static CloudBlob connectToAzBlob(
-            String azStorageConnStr, String containerName, String fileName, Logger l) {
-        try {
-            // Retrieve storage account from connection-string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
-
-            // Retrieve reference to a previously created container.
-            CloudBlobContainer container = blobClient.getContainerReference(containerName);
-
-            ListBlobItem blobItem = container.getBlockBlobReference(fileName);
-
-            CloudBlob blob = (CloudBlob) blobItem;
-            //			blob.download(new FileOutputStream("/home/shilpa/Desktop/" + blob.getName()));
-            //			System.out.println("File saved");
-            return blob;
-        } catch (Exception e) {
-            l.warn("Exception in connectToAzBlob: " + containerName + "/" + fileName, e);
-        }
-
-        return null;
     }
 
     /***

@@ -8,6 +8,12 @@ public class MqttSubscribeEntry implements Serializable {
     private String BlobModelPath;
     private String msgid;
 
+    public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid) {
+        Analaytictype = analaytictype;
+        BlobModelPath = blobModelPath;
+        this.msgid = msgid;
+    }
+
     public String getBlobModelPath() {
         return BlobModelPath;
     }
@@ -30,12 +36,6 @@ public class MqttSubscribeEntry implements Serializable {
 
     public void setAnalaytictype(String analaytictype) {
         Analaytictype = analaytictype;
-    }
-
-    public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid) {
-        Analaytictype = analaytictype;
-        BlobModelPath = blobModelPath;
-        this.msgid = msgid;
     }
 
     @Override

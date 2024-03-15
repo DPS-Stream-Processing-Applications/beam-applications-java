@@ -6,7 +6,6 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,6 +14,12 @@ import java.util.Random;
 
 public class CityDataGenerator {
     private static long rowToParse = 0;
+
+    private String dataSetFileName;
+
+    public CityDataGenerator(String dataSetFileName) {
+        this.dataSetFileName = dataSetFileName;
+    }
 
     public static SYS_City generateRandomCityData() {
         SYS_City sysData = new SYS_City();
@@ -34,9 +39,8 @@ public class CityDataGenerator {
         return sysData;
     }
 
-    public static SYS_City getNextDataEntry() {
-        // FIXME!
-        String csvFile = "./train/src/main/resources/datasets/SYS_sample_data_senml.csv";
+    public SYS_City getNextDataEntry() {
+        String csvFile = dataSetFileName;
         long totalNumberLines = TrainJob.countLines(csvFile);
         rowToParse = rowToParse % totalNumberLines;
         SYS_City sysCity = new SYS_City();

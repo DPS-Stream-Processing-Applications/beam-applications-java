@@ -4,14 +4,13 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
-import org.apache.beam.sdk.transforms.DoFn;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.beam.sdk.transforms.DoFn;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
@@ -46,8 +45,6 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
 
     @Setup
     public void setup() {
-        // TODO Auto-generated method stub
-        //		System.out.println("SampleSpout PID,"+ ManagementFactory.getRuntimeMXBean().getName());
         BatchedFileLogging.writeToTemp(this, this.outSpoutCSVLogFileName);
         Random r = new Random();
         try {
@@ -226,12 +223,9 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
 
     @ProcessElement
     public void processElement(@Element String input, OutputReceiver<SourceEntry> out) {
-        // TODO Auto-generated method stub
-        //		try {
-        //		System.out.println("spout Queue count= "+this.eventQueue.size());
         // allow multiple tuples to be emitted per next tuple.
         // Discouraged? https://groups.google.com/forum/#!topic/storm-user/SGwih7vPiDE
-        int count = 0, MAX_COUNT = 10; // FIXME?
+        // int count = 0, MAX_COUNT = 10; // FIXME?
         int sendMessages = 0;
         while (sendMessages < numberLines) {
             // while (count < MAX_COUNT) {
@@ -241,7 +235,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
                 // return;
                 continue;
             }
-            count++;
+            // count++;
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
             for (String s : entry) {
@@ -274,23 +268,18 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
                 // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException("Exception when writing to batchLogger " + e);
             }
-            //		} catch (InterruptedException e) {
-            //			// TODO Auto-generated catch block
-            //			e.printStackTrace();
-            //		}
         }
     }
 
     @Override
     public void receive(List<String> event) {
-        // TODO Auto-generated method stub
-        // System.out.println("Called IN SPOUT### ");
         try {
             this.eventQueue.put(event);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new RuntimeException("Exception in receive Event" + e);
         }
     }
 }

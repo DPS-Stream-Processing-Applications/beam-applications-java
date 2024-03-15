@@ -7,9 +7,8 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import org.slf4j.Logger;
-
 import java.util.*;
+import org.slf4j.Logger;
 
 public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     private static final Object SETUP_LOCK = new Object();
@@ -24,87 +23,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     private static int useMsgField;
     private static Random rn;
 
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                storageConnStr =
-                        p_.getProperty(
-                                "IO.AZURE_STORAGE_CONN_STR"); // TODO: add to config.property file
-                tableName =
-                        p_.getProperty(
-                                "IO.AZURE_TABLE.TABLE_NAME"); // TODO: pass table with TaxiDropoff
-                // Entity
-                partitionKey =
-                        p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY"); // TODO: pass partition with
-                // TaxiDropoff Entity
-                useMsgField =
-                        Integer.parseInt(
-                                p_.getProperty(
-                                        "IO.AZURE_TABLE.USE_MSG_FIELD",
-                                        "0")); // If positive, use that particular field number in
-                // the input CSV message as input for count
-                startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
-                endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
-                rn = new Random();
-                doneSetup = true;
-            }
-        }
-    }
-
-    @Override
-    protected Float doTaskLogic(Map map) {
-        String rowKeyStart, rowKeyEnd;
-        CloudTable cloudTbl = connectToAzTable(storageConnStr, tableName, l);
-        l.warn("Table name is - " + cloudTbl.getName());
-        // FIXME: How do you advance the rowkey. Have a start and end for row key as input property?
-        //		String rowKeyStart,rowKeyEnd;
-        if (useMsgField > 0) {
-            //			rowKey = m.split(",")[useMsgField - 1];
-            rowKeyStart = (String) map.get("ROWKEYSTART");
-            rowKeyEnd = (String) map.get("ROWKEYEND");
-            //			assert Integer.parseInt(rowKeyStart)>=startRowKey;
-            //			assert Integer.parseInt(rowKeyEnd)<=endRowKey;
-            if (l.isInfoEnabled()) l.info("1-row key accesed till - " + rowKeyEnd);
-        } else {
-            rowKeyStart = String.valueOf(rn.nextInt(endRowKey));
-            rowKeyEnd = String.valueOf(rn.nextInt(endRowKey));
-            if (l.isInfoEnabled()) l.info("2-row key accesed - " + rowKeyEnd);
-        }
-        Iterable<FIT_data> result =
-                getAzTableRangeByKeyFIT(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
-        System.out.println("Row key = " + rowKeyEnd);
-        System.out.println("Result = " + result);
-
-        super.setLastResult(result);
-
-        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
-    }
-
-    public Float doTaskLogicDummy(Map map) {
-        String rowKeyStart = (String) map.get("ROWKEYSTART");
-        String rowKeyEnd = (String) map.get("ROWKEYEND");
-        long start = Long.parseLong(rowKeyStart);
-        long end = Long.parseLong(rowKeyEnd);
-
-        List<FIT_data> resultList = new ArrayList<>();
-        /*
-        for (long i = start; start <= end; i++) {
-            resultList.add(FitDataGenerator.generateRandomFITData());
-
-        }
-         */
-        for (long i = 0; i <= 10; i++) {
-            // FIXME!
-            resultList.add(FitDataGenerator.getNextDataEntry());
-        }
-
-        Iterable<FIT_data> result = resultList;
-
-        super.setLastResult(result);
-
-        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
-    }
+    private static String dataSetFilePath;
 
     /***
      *
@@ -214,5 +133,88 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         map.put("ROWKEYSTART", "23");
         map.put("ROWKEYEND", "64");
         test.doTaskLogicDummy(map);
+    }
+
+    public void setup(Logger l_, Properties p_) {
+        super.setup(l_, p_);
+        synchronized (SETUP_LOCK) {
+            if (!doneSetup) { // Do setup only once for this task
+                storageConnStr =
+                        p_.getProperty(
+                                "IO.AZURE_STORAGE_CONN_STR"); // TODO: add to config.property file
+                tableName =
+                        p_.getProperty(
+                                "IO.AZURE_TABLE.TABLE_NAME"); // TODO: pass table with TaxiDropoff
+                // Entity
+                partitionKey =
+                        p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY"); // TODO: pass partition with
+                // TaxiDropoff Entity
+                useMsgField =
+                        Integer.parseInt(
+                                p_.getProperty(
+                                        "IO.AZURE_TABLE.USE_MSG_FIELD",
+                                        "0")); // If positive, use that particular field number in
+                // the input CSV message as input for count
+                startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
+                endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
+                dataSetFilePath = p_.getProperty("TRAIN.DATASET_FULL_NAME_FIT");
+                rn = new Random();
+                doneSetup = true;
+            }
+        }
+    }
+
+    @Override
+    protected Float doTaskLogic(Map map) {
+        String rowKeyStart, rowKeyEnd;
+        CloudTable cloudTbl = connectToAzTable(storageConnStr, tableName, l);
+        l.warn("Table name is - " + cloudTbl.getName());
+        // FIXME: How do you advance the rowkey. Have a start and end for row key as input property?
+        //		String rowKeyStart,rowKeyEnd;
+        if (useMsgField > 0) {
+            //			rowKey = m.split(",")[useMsgField - 1];
+            rowKeyStart = (String) map.get("ROWKEYSTART");
+            rowKeyEnd = (String) map.get("ROWKEYEND");
+            //			assert Integer.parseInt(rowKeyStart)>=startRowKey;
+            //			assert Integer.parseInt(rowKeyEnd)<=endRowKey;
+            if (l.isInfoEnabled()) l.info("1-row key accesed till - " + rowKeyEnd);
+        } else {
+            rowKeyStart = String.valueOf(rn.nextInt(endRowKey));
+            rowKeyEnd = String.valueOf(rn.nextInt(endRowKey));
+            if (l.isInfoEnabled()) l.info("2-row key accesed - " + rowKeyEnd);
+        }
+        Iterable<FIT_data> result =
+                getAzTableRangeByKeyFIT(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
+        System.out.println("Row key = " + rowKeyEnd);
+        System.out.println("Result = " + result);
+
+        super.setLastResult(result);
+
+        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
+    }
+
+    public Float doTaskLogicDummy(Map map) {
+        String rowKeyStart = (String) map.get("ROWKEYSTART");
+        String rowKeyEnd = (String) map.get("ROWKEYEND");
+        long start = Long.parseLong(rowKeyStart);
+        long end = Long.parseLong(rowKeyEnd);
+
+        List<FIT_data> resultList = new ArrayList<>();
+        /*
+        for (long i = start; start <= end; i++) {
+            resultList.add(FitDataGenerator.generateRandomFITData());
+
+        }
+         */
+        FitDataGenerator fitDataGenerator = new FitDataGenerator(dataSetFilePath);
+        for (long i = 0; i <= 10; i++) {
+            resultList.add(fitDataGenerator.getNextDataEntry());
+        }
+
+        Iterable<FIT_data> result = resultList;
+
+        super.setLastResult(result);
+
+        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
     }
 }

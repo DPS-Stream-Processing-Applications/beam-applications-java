@@ -1,13 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.slf4j.Logger;
-import weka.classifiers.functions.LinearRegression;
-import weka.core.Instances;
-
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
+import org.slf4j.Logger;
+import weka.classifiers.functions.LinearRegression;
+import weka.core.Instances;
 
 /**
  * This task should only be run from a single thread to avoid overwriting output model file.
@@ -24,11 +23,46 @@ public class LinearRegressionTrainBatched extends AbstractTask {
     //	private static int modelTrainFreq;
     private static String instanceHeader = null;
     private static String SAMPLE_HEADER = "";
+    private static String dummyData;
     // local fields assigned to each thread
     private int instancesCount = 0;
     private StringBuffer instancesBuf = null;
 
-    private static String dummyData;
+    /**
+     * @param instanceReader
+     * @param modelFilePath
+     * @param model
+     * @param l @return
+     */
+    private static int linearRegressionTrainAndSaveModel(
+            StringReader instanceReader,
+            String modelFilePath,
+            ByteArrayOutputStream model,
+            Logger l) {
+
+        Instances trainingData = WekaUtil.loadDatasetInstances(instanceReader, l);
+        if (trainingData == null) return -1;
+
+        try {
+            // train the model
+            LinearRegression lr = new LinearRegression();
+            lr.buildClassifier(trainingData);
+
+            weka.core.SerializationHelper.write(model, lr);
+
+            // saving the model
+            weka.core.SerializationHelper.write(modelFilePath, lr);
+
+        } catch (Exception e) {
+            l.warn("error training linear regression", e);
+            return -2;
+        }
+        if (l.isInfoEnabled())
+            l.info(
+                    "linear regression Model trained over full ARFF file and saved at {} ",
+                    modelFilePath);
+        return 0;
+    }
 
     public void setup(Logger l_, Properties p_) {
         // TODO: Later, have option of training using instances present in data file rather than
@@ -108,41 +142,5 @@ public class LinearRegressionTrainBatched extends AbstractTask {
 
         return Float.valueOf(1);
         //		return Float.valueOf(Float.MIN_VALUE);
-    }
-
-    /**
-     * @param instanceReader
-     * @param modelFilePath
-     * @param model
-     * @param l              @return
-     */
-    private static int linearRegressionTrainAndSaveModel(
-            StringReader instanceReader,
-            String modelFilePath,
-            ByteArrayOutputStream model,
-            Logger l) {
-
-        Instances trainingData = WekaUtil.loadDatasetInstances(instanceReader, l);
-        if (trainingData == null) return -1;
-
-        try {
-            // train the model
-            LinearRegression lr = new LinearRegression();
-            lr.buildClassifier(trainingData);
-
-            weka.core.SerializationHelper.write(model, lr);
-
-            // saving the model
-            weka.core.SerializationHelper.write(modelFilePath, lr);
-
-        } catch (Exception e) {
-            l.warn("error training linear regression", e);
-            return -2;
-        }
-        if (l.isInfoEnabled())
-            l.info(
-                    "linear regression Model trained over full ARFF file and saved at {} ",
-                    modelFilePath);
-        return 0;
     }
 }

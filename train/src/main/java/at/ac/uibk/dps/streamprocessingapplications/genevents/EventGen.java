@@ -4,7 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.CsvSplitter
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.JsonSplitter;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.TableClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -82,12 +81,9 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -146,12 +142,10 @@ public class EventGen {
                 this.executorService.execute(subEventGenArr[i]);
             }
             sem2.release(numThreads);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
@@ -180,6 +174,7 @@ class SubEventGen implements Runnable {
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+            throw new RuntimeException(e1);
         }
         List<List<String>> rows = this.eventList.getRows();
         int rowLen = rows.size();
@@ -196,7 +191,7 @@ class SubEventGen implements Runnable {
                 long delay =
                         deltaTs
                                 - (currentTs
-                                - experiRestartTime); // how long until this event should be
+                                        - experiRestartTime); // how long until this event should be
                 // sent?
                 // delay = 1000;
                 if (delay > 10) { // sleep only if it is non-trivial time. We will catch up on sleep
@@ -205,7 +200,6 @@ class SubEventGen implements Runnable {
                         System.out.println("Sleeping for " + delay);
                         Thread.sleep(delay);
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                         throw new RuntimeException("Error in delay");
                     }

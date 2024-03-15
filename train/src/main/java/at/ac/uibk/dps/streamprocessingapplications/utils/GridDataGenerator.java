@@ -1,7 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.GRID_data;
-
 import java.util.Random;
 
 public class GridDataGenerator {

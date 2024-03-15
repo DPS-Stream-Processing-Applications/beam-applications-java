@@ -4,21 +4,19 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.AnnotateEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.TrainEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeTrainBatched;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
-
 public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
     private static Logger l;
-    private Properties p;
-
+    private final String dataSetType;
     DecisionTreeTrainBatched decisionTreeTrainBatched;
     String datasetName = "";
-    private final String dataSetType;
+    private Properties p;
 
     public DecisionTreeBeam(Properties p_, String dataSetType) {
         this.p = p_;

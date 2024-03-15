@@ -7,6 +7,12 @@ public class AnnotateEntry implements Serializable {
     private String annotData;
     private String rowKeyEnd;
 
+    public AnnotateEntry(String msgid, String annotData, String rowKeyEnd) {
+        this.msgid = msgid;
+        this.annotData = annotData;
+        this.rowKeyEnd = rowKeyEnd;
+    }
+
     public String getMsgid() {
         return msgid;
     }
@@ -28,12 +34,6 @@ public class AnnotateEntry implements Serializable {
     }
 
     public void setRowKeyEnd(String rowKeyEnd) {
-        this.rowKeyEnd = rowKeyEnd;
-    }
-
-    public AnnotateEntry(String msgid, String annotData, String rowKeyEnd) {
-        this.msgid = msgid;
-        this.annotData = annotData;
         this.rowKeyEnd = rowKeyEnd;
     }
 

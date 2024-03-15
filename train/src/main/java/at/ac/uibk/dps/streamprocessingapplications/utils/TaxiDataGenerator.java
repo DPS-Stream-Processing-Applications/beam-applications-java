@@ -6,7 +6,6 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,6 +14,11 @@ import java.util.Random;
 
 public class TaxiDataGenerator {
     private static long rowToParse = 0;
+    private String dataSetPath;
+
+    public TaxiDataGenerator(String dataSetPath) {
+        this.dataSetPath = dataSetPath;
+    }
 
     public static Taxi_Trip generateRandomTaxiData() {
         Taxi_Trip sysData = new Taxi_Trip();
@@ -41,9 +45,8 @@ public class TaxiDataGenerator {
         return sysData;
     }
 
-    public static Taxi_Trip getNextDataEntry() {
-        // FIXME!
-        String csvFile = "./train/src/main/resources/datasets/TAXI_sample_data_senml.csv";
+    public Taxi_Trip getNextDataEntry() {
+        String csvFile = dataSetPath;
         long totalNumberLines = TrainJob.countLines(csvFile);
         rowToParse = rowToParse % totalNumberLines;
         Taxi_Trip taxiTrip = new Taxi_Trip();

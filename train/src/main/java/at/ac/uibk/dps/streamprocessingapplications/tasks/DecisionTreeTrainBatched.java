@@ -1,9 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.slf4j.Logger;
-import weka.classifiers.trees.J48;
-import weka.core.Instances;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -11,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
+import org.slf4j.Logger;
+import weka.classifiers.trees.J48;
+import weka.core.Instances;
 
 /**
  * This task should only be run from a single thread to avoid overwriting output model file.
@@ -27,11 +26,52 @@ public class DecisionTreeTrainBatched extends AbstractTask {
     //	private static int modelTrainFreq;
     private static String instanceHeader = null;
     private static String SAMPLE_HEADER = "";
+    private static String dummyData;
     // local fields assigned to each thread
     private int instancesCount = 0;
     private StringBuffer instancesBuf = null;
 
-    private static String dummyData;
+    /***
+     *
+     * @param instancesReader
+     * @param modelFilePath
+     * @param model
+     *@param l  @return
+     */
+    private static int decisionTreeTrainAndSaveModel(
+            StringReader instancesReader,
+            String modelFilePath,
+            ByteArrayOutputStream model,
+            Logger l) {
+
+        Instances trainingData = WekaUtil.loadDatasetInstances(instancesReader, l);
+
+        if (trainingData == null) return -1;
+
+        try {
+            // train the model
+            J48 j48tree = new J48();
+            j48tree.buildClassifier(trainingData);
+            if (l.isInfoEnabled()) l.info("Model is - " + j48tree.toString());
+
+            //			System.out.println(("Model is - "+j48tree.toString()));
+
+            // saving the model
+            weka.core.SerializationHelper.write(modelFilePath, j48tree);
+
+        } catch (Exception e) {
+            l.warn("error training decision tree", e);
+            System.out.println(e);
+            return -2;
+        }
+
+        if (l.isInfoEnabled()) {
+            l.info("Decision tree Model trained and saved at {} ", modelFilePath);
+            l.info("number of training instances {} ", trainingData.numInstances());
+        }
+
+        return trainingData.numInstances(); // return number of instances trained on
+    }
 
     public void setup(Logger l_, Properties p_) {
         // TODO: Later, have option of training using instances present in data file rather than
@@ -102,47 +142,5 @@ public class DecisionTreeTrainBatched extends AbstractTask {
         }
 
         return Float.valueOf(Float.MIN_VALUE);
-    }
-
-    /***
-     *
-     * @param instancesReader
-     * @param modelFilePath
-     * @param model
-     *@param l  @return
-     */
-    private static int decisionTreeTrainAndSaveModel(
-            StringReader instancesReader,
-            String modelFilePath,
-            ByteArrayOutputStream model,
-            Logger l) {
-
-        Instances trainingData = WekaUtil.loadDatasetInstances(instancesReader, l);
-
-        if (trainingData == null) return -1;
-
-        try {
-            // train the model
-            J48 j48tree = new J48();
-            j48tree.buildClassifier(trainingData);
-            if (l.isInfoEnabled()) l.info("Model is - " + j48tree.toString());
-
-            //			System.out.println(("Model is - "+j48tree.toString()));
-
-            // saving the model
-            weka.core.SerializationHelper.write(modelFilePath, j48tree);
-
-        } catch (Exception e) {
-            l.warn("error training decision tree", e);
-            System.out.println(e);
-            return -2;
-        }
-
-        if (l.isInfoEnabled()) {
-            l.info("Decision tree Model trained and saved at {} ", modelFilePath);
-            l.info("number of training instances {} ", trainingData.numInstances());
-        }
-
-        return trainingData.numInstances(); // return number of instances trained on
     }
 }

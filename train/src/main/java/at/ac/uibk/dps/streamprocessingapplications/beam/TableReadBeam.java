@@ -9,31 +9,25 @@ import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTas
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskGRID;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskSYS;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskTAXI;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Properties;
-
 public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
+    private static Logger l;
+    private final String datatype;
     private Properties p;
-    private String datatype;
-
     private AzureTableRangeQueryTaskFIT azureTableRangeQueryTaskFIT;
-
     private AzureTableRangeQueryTaskSYS azureTableRangeQueryTaskSYS;
-
     private AzureTableRangeQueryTaskGRID azureTableRangeQueryTaskGRID;
-
-    private AzureTableRangeQueryTaskTAXI azureTableRangeQueryTaskTAXI;
 
     // private TupleTag<String> trainData = new TupleTag<>();
     // private TupleTag<String> msgId = new TupleTag<>();
     // private TupleTag<String> rowKeyEnd = new TupleTag<>();
-
-    private static Logger l;
+    private AzureTableRangeQueryTaskTAXI azureTableRangeQueryTaskTAXI;
 
     public TableReadBeam(Properties p_, String outCSVFileName, String datatype) {
         this.p = p_;
@@ -46,15 +40,24 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
 
     @Setup
     public void setup() {
-        azureTableRangeQueryTaskFIT = new AzureTableRangeQueryTaskFIT();
         initLogger(LoggerFactory.getLogger("APP"));
-        azureTableRangeQueryTaskFIT.setup(l, p);
-        azureTableRangeQueryTaskGRID = new AzureTableRangeQueryTaskGRID();
-        azureTableRangeQueryTaskGRID.setup(l, p);
-        azureTableRangeQueryTaskSYS = new AzureTableRangeQueryTaskSYS();
-        azureTableRangeQueryTaskSYS.setup(l, p);
-        azureTableRangeQueryTaskTAXI = new AzureTableRangeQueryTaskTAXI();
-        azureTableRangeQueryTaskTAXI.setup(l, p);
+        if (datatype.equals("FIT")) {
+            azureTableRangeQueryTaskFIT = new AzureTableRangeQueryTaskFIT();
+            azureTableRangeQueryTaskFIT.setup(l, p);
+        }
+        if (datatype.equals("GRID")) {
+            azureTableRangeQueryTaskGRID = new AzureTableRangeQueryTaskGRID();
+            azureTableRangeQueryTaskGRID.setup(l, p);
+        }
+        if (datatype.equals("SYS")) {
+            azureTableRangeQueryTaskSYS =
+                    new AzureTableRangeQueryTaskSYS(p.getProperty("TRAIN.DATASET_FULL_NAME_SYS"));
+            azureTableRangeQueryTaskSYS.setup(l, p);
+        }
+        if (datatype.equals("TAXI")) {
+            azureTableRangeQueryTaskTAXI = new AzureTableRangeQueryTaskTAXI();
+            azureTableRangeQueryTaskTAXI.setup(l, p);
+        }
     }
 
     @ProcessElement

@@ -4,28 +4,25 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.AnnotateEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.DbEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AnnotateDTClass;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
-
 public class AnnotateBeam extends DoFn<DbEntry, AnnotateEntry> {
 
-    private Properties p;
-
     private static Logger l;
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
     AnnotateDTClass annotateDTClass;
+    private Properties p;
 
     public AnnotateBeam(Properties p_) {
         p = p_;
+    }
+
+    public static void initLogger(Logger l_) {
+        l = l_;
     }
 
     @Setup

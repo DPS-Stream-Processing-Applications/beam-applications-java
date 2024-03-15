@@ -4,14 +4,13 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
+import org.slf4j.Logger;
 
 /**
  * Uploads a local file to blob on Azure cloud
@@ -30,49 +29,6 @@ public class AzureBlobUploadTask extends AbstractTask<String, Float> {
     private static String storageConnStr;
     private static String containerName;
     private String[] localFilePaths;
-
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                // If positive, use it for index over file names else read randomly
-                useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB.USE_MSG_FIELD"));
-                storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
-                System.out.println("Storage container  " + storageConnStr);
-                containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
-                doneSetup = true;
-            }
-
-            String csvLocalPaths = p_.getProperty("IO.AZURE_BLOB_UPLOAD.FILE_SOURCE_PATH");
-            assert csvLocalPaths != null;
-            localFilePaths = csvLocalPaths.split(",");
-        }
-    }
-
-    @Override
-    protected Float doTaskLogic(Map<String, String> map) {
-        String m = map.get(AbstractTask.DEFAULT_KEY);
-        // pass file index to be downloaded in message or at random
-
-        int localFileSourcePathIndex;
-        String localFileSourcePath;
-        if (useMsgField > 0) {
-            // localFileSourcePathIndex = Integer.parseInt(m.split(",")[useMsgField - 1]) %
-            // localFilePaths.length;
-            // localFileSourcePath = localFilePaths[localFileSourcePathIndex];
-        } else if (useMsgField == 0) {
-            localFileSourcePath = m;
-        } else {
-            localFileSourcePathIndex = ThreadLocalRandom.current().nextInt(localFilePaths.length);
-            localFileSourcePath = localFilePaths[localFileSourcePathIndex];
-        }
-
-        // CloudBlobContainer container = connectToAzContainer(storageConnStr, containerName,  l);
-        // int result = putAzBlob(container,localFileSourcePath,l);
-
-        int result = 1;
-        return Float.valueOf(result);
-    }
 
     /***
      *
@@ -129,5 +85,48 @@ public class AzureBlobUploadTask extends AbstractTask<String, Float> {
             l.warn("Exception in getAzBlob: " + container);
             return -1;
         }
+    }
+
+    public void setup(Logger l_, Properties p_) {
+        super.setup(l_, p_);
+        synchronized (SETUP_LOCK) {
+            if (!doneSetup) { // Do setup only once for this task
+                // If positive, use it for index over file names else read randomly
+                useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB.USE_MSG_FIELD"));
+                storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
+                System.out.println("Storage container  " + storageConnStr);
+                containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
+                doneSetup = true;
+            }
+
+            String csvLocalPaths = p_.getProperty("IO.AZURE_BLOB_UPLOAD.FILE_SOURCE_PATH");
+            assert csvLocalPaths != null;
+            localFilePaths = csvLocalPaths.split(",");
+        }
+    }
+
+    @Override
+    protected Float doTaskLogic(Map<String, String> map) {
+        String m = map.get(AbstractTask.DEFAULT_KEY);
+        // pass file index to be downloaded in message or at random
+
+        int localFileSourcePathIndex;
+        String localFileSourcePath;
+        if (useMsgField > 0) {
+            // localFileSourcePathIndex = Integer.parseInt(m.split(",")[useMsgField - 1]) %
+            // localFilePaths.length;
+            // localFileSourcePath = localFilePaths[localFileSourcePathIndex];
+        } else if (useMsgField == 0) {
+            localFileSourcePath = m;
+        } else {
+            localFileSourcePathIndex = ThreadLocalRandom.current().nextInt(localFilePaths.length);
+            localFileSourcePath = localFilePaths[localFileSourcePathIndex];
+        }
+
+        // CloudBlobContainer container = connectToAzContainer(storageConnStr, containerName,  l);
+        // int result = putAzBlob(container,localFileSourcePath,l);
+
+        int result = 1;
+        return Float.valueOf(result);
     }
 }

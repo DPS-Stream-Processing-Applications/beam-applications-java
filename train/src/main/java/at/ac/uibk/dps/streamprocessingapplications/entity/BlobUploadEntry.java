@@ -6,6 +6,11 @@ public class BlobUploadEntry implements Serializable {
     private String msgid;
     private String fileName;
 
+    public BlobUploadEntry(String msgid, String fileName) {
+        this.msgid = msgid;
+        this.fileName = fileName;
+    }
+
     public String getMsgid() {
         return msgid;
     }
@@ -19,11 +24,6 @@ public class BlobUploadEntry implements Serializable {
     }
 
     public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public BlobUploadEntry(String msgid, String fileName) {
-        this.msgid = msgid;
         this.fileName = fileName;
     }
 }

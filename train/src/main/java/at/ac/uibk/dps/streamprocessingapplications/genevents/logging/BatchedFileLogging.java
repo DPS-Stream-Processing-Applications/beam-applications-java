@@ -107,7 +107,6 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.logging;
 // import in.dream_lab.genevents.utils.GlobalConstants;
 
 import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -117,9 +116,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by anshushukla on 20/05/15.
- */
+/** Created by anshushukla on 20/05/15. */
 public class BatchedFileLogging {
     int counter = 0;
     //    Map<Long,String> batch=new HashMap<Long,String>();
@@ -157,42 +154,51 @@ public class BatchedFileLogging {
         }
     }
 
-    public void batchLogwriter(long ts, String identifierData) throws Exception {
-        if (counter < this.threshold) {
-            // System.out.print("data is inside hashmap");
-            //            batch.put(ts,identifierData);
-            batch.add(new TupleType(ts, identifierData));
-            counter += 1;
-        } else {
-            // 1-write Map to file
-            //            Iterator<Map.Entry<Long, String>> it = batch.entrySet().iterator();
-            //            while (it.hasNext() )
-            //            {
-            //                // the key/value pair is stored here in pairs
-            //                Map.Entry<Long, String> pairs = it.next();
-            //                //System.out.println("Value is " + pairs.getValue());
-            //
-            //                this.out.write( this.logStringPrefix + "," + pairs.getKey() + "," +
-            // pairs.getValue() + "\n");
-            //            }
-            //            System.out.print("data is written to file");
-            //            this.out.flush();
-            //
-            //            //2-flush all data from map
-            //            batch.clear();
-            //
-            //            //3-insert new tuple to map
-            //            counter=1;
-            //            batch.put(ts,identifierData);
-            for (TupleType tp : batch) {
-                this.out.write(this.logStringPrefix + "," + tp.ts + "," + tp.identifier + "\n");
-            }
-            this.out.flush();
+    // TEMP  LOGIC
+    //
+    public static void writeToTemp(Object o, String csvFileNameOut) {
 
-            batch.clear();
+        // ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
+        //        String ExpNumber=GlobalConstants.getExperimentNumber();
+        //        System.out.println("ExpNumber-"+ExpNumber.split("-")[2]);
 
-            counter = 1;
-            batch.add(new TupleType(ts, identifierData));
+        File temp = null;
+        //	String ExpNumber=GlobalConstants.getExperimentNumber();
+        try {
+            File f = new File("/tmp/nameWithPid");
+            f.mkdirs();
+
+            temp =
+                    File.createTempFile(
+                            o.getClass().getSimpleName()
+                                    + "-"
+                                    + System.currentTimeMillis()
+                                    + "-"
+                                    + csvFileNameOut
+                                            .split("\\/")[csvFileNameOut.split("\\/").length - 1]
+                                    + "-BoltPID-"
+                                    + ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
+                                    + "-",
+                            ".tmp",
+                            f);
+
+            // write it
+            BufferedWriter tm = new BufferedWriter(new FileWriter(temp));
+            String s =
+                    "Hostname,"
+                            + InetAddress.getLocalHost().getHostName()
+                            + ",CurrentClassName,"
+                            + o.getClass().getSimpleName()
+                            + ",BoltPID,"
+                            + ManagementFactory.getRuntimeMXBean().getName()
+                            + ",Timestamp,"
+                            + System.currentTimeMillis()
+                            + "\n";
+
+            tm.write(s);
+            tm.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -249,54 +255,6 @@ public class BatchedFileLogging {
     //         System.out.println("Inside the Exception");
     //    }
 
-    // TEMP  LOGIC
-    //
-    public static void writeToTemp(Object o, String csvFileNameOut) {
-
-        // ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
-        //        String ExpNumber=GlobalConstants.getExperimentNumber();
-        //        System.out.println("ExpNumber-"+ExpNumber.split("-")[2]);
-
-        File temp = null;
-        //	String ExpNumber=GlobalConstants.getExperimentNumber();
-        try {
-            File f = new File("/tmp/nameWithPid");
-            f.mkdirs();
-
-            temp =
-                    File.createTempFile(
-                            o.getClass().getSimpleName()
-                                    + "-"
-                                    + System.currentTimeMillis()
-                                    + "-"
-                                    + csvFileNameOut
-                                    .split("\\/")[csvFileNameOut.split("\\/").length - 1]
-                                    + "-BoltPID-"
-                                    + ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
-                                    + "-",
-                            ".tmp",
-                            f);
-
-            // write it
-            BufferedWriter tm = new BufferedWriter(new FileWriter(temp));
-            String s =
-                    "Hostname,"
-                            + InetAddress.getLocalHost().getHostName()
-                            + ",CurrentClassName,"
-                            + o.getClass().getSimpleName()
-                            + ",BoltPID,"
-                            + ManagementFactory.getRuntimeMXBean().getName()
-                            + ",Timestamp,"
-                            + System.currentTimeMillis()
-                            + "\n";
-
-            tm.write(s);
-            tm.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void writeToTempDB(Object o, String csvFileNameOut, String conne) {
 
         // ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
@@ -316,7 +274,7 @@ public class BatchedFileLogging {
                                     + System.currentTimeMillis()
                                     + "-"
                                     + csvFileNameOut
-                                    .split("\\/")[csvFileNameOut.split("\\/").length - 1]
+                                            .split("\\/")[csvFileNameOut.split("\\/").length - 1]
                                     + "-BoltPID-"
                                     + ManagementFactory.getRuntimeMXBean().getName().split("@")[0]
                                     + "-",
@@ -340,6 +298,45 @@ public class BatchedFileLogging {
             tm.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void batchLogwriter(long ts, String identifierData) throws Exception {
+        if (counter < this.threshold) {
+            // System.out.print("data is inside hashmap");
+            //            batch.put(ts,identifierData);
+            batch.add(new TupleType(ts, identifierData));
+            counter += 1;
+        } else {
+            // 1-write Map to file
+            //            Iterator<Map.Entry<Long, String>> it = batch.entrySet().iterator();
+            //            while (it.hasNext() )
+            //            {
+            //                // the key/value pair is stored here in pairs
+            //                Map.Entry<Long, String> pairs = it.next();
+            //                //System.out.println("Value is " + pairs.getValue());
+            //
+            //                this.out.write( this.logStringPrefix + "," + pairs.getKey() + "," +
+            // pairs.getValue() + "\n");
+            //            }
+            //            System.out.print("data is written to file");
+            //            this.out.flush();
+            //
+            //            //2-flush all data from map
+            //            batch.clear();
+            //
+            //            //3-insert new tuple to map
+            //            counter=1;
+            //            batch.put(ts,identifierData);
+            for (TupleType tp : batch) {
+                this.out.write(this.logStringPrefix + "," + tp.ts + "," + tp.identifier + "\n");
+            }
+            this.out.flush();
+
+            batch.clear();
+
+            counter = 1;
+            batch.add(new TupleType(ts, identifierData));
         }
     }
     //

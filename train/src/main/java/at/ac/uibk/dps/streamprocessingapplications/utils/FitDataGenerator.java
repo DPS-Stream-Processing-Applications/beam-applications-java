@@ -6,7 +6,6 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Objects;
@@ -14,6 +13,11 @@ import java.util.Random;
 
 public class FitDataGenerator {
     private static long rowToParse = 0;
+    private String dataSetPath;
+
+    public FitDataGenerator(String dataSetPath) {
+        this.dataSetPath = dataSetPath;
+    }
 
     public static FIT_data generateRandomFITData() {
         FIT_data fitData = new FIT_data();
@@ -38,9 +42,8 @@ public class FitDataGenerator {
         return fitData;
     }
 
-    public static FIT_data getNextDataEntry() {
-        // FIXME!
-        String csvFile = "./train/src/main/resources/datasets/FIT_sample_data_senml.csv";
+    public FIT_data getNextDataEntry() {
+        String csvFile = dataSetPath;
         long totalNumberLines = TrainJob.countLines(csvFile);
         rowToParse = rowToParse % totalNumberLines;
 

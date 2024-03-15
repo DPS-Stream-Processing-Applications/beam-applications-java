@@ -1,18 +1,17 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
 import com.google.common.primitives.Doubles;
+import java.util.*;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 import org.slf4j.Logger;
-
-import java.util.*;
 
 /**
  * @author shilpa
  */
 public class AnnotateDTClass extends AbstractTask<String, String> {
+    private static final Object SETUP_LOCK = new Object();
     // private static TreeMap<Double, String> annotationMap;
     private static String filePath;
-    private static final Object SETUP_LOCK = new Object();
     private static boolean doneSetup = false;
     private static int useMsgField;
 

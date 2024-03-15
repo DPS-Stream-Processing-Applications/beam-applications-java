@@ -1,16 +1,22 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import com.opencsv.CSVReader;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+interface MyReader {
+    String[] readLine() throws IOException;
+
+    void init() throws FileNotFoundException;
+
+    public void close() throws IOException;
+}
 
 /*
  * Splits the JSON file in round-robin manner and stores it to individual files
@@ -32,11 +38,7 @@ public class JsonSplitter {
                 headerList.add(s);
             }
             return headerList;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -110,9 +112,9 @@ public class JsonSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                * (1.0 / accFactor)
-                                * 60
-                                * 1000; // accFactor is actually the scaling factor or
+                                        * (1.0 / accFactor)
+                                        * 60
+                                        * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
             }
 
@@ -166,50 +168,6 @@ public class JsonSplitter {
      * @throws ParseException
      * @throws IOException
      */
-    public static void main(String[] args) throws ParseException, IOException {
-        // TODO Auto-generated method stub
-        int defaultNumThreads = 4, defaultPeakRate = 100;
-        switch (args.length) {
-            case 2:
-                numThreads = Integer.parseInt(args[0]);
-                peakRate = Integer.parseInt(args[1]);
-                break;
-            case 1:
-                numThreads = Integer.parseInt(args[0]);
-                peakRate = defaultPeakRate;
-                break;
-            case 0:
-                numThreads = defaultNumThreads;
-                peakRate = defaultPeakRate;
-                break;
-            default:
-                LOG.warn("Invalid Number of Arguments! args = numThreads peakRate");
-                return;
-        }
-
-        //		String inputFileName = "/var/tmp/SyS/bangalore.csv";
-        String inputFileName = "/Users/anshushukla/data/trytry.csv";
-
-        // roundRobinSplitCsvToFiles(inputFileName, numThreads);
-        List<TableClass> list =
-                roundRobinSplitJsonToMemory(inputFileName, numThreads, 0.001, "SYS");
-        for (int i = 0; i < numThreads; i++) System.out.println(list.get(i).getRows().size());
-
-        // Test Iterator Functionality
-        //		for(RowClass t : list.get(0)){
-        //			System.out.println(t);
-        //		}
-
-        LOG.info("jkl");
-    }
-}
-
-interface MyReader {
-    String[] readLine() throws IOException;
-
-    void init() throws FileNotFoundException;
-
-    public void close() throws IOException;
 }
 
 class MyCSVReader implements MyReader {
@@ -221,8 +179,8 @@ class MyCSVReader implements MyReader {
         try {
             init();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -245,13 +203,13 @@ class MyJSONReader implements MyReader {
     public FileReader reader;
     public String inputFileName;
 
-    public MyJSONReader(String inputFileName_) {
+    public MyJSONReader(String inputFileName_) throws FileNotFoundException {
         inputFileName = inputFileName_;
         try {
             init();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new FileNotFoundException(e.toString());
         }
     }
 

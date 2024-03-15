@@ -1,19 +1,18 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.apache.commons.lang3.time.StopWatch;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
 
 public abstract class AbstractTask<T, U> implements ITask<T, U> {
 
+    public static final String DEFAULT_KEY = "D";
     protected Logger l;
     protected StopWatch sw;
     protected int counter;
     private U lastResult = null;
-    public static final String DEFAULT_KEY = "D";
 
     @Override
     public void setup(Logger l_, Properties p_) {

@@ -14,6 +14,8 @@ public class SYS_City extends TableServiceEntity {
             airquality_raw;
     private long rangeKey;
 
+    public SYS_City() {}
+
     public long getRangeKey() {
         return rangeKey;
     }
@@ -92,8 +94,5 @@ public class SYS_City extends TableServiceEntity {
 
     public void setAirquality_raw(String airquality_raw) {
         this.airquality_raw = airquality_raw;
-    }
-
-    public SYS_City() {
     }
 }

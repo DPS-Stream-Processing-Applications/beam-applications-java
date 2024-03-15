@@ -4,29 +4,26 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobUploadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTPublishTask;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
-
 public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
 
+    private static Logger l;
+    MQTTPublishTask mqttPublishTask;
     private Properties p;
 
     public MqttPublishBeam(Properties p_) {
         p = p_;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
-
-    MQTTPublishTask mqttPublishTask;
 
     @Setup
     public void setup() throws IOException {

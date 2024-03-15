@@ -5,15 +5,15 @@ import java.io.Serializable;
 public class MqttPublishEntry implements Serializable {
     private String msgid;
 
+    public MqttPublishEntry(String msgid) {
+        this.msgid = msgid;
+    }
+
     public String getMsgid() {
         return msgid;
     }
 
     public void setMsgid(String msgid) {
-        this.msgid = msgid;
-    }
-
-    public MqttPublishEntry(String msgid) {
         this.msgid = msgid;
     }
 

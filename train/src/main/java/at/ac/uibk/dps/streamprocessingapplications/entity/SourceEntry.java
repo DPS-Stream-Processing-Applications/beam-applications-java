@@ -9,6 +9,15 @@ public class SourceEntry implements Serializable {
     private String rowKeyStart;
     private String rowKeyEnd;
 
+    public SourceEntry(String rowString, String msgid, String rowKeyStart, String rowKeyEnd) {
+        this.rowString = rowString;
+        this.msgid = msgid;
+        this.rowKeyStart = rowKeyStart;
+        this.rowKeyEnd = rowKeyEnd;
+    }
+
+    public SourceEntry() {}
+
     public String getRowString() {
         return rowString;
     }
@@ -39,16 +48,6 @@ public class SourceEntry implements Serializable {
 
     public void setRowKeyEnd(String rowKeyEnd) {
         this.rowKeyEnd = rowKeyEnd;
-    }
-
-    public SourceEntry(String rowString, String msgid, String rowKeyStart, String rowKeyEnd) {
-        this.rowString = rowString;
-        this.msgid = msgid;
-        this.rowKeyStart = rowKeyStart;
-        this.rowKeyEnd = rowKeyEnd;
-    }
-
-    public SourceEntry() {
     }
 
     @Override

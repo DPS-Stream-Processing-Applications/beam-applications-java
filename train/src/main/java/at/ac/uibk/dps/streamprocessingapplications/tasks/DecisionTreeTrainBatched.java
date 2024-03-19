@@ -1,5 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import org.slf4j.Logger;
+import weka.classifiers.trees.J48;
+import weka.core.Instances;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -7,9 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
-import org.slf4j.Logger;
-import weka.classifiers.trees.J48;
-import weka.core.Instances;
 
 /**
  * This task should only be run from a single thread to avoid overwriting output model file.

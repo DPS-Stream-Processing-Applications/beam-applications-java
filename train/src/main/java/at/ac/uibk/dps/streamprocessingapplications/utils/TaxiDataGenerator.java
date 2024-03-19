@@ -6,6 +6,7 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;

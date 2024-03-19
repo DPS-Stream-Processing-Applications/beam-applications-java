@@ -4,8 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.*;
-import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -14,6 +12,9 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
+
+import java.io.*;
+import java.util.Properties;
 
 public class TrainJob {
 

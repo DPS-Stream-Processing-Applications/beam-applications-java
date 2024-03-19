@@ -1,12 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import com.opencsv.CSVReader;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Splits the CSV file in round-robin manner and stores it to individual files based on the number
@@ -121,9 +122,9 @@ public class CsvSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                        * (1.0 / accFactor)
-                                        * 60
-                                        * 1000; // accFactor is actually the scaling factor or
+                                * (1.0 / accFactor)
+                                * 60
+                                * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
                 // System.out.println("GOTSTART TS : "  + ts + " cut off " + cutOffTimeStamp);
             }

@@ -7,8 +7,9 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import java.util.*;
 import org.slf4j.Logger;
+
+import java.util.*;
 
 public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     private static final Object SETUP_LOCK = new Object();
@@ -22,9 +23,8 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
     private static int useMsgField;
     private static Random rn;
-    private boolean isJson;
-
     private static String dataSetFilePath;
+    private boolean isJson;
 
     /***
      *
@@ -48,10 +48,6 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
             l.warn("Exception in connectToAzTable: " + tableName, e);
         }
         return cloudTable;
-    }
-
-    public void setJson(boolean json) {
-        isJson = json;
     }
 
     /***
@@ -130,6 +126,10 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
                     e);
         }
         return null;
+    }
+
+    public void setJson(boolean json) {
+        isJson = json;
     }
 
     public void setup(Logger l_, Properties p_) {

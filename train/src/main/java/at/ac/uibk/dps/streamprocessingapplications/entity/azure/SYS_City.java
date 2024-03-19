@@ -14,7 +14,8 @@ public class SYS_City extends TableServiceEntity {
             airquality_raw;
     private long rangeKey;
 
-    public SYS_City() {}
+    public SYS_City() {
+    }
 
     public long getRangeKey() {
         return rangeKey;

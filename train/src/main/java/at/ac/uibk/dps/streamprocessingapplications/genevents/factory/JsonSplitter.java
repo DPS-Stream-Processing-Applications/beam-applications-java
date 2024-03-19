@@ -1,14 +1,15 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import com.opencsv.CSVReader;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 interface MyReader {
     String[] readLine() throws IOException;
@@ -113,9 +114,9 @@ public class JsonSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                        * (1.0 / accFactor)
-                                        * 60
-                                        * 1000; // accFactor is actually the scaling factor or
+                                * (1.0 / accFactor)
+                                * 60
+                                * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
             }
 

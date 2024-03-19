@@ -21,7 +21,9 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
     private static int startRowKey;
     private static int endRowKey;
     private static int useMsgField;
+    private static String dataSetFilePath;
     private static Random rn;
+    private boolean isJson;
 
     /***
      *
@@ -47,6 +49,10 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
         return cloudTable;
     }
 
+    public void setJson(boolean json) {
+        isJson = json;
+    }
+
     /***
      *
      * @param cloudTable
@@ -65,7 +71,7 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
         try {
 
             // filters
-            System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
+            // System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
 
             // Create a filter condition where the partition key is "Smith".
             String partitionFilter =
@@ -148,6 +154,8 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
                 // the input CSV message as input for count
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
+                dataSetFilePath = p_.getProperty("TRAIN.DATASET_FULL_NAME_GRID");
+                this.setJson(dataSetFilePath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }

@@ -16,8 +16,11 @@ public class TaxiDataGenerator {
     private static long rowToParse = 0;
     private String dataSetPath;
 
-    public TaxiDataGenerator(String dataSetPath) {
+    private boolean isCsvFile;
+
+    public TaxiDataGenerator(String dataSetPath, boolean isCsvFile) {
         this.dataSetPath = dataSetPath;
+        this.isCsvFile = isCsvFile;
     }
 
     public static Taxi_Trip generateRandomTaxiData() {
@@ -49,43 +52,61 @@ public class TaxiDataGenerator {
         String csvFile = dataSetPath;
         long totalNumberLines = TrainJob.countLines(csvFile);
         rowToParse = rowToParse % totalNumberLines;
+
         Taxi_Trip taxiTrip = new Taxi_Trip();
         try {
-            Gson gson = new Gson();
-            CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
-            String[] row;
-            int currentRow = 0;
-            while ((row = reader.readNext()) != null && currentRow < rowToParse) {
-                currentRow++;
-            }
+            if (isCsvFile) {
+                Gson gson = new Gson();
+                CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+                String[] row;
+                int currentRow = 0;
+                while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                    currentRow++;
+                }
 
-            long counter = 0;
-            if (row != null) {
-                String json = Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
-                json = json.replaceFirst("\\{", "");
-                json = "{ts:" + json;
+                long counter = 0;
+                if (row != null) {
+                    String json =
+                            Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
+                    json = json.replaceFirst("\\{", "");
+                    json = "{ts:" + json;
 
-                // Parse JSON using Gson
-                Measurement measurement = gson.fromJson(json, Measurement.class);
+                    Measurement measurement = gson.fromJson(json, Measurement.class);
 
-                for (SensorData entry : measurement.getSensorDataList()) {
+                    for (SensorData entry : measurement.getSensorDataList()) {
 
-                    if (Objects.equals(entry.getN(), "trip_time_in_secs")) {
-                        taxiTrip.setTrip_time_in_secs(entry.getV());
-                        counter++;
-                    }
-                    if (Objects.equals(entry.getN(), "trip_distance")) {
-                        taxiTrip.setTrip_distance(entry.getV());
-                        counter++;
-                    }
-                    if (Objects.equals(entry.getN(), "fare_amount")) {
-                        taxiTrip.setFare_amount(entry.getV());
-                        counter++;
+                        if (Objects.equals(entry.getN(), "trip_time_in_secs")) {
+                            taxiTrip.setTrip_time_in_secs(entry.getV());
+                            counter++;
+                        }
+                        if (Objects.equals(entry.getN(), "trip_distance")) {
+                            taxiTrip.setTrip_distance(entry.getV());
+                            counter++;
+                        }
+                        if (Objects.equals(entry.getN(), "fare_amount")) {
+                            taxiTrip.setFare_amount(entry.getV());
+                            counter++;
+                        }
                     }
                 }
-            }
-            if (counter != 3) {
-                throw new RuntimeException("Counter is not correct!");
+                if (counter != 3) {
+                    throw new RuntimeException("Counter is not correct!");
+                }
+            } else {
+                if (rowToParse == 0) {
+                    rowToParse = 1;
+                }
+                CSVReader reader = new CSVReader(new FileReader(csvFile), ',');
+                String[] row;
+                int currentRow = 0;
+                while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                    currentRow++;
+                }
+                if (row != null) {
+                    taxiTrip.setTrip_time_in_secs(row[4]);
+                    taxiTrip.setTrip_distance(row[5]);
+                    taxiTrip.setFare_amount(row[11]);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Error when reading row " + e);

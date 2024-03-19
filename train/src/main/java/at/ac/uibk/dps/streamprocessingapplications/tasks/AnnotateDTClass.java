@@ -64,7 +64,6 @@ public class AnnotateDTClass extends AbstractTask<String, String> {
 
         if (l.isInfoEnabled()) {
             for (Map.Entry<Double, String> tm : annotationMap.entrySet()) { // print keys and values
-                System.out.println(tm.getKey() + " : " + tm.getValue());
             }
         }
 

@@ -94,7 +94,6 @@ public class AzureBlobUploadTask extends AbstractTask<String, Float> {
                 // If positive, use it for index over file names else read randomly
                 useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB.USE_MSG_FIELD"));
                 storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
-                System.out.println("Storage container  " + storageConnStr);
                 containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
                 doneSetup = true;
             }

@@ -24,6 +24,7 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
     private static int useMsgField;
     private static Random rn;
     private static String dataSetPath;
+    private boolean isJson;
 
     /***
      *
@@ -67,7 +68,7 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
         try {
 
             // filters
-            System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
+            // System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
 
             // Create a filter condition where the partition key is "Smith".
             String partitionFilter =
@@ -150,7 +151,9 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
                 // the input CSV message as input for count
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
-                dataSetPath = p_.getProperty("TRAIN.DATASET_FULL_NAME_TAXI");
+                // FIXME! Here could be the full dataset
+                dataSetPath = p_.getProperty("TRAIN.DATASET_SENML_NAME_TAXI");
+                this.setJson(dataSetPath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }
@@ -193,7 +196,7 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
         long end = Long.parseLong(rowKeyEnd);
 
         List<Taxi_Trip> resultList = new ArrayList<>();
-        TaxiDataGenerator taxiDataGenerator = new TaxiDataGenerator(dataSetPath);
+        TaxiDataGenerator taxiDataGenerator = new TaxiDataGenerator(dataSetPath, isJson);
         for (long i = 0; i <= 10; i++) {
             resultList.add(taxiDataGenerator.getNextDataEntry());
         }
@@ -203,6 +206,10 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
         super.setLastResult(result);
 
         return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
+    }
+
+    public void setJson(boolean json) {
+        isJson = json;
     }
 
     /***

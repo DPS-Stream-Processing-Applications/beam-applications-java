@@ -17,8 +17,11 @@ public class CityDataGenerator {
 
     private String dataSetFileName;
 
-    public CityDataGenerator(String dataSetFileName) {
+    private boolean isCsvFile;
+
+    public CityDataGenerator(String dataSetFileName, boolean isCsvFile) {
         this.dataSetFileName = dataSetFileName;
+        this.isCsvFile = isCsvFile;
     }
 
     public static SYS_City generateRandomCityData() {
@@ -45,41 +48,48 @@ public class CityDataGenerator {
         rowToParse = rowToParse % totalNumberLines;
         SYS_City sysCity = new SYS_City();
         try {
-            Gson gson = new Gson();
-            CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
-            String[] row;
-            int currentRow = 0;
-            while ((row = reader.readNext()) != null && currentRow < rowToParse) {
-                currentRow++;
-            }
+            if (isCsvFile) {
+                Gson gson = new Gson();
+                CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+                String[] row;
+                int currentRow = 0;
+                while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                    currentRow++;
+                }
 
-            if (row != null) {
-                String json = Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
-                json = json.replaceFirst("\\{", "");
-                json = "{ts:" + json;
+                if (row != null) {
+                    String json =
+                            Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
+                    json = json.replaceFirst("\\{", "");
+                    json = "{ts:" + json;
 
-                // Parse JSON using Gson
-                Measurement measurement = gson.fromJson(json, Measurement.class);
-                sysCity.setTs(measurement.getTs());
-                for (SensorData entry : measurement.getSensorDataList()) {
+                    // Parse JSON using Gson
+                    Measurement measurement = gson.fromJson(json, Measurement.class);
+                    sysCity.setTs(measurement.getTs());
+                    for (SensorData entry : measurement.getSensorDataList()) {
 
-                    if (Objects.equals(entry.getN(), "source")) {
-                        sysCity.setSource(entry.getSv());
-                    } else if (Objects.equals(entry.getN(), "longitude")) {
-                        sysCity.setLongitude(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "latitude")) {
-                        sysCity.setLatitude(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "temperature")) {
-                        sysCity.setTemperature(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "humidity")) {
-                        sysCity.setHumidity(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "light")) {
-                        sysCity.setLight(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "dust")) {
-                        sysCity.setDust(entry.getV());
-                    } else if (Objects.equals(entry.getN(), "airquality_raw")) {
-                        sysCity.setAirquality_raw(entry.getV());
+                        if (Objects.equals(entry.getN(), "source")) {
+                            sysCity.setSource(entry.getSv());
+                        } else if (Objects.equals(entry.getN(), "longitude")) {
+                            sysCity.setLongitude(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "latitude")) {
+                            sysCity.setLatitude(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "temperature")) {
+                            sysCity.setTemperature(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "humidity")) {
+                            sysCity.setHumidity(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "light")) {
+                            sysCity.setLight(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "dust")) {
+                            sysCity.setDust(entry.getV());
+                        } else if (Objects.equals(entry.getN(), "airquality_raw")) {
+                            sysCity.setAirquality_raw(entry.getV());
+                        }
                     }
+                }
+            } else {
+                if (rowToParse == 0) {
+                    rowToParse = 1;
                 }
             }
         } catch (IOException e) {

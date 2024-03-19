@@ -149,7 +149,6 @@ public class CsvSplitter {
 
         BufferedReader bReader = new BufferedReader(new FileReader(inputFileName));
         String headerLine = bReader.readLine();
-        System.out.println(headerLine);
         String line;
 
         BufferedWriter[] bWriters = new BufferedWriter[numThreads];

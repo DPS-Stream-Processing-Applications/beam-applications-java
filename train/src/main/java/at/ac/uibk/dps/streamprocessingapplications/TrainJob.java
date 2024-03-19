@@ -96,6 +96,15 @@ public class TrainJob {
                         "Table Read",
                         ParDo.of(new TableReadBeam(p_, spoutLogFileName, dataSetType)));
 
+        dataFromAzureDB.apply(
+                ParDo.of(
+                        new DoFn<DbEntry, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println(c.element());
+                            }
+                        }));
+
         PCollection<TrainEntry> linearRegressionTrain =
                 dataFromAzureDB.apply(
                         "Multi Var Linear Regression",

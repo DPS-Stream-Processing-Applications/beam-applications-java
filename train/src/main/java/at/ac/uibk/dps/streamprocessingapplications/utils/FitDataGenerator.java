@@ -15,8 +15,11 @@ public class FitDataGenerator {
     private static long rowToParse = 0;
     private String dataSetPath;
 
-    public FitDataGenerator(String dataSetPath) {
+    private boolean isCsvFile;
+
+    public FitDataGenerator(String dataSetPath, boolean isCsvFile) {
         this.dataSetPath = dataSetPath;
+        this.isCsvFile = isCsvFile;
     }
 
     public static FIT_data generateRandomFITData() {
@@ -46,56 +49,62 @@ public class FitDataGenerator {
         String csvFile = dataSetPath;
         long totalNumberLines = TrainJob.countLines(csvFile);
         rowToParse = rowToParse % totalNumberLines;
-
         FIT_data fitData = new FIT_data();
         try {
-            Gson gson = new Gson();
-            CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
-            String[] row;
-            int currentRow = 0;
-            while ((row = reader.readNext()) != null && currentRow < rowToParse) {
-                currentRow++;
-            }
+            if (isCsvFile) {
+                Gson gson = new Gson();
+                CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+                String[] row;
+                int currentRow = 0;
+                while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                    currentRow++;
+                }
 
-            if (row != null) {
-                String json = Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
-                json = json.replaceFirst("\\{", "");
-                json = "{ts:" + json;
+                if (row != null) {
+                    String json =
+                            Arrays.toString(row).substring(1, Arrays.toString(row).length() - 1);
+                    json = json.replaceFirst("\\{", "");
+                    json = "{ts:" + json;
 
-                Measurement measurement = gson.fromJson(json, Measurement.class);
+                    Measurement measurement = gson.fromJson(json, Measurement.class);
 
-                for (SensorData entry : measurement.getSensorDataList()) {
+                    for (SensorData entry : measurement.getSensorDataList()) {
 
-                    if (Objects.equals(entry.getN(), "acc_ankle_x")) {
-                        fitData.setAcc_ankle_x(entry.getV());
+                        if (Objects.equals(entry.getN(), "acc_ankle_x")) {
+                            fitData.setAcc_ankle_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_ankle_y")) {
+                            fitData.setAcc_ankle_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_ankle_z")) {
+                            fitData.setAcc_ankle_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_x")) {
+                            fitData.setAcc_arm_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_y")) {
+                            fitData.setAcc_arm_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_z")) {
+                            fitData.setAcc_arm_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_chest_x")) {
+                            fitData.setAcc_chest_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_chest_y")) {
+                            fitData.setAcc_chest_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_chest_z")) {
+                            fitData.setAcc_chest_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "ecg_lead_1")) {
+                            fitData.setEcg_lead_1(entry.getV());
+                        }
                     }
-                    if (Objects.equals(entry.getN(), "acc_ankle_y")) {
-                        fitData.setAcc_ankle_y(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_ankle_z")) {
-                        fitData.setAcc_ankle_z(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_arm_x")) {
-                        fitData.setAcc_arm_x(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_arm_y")) {
-                        fitData.setAcc_arm_y(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_arm_z")) {
-                        fitData.setAcc_arm_z(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_chest_x")) {
-                        fitData.setAcc_chest_x(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_chest_y")) {
-                        fitData.setAcc_chest_y(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "acc_chest_z")) {
-                        fitData.setAcc_chest_z(entry.getV());
-                    }
-                    if (Objects.equals(entry.getN(), "ecg_lead_1")) {
-                        fitData.setEcg_lead_1(entry.getV());
-                    }
+                }
+            } else {
+                if (rowToParse == 0) {
+                    rowToParse = 1;
                 }
             }
         } catch (Exception e) {

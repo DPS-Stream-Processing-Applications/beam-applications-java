@@ -21,6 +21,8 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
     private static int startRowKey;
     private static int endRowKey;
 
+    private boolean isJson;
+
     private static int useMsgField;
     private static Random rn;
 
@@ -28,6 +30,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
 
     public AzureTableRangeQueryTaskSYS(String dataSetPath) {
         this.dataSetPath = dataSetPath;
+        this.setJson(dataSetPath.contains("senml"));
     }
 
     /***
@@ -54,6 +57,10 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
         return cloudTable;
     }
 
+    public void setJson(boolean json) {
+        isJson = json;
+    }
+
     /***
      *
      * @param cloudTable
@@ -72,7 +79,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
         try {
 
             // filters
-            System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
+            // System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
 
             // Create a filter condition where the partition key is "Smith".
             String partitionFilter =
@@ -186,7 +193,7 @@ public class AzureTableRangeQueryTaskSYS extends AbstractTask {
 
         }
          */
-        CityDataGenerator cityDataGenerator = new CityDataGenerator(dataSetPath);
+        CityDataGenerator cityDataGenerator = new CityDataGenerator(dataSetPath, isJson);
         for (long i = 0; i <= 10; i++) {
             resultList.add(cityDataGenerator.getNextDataEntry());
         }

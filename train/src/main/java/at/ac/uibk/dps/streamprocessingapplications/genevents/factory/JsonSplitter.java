@@ -85,6 +85,7 @@ public class JsonSplitter {
 
             int timestampColIndex = 0;
             DateTime date = null;
+            //FIXME
             datasetType = "SENML";
             if (datasetType.equals("TAXI")) {
                 timestampColIndex = 3;
@@ -137,7 +138,6 @@ public class JsonSplitter {
 
         BufferedReader bReader = new BufferedReader(new FileReader(inputFileName));
         String headerLine = bReader.readLine();
-        System.out.println(headerLine);
         String line;
 
         BufferedWriter[] bWriters = new BufferedWriter[numThreads];

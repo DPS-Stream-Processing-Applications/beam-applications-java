@@ -22,6 +22,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
     private static int useMsgField;
     private static Random rn;
+    private boolean isJson;
 
     private static String dataSetFilePath;
 
@@ -49,6 +50,10 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         return cloudTable;
     }
 
+    public void setJson(boolean json) {
+        isJson = json;
+    }
+
     /***
      *
      * @param cloudTable
@@ -67,7 +72,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         try {
 
             // filters
-            System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
+            // System.out.println("getAzTableRowByKey-" + rowkeyStart + "," + rowkeyEnd);
 
             // Create a filter condition where the partition key is "Smith".
             String partitionFilter =
@@ -127,14 +132,6 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         return null;
     }
 
-    public static void main(String[] args) {
-        AzureTableRangeQueryTaskFIT test = new AzureTableRangeQueryTaskFIT();
-        Map<String, String> map = new HashMap<>();
-        map.put("ROWKEYSTART", "23");
-        map.put("ROWKEYEND", "64");
-        test.doTaskLogicDummy(map);
-    }
-
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
         synchronized (SETUP_LOCK) {
@@ -158,6 +155,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
                 dataSetFilePath = p_.getProperty("TRAIN.DATASET_FULL_NAME_FIT");
+                this.setJson(dataSetFilePath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }
@@ -185,8 +183,6 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
         }
         Iterable<FIT_data> result =
                 getAzTableRangeByKeyFIT(cloudTbl, partitionKey, rowKeyStart, rowKeyEnd, l);
-        System.out.println("Row key = " + rowKeyEnd);
-        System.out.println("Result = " + result);
 
         super.setLastResult(result);
 
@@ -206,7 +202,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
         }
          */
-        FitDataGenerator fitDataGenerator = new FitDataGenerator(dataSetFilePath);
+        FitDataGenerator fitDataGenerator = new FitDataGenerator(dataSetFilePath, isJson);
         for (long i = 0; i <= 10; i++) {
             resultList.add(fitDataGenerator.getNextDataEntry());
         }

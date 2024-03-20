@@ -20,6 +20,7 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
     AzureBlobDownloadTask azureBlobDownloadTask;
 
     public BlobReadBeam(Properties p_) {
+        // FIXME!
         this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
     }

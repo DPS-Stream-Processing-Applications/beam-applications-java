@@ -23,6 +23,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
     public MqttSubscribeBeam() {
     }
+
     public MqttSubscribeBeam(Properties p_, String spoutLogFileName) {
         this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;

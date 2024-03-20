@@ -57,7 +57,8 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         this.eventGen = new EventGen(this, this.scalingFactor);
         this.eventQueue = new LinkedBlockingQueue<>();
         String uLogfilename = this.outSpoutCSVLogFileName + msgId;
-        this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); // Launch threads
+        boolean isJson = csvFileName.contains("senml");
+        this.eventGen.launch(this.csvFileName, uLogfilename, -1, isJson); // Launch threads
     }
 
     @ProcessElement
@@ -75,7 +76,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             for (String s : entry) {
                 rowStringBuf.append(",").append(s);
             }
-            String rowString = rowStringBuf.toString().substring(1);
+            String rowString = rowStringBuf.substring(1);
             String newRow = rowString.substring(rowString.indexOf(",") + 1);
             msgId++;
             values.setMsgid(Long.toString(msgId));

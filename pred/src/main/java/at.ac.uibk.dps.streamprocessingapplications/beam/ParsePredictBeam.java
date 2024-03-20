@@ -24,9 +24,13 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
     private ArrayList<String> observableFields;
     private String[] metaFields;
     private String idField;
-    public ParsePredictBeam(Properties p_, String dataSetType) {
+
+    private boolean isJson;
+
+    public ParsePredictBeam(Properties p_, String dataSetType, boolean isJson) {
         p = p_;
         this.dataSetType = dataSetType;
+        this.isJson = isJson;
     }
 
     public static void initLogger(Logger l_) {
@@ -38,7 +42,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
         try {
             initLogger(LoggerFactory.getLogger("APP"));
-            senMLParseTask = new SenMlParse(dataSetType);
+            senMLParseTask = new SenMlParse(dataSetType, isJson);
             senMLParseTask.setup(l, p);
             observableFields = new ArrayList();
             String line;
@@ -118,9 +122,10 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             }
             meta = meta.deleteCharAt(meta.lastIndexOf(","));
             for (int j = 0; j < observableFields.size(); j++) {
-                obsVal.append((String) resultMap.get((String) observableFields.get(j)));
+                obsVal.append(resultMap.get(observableFields.get(j)));
                 obsVal.append(",");
             }
+            obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
             // obsVal.substring(0, obsVal.length() - 1);
             out.output(
                     new SenMlEntry(

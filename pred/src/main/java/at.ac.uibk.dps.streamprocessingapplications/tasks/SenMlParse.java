@@ -5,6 +5,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +26,11 @@ public class SenMlParse extends AbstractTask<String, Map> {
     private ArrayList<String> senMLlist;
     private String sampledata;
 
-    public SenMlParse(String dataSetType) {
+    private boolean isJson;
+
+    public SenMlParse(String dataSetType, boolean isJson) {
         this.dataSetType = dataSetType;
+        this.isJson = isJson;
     }
 
     public void setup(Logger l_, Properties p_) {
@@ -40,6 +46,11 @@ public class SenMlParse extends AbstractTask<String, Map> {
 
     @Override
     protected Float doTaskLogic(Map map) {
+        if (!isJson) {
+            Map<String, String> output = doTaskLogicCsv(map);
+            super.setLastResult(output);
+            return 1.0f;
+        }
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject;
 
@@ -98,5 +109,53 @@ public class SenMlParse extends AbstractTask<String, Map> {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    protected Map<String, String> doTaskLogicCsv(Map map) {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject;
+
+        HashMap<String, String> mapkeyValues = new HashMap<>();
+        try {
+            String m;
+            if (useMsgField == -1) m = sampledata;
+            else m = (String) map.get(AbstractTask.DEFAULT_KEY);
+
+            String[] inputData = m.split(",");
+            /*this is for TAXI dataset*/
+            long baseTime = 0L;
+            if (dataSetType.equals("TAXI") | dataSetType.equals("SYS")) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime dateTime = LocalDateTime.parse(inputData[1], formatter);
+
+                baseTime = dateTime.toEpochSecond(ZoneOffset.UTC);
+            }
+            if (dataSetType.equals("FIT")) {
+                baseTime = 0L;
+                // dataset
+            }
+
+            mapkeyValues.put("timestamp", String.valueOf(baseTime));
+            mapkeyValues.put("taxi_identifier", inputData[0]);
+            mapkeyValues.put("pickup_datetime", inputData[1]);
+            mapkeyValues.put("pickup_longitude", inputData[5]);
+            mapkeyValues.put("pickup_latitude", inputData[6]);
+            mapkeyValues.put("dropoff_longitude", inputData[7]);
+            mapkeyValues.put("dropoff_latitude", inputData[8]);
+            mapkeyValues.put("payment_type", inputData[9]);
+            mapkeyValues.put("hack_license", inputData[0]);
+            mapkeyValues.put("dropoff_datetime", inputData[2]);
+            mapkeyValues.put("trip_time_in_secs", inputData[3]);
+            mapkeyValues.put("trip_distance", inputData[4]);
+            mapkeyValues.put("fare_amount", inputData[10]);
+            mapkeyValues.put("surcharge", inputData[11]);
+            mapkeyValues.put("mta_tax", inputData[12]);
+            mapkeyValues.put("tip_amount", inputData[13]);
+            mapkeyValues.put("tolls_amount", inputData[14]);
+            mapkeyValues.put("total_amount", inputData[15]);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return mapkeyValues;
     }
 }

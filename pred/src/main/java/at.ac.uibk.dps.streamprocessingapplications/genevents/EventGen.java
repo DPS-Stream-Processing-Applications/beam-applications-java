@@ -103,17 +103,20 @@ public class EventGen {
         // 1. Load CSV to in-memory data structure
         // 2. Assign a thread with (new SubEventGen(myISEG, eventList))
         // 3. Attach this thread to ThreadPool
+        if (!isJson) {
+            this.launch(csvFileName, outCSVFileName, experimentDurationMillis);
+        }
         try {
             int numThreads = GlobalConstants.numThreads;
             // double scalingFactor = GlobalConstants.accFactor;
             String datasetType = "";
-            if (outCSVFileName.indexOf("TAXI") != -1) {
+            if (outCSVFileName.contains("TAXI")) {
                 datasetType = "TAXI"; // GlobalConstants.dataSetType = "TAXI";
-            } else if (outCSVFileName.indexOf("SYS") != -1) {
+            } else if (outCSVFileName.contains("SYS")) {
                 datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
-            } else if (outCSVFileName.indexOf("PLUG") != -1) {
+            } else if (outCSVFileName.contains("PLUG")) {
                 datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
-            } else if (outCSVFileName.indexOf("SENML") != -1) {
+            } else if (outCSVFileName.contains("SENML")) {
                 datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
             }
 

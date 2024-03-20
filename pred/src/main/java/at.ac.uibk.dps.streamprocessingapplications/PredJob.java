@@ -50,7 +50,7 @@ public class PredJob {
             System.out.println("ERROR! INVALID NUMBER OF ARGUMENTS");
             return;
         }
-
+        boolean isJson = argumentClass.getInputDatasetPathName().contains("senml");
         String logFilePrefix =
                 argumentClass.getTopoName()
                         + "-"
@@ -102,7 +102,8 @@ public class PredJob {
                                         lines)));
 
         PCollection<SenMlEntry> mlParseData =
-                sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType)));
+                sourceData.apply(
+                        "SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
 
         PCollection<LinearRegressionEntry> linearRegression1 =
                 mlParseData.apply(

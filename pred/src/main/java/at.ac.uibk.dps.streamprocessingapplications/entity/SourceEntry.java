@@ -12,8 +12,7 @@ public class SourceEntry implements Serializable {
         this.payLoad = payLoad;
     }
 
-    public SourceEntry() {
-    }
+    public SourceEntry() {}
 
     public String getMsgid() {
         return msgid;

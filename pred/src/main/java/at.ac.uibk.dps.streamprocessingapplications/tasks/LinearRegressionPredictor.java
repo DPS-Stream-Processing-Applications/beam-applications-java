@@ -1,13 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import java.io.StringReader;
+import java.util.Map;
+import java.util.Properties;
 import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
-
-import java.io.StringReader;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.

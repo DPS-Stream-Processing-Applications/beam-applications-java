@@ -2,13 +2,12 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.AverageEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.ErrorEstimateEntry;
+import java.io.IOException;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Properties;
 
 public class ErrorEstimateBeam2 extends DoFn<AverageEntry, ErrorEstimateEntry> {
     private static Logger l;

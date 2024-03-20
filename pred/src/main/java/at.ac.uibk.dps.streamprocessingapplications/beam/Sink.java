@@ -5,15 +5,12 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
-
 public class Sink extends DoFn<MqttPublishEntry, String> {
     private static final Logger LOG = LoggerFactory.getLogger("APP");
 
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
 
     public Sink(String csvFileNameOutSink) {
-        Random ran = new Random();
         this.csvFileNameOutSink = csvFileNameOutSink;
     }
 

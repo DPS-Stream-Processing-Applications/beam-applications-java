@@ -3,14 +3,13 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTSubscribeTask;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 
 public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
@@ -21,8 +20,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     Properties p;
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
 
-    public MqttSubscribeBeam() {
-    }
+    public MqttSubscribeBeam() {}
 
     public MqttSubscribeBeam(Properties p_, String spoutLogFileName) {
         this.csvFileNameOutSink = csvFileNameOutSink;

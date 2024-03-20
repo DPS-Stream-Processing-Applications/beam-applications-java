@@ -4,15 +4,14 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.AverageEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.BlockWindowAverage;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.slf4j.Logger;
 
 public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
 
@@ -33,10 +32,10 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
 
     @Setup
     public void setup() throws MqttException {
-        blockWindowAverageMap = new HashMap<String, BlockWindowAverage>();
+        blockWindowAverageMap = new HashMap<>();
         String useMsgField = p.getProperty("AGGREGATE.BLOCK_AVERAGE.USE_MSG_FIELD");
         String[] msgField = useMsgField.split(",");
-        useMsgList = new ArrayList<String>();
+        useMsgList = new ArrayList<>();
         for (String s : msgField) {
             useMsgList.add(s);
         }
@@ -51,7 +50,7 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
         String obsType = input.getObsType();
         String obsVal = input.getObsVal();
 
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         if (dataSetType.equals("TAXI")) {
             // obsVal = "12,13,14";
             String fare_amount = obsVal.split(",")[2]; // fare_amount as last obs. in input
@@ -93,7 +92,7 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
 
             if (avgres != null) {
                 if (avgres != Float.MIN_VALUE) {
-                    if (l.isInfoEnabled()) l.info("avgres AVG:{}", avgres.toString());
+                    if (l.isInfoEnabled()) l.info("avgres AVG:{}", avgres);
 
                     out.output(
                             new AverageEntry(

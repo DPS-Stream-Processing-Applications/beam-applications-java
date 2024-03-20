@@ -1,10 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
+import org.slf4j.Logger;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.

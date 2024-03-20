@@ -4,18 +4,15 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
+import java.io.*;
+import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.Flatten;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
-
-import java.io.*;
-import java.util.Properties;
 
 public class PredJob {
 
@@ -89,7 +86,7 @@ public class PredJob {
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
 
         PCollection<BlobReadEntry> blobRead =
-                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
+                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_, sinkLogFileName)));
 
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
@@ -155,7 +152,15 @@ public class PredJob {
                         .apply("Merge PCollections", Flatten.pCollections());
 
         PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
-
+        PCollection<Long> count = out.apply("Count", Count.globally());
+        count.apply(
+                ParDo.of(
+                        new DoFn<Long, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Length of PCollection: " + c.element());
+                            }
+                        }));
         p.run();
     }
 }

@@ -4,18 +4,17 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeClassify;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.trees.J48;
 import weka.core.SerializationHelper;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Properties;
 
 public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
 
@@ -56,16 +55,16 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
             obsVal = "22.7,49.3,0,1955.22,27"; // dummy
         }
 
-        /* We are getting an model update message so we will update the model only*/
+        /* We are getting a model update message so we will update the model only*/
 
         if (msgtype.equals("modelupdate") && analyticsType.equals("DTC")) {
-            byte[] BlobModelObject = (byte[]) input.getBlobModelObject();
+            byte[] BlobModelObject = input.getBlobModelObject();
             InputStream bytesInputStream = new ByteArrayInputStream(BlobModelObject);
             //        	ByteArrayInputStream BlobModelObject= (ByteArrayInputStream)
             // input.getValueByField("BlobModelObject");
             // do nothing for now
             //            byte[] blobModelObjects = input.getBinaryByField("BlobModelObject");
-            //            p.setProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH",)
+            //            p.setProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH")
 
             // TODO:  1- Either write model file to local disk - no task code change
             // TODO:  2- Pass it as bytestream , update the code for task
@@ -92,12 +91,10 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
         //            }
         //        }
 
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
 
         Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
-        //        System.out.println("TestS: DT res " +res);
-        // res = Float.valueOf("1");
         if (res != null) {
             if (res != Float.MIN_VALUE)
                 out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));

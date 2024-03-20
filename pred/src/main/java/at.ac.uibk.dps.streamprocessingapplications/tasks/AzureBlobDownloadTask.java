@@ -5,12 +5,11 @@ import com.microsoft.azure.storage.blob.CloudBlob;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.ListBlobItem;
-import org.slf4j.Logger;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
+import org.slf4j.Logger;
 
 /**
  * Downloads a blob from Azure cloud to local memory

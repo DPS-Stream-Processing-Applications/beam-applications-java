@@ -1,9 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.slf4j.Logger;
-import weka.core.Instance;
-import weka.core.Instances;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,6 +7,9 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import weka.core.Instance;
+import weka.core.Instances;
 
 public class WekaUtil {
 

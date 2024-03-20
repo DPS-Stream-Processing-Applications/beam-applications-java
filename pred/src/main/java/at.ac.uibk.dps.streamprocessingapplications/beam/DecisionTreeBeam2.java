@@ -4,14 +4,13 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeClassify;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 
 public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     private static Logger l;
@@ -39,8 +38,6 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     public void processElement(
             @Element SenMlEntry input, DoFn.OutputReceiver<DecisionTreeEntry> out)
             throws IOException {
-        String msgtype = input.getMsgtype();
-        String analyticsType = input.getAnalyticType();
         String sensorMeta = input.getMeta();
 
         String obsVal = "0";
@@ -52,7 +49,7 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
             obsVal = "22.7,49.3,0,1955.22,27"; // dummy
         }
 
-        /* We are getting an model update message so we will update the model only*/
+        /* We are getting a model update message so we will update the model only*/
 
         //        if(msgtype.equals("modelupdate") && analyticsType.equals("DTC")){
         //
@@ -66,7 +63,7 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
         //            }
         //        }
 
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
         Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
         if (res != null) {

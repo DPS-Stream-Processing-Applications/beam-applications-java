@@ -1,11 +1,10 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.eclipse.paho.client.mqttv3.*;
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.eclipse.paho.client.mqttv3.*;
+import org.slf4j.Logger;
 
 public class MQTTSubscribeTask extends AbstractTask implements MqttCallback {
     private static final Object SETUP_LOCK = new Object();
@@ -24,8 +23,7 @@ public class MQTTSubscribeTask extends AbstractTask implements MqttCallback {
     private String apolloClient;
     private String apolloURL;
 
-    public MQTTSubscribeTask() throws MqttException {
-    }
+    public MQTTSubscribeTask() throws MqttException {}
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
@@ -78,8 +76,7 @@ public class MQTTSubscribeTask extends AbstractTask implements MqttCallback {
     }
 
     @Override
-    public void connectionLost(Throwable arg0) {
-    }
+    public void connectionLost(Throwable arg0) {}
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken arg0) {

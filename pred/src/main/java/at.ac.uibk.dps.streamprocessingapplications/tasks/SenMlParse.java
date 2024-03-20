@@ -1,10 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.slf4j.Logger;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
 
 /**
  * @author simmhan, shilpa
@@ -112,9 +111,6 @@ public class SenMlParse extends AbstractTask<String, Map> {
     }
 
     protected Map<String, String> doTaskLogicCsv(Map map) {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject;
-
         HashMap<String, String> mapkeyValues = new HashMap<>();
         try {
             String m;

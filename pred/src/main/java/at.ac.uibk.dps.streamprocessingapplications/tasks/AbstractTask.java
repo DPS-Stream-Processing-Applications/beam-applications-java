@@ -1,10 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.apache.commons.lang3.time.StopWatch;
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Properties;
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
 
 public abstract class AbstractTask<T, U> implements ITask<T, U> {
 

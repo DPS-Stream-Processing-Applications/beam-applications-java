@@ -4,13 +4,12 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureBlobDownloadTask;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
 
@@ -19,7 +18,7 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
     AzureBlobDownloadTask azureBlobDownloadTask;
 
-    public BlobReadBeam(Properties p_) {
+    public BlobReadBeam(Properties p_, String csvFileNameOutSink) {
         // FIXME!
         this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
@@ -46,7 +45,7 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
         String msgId = input.getMsgid();
 
         //        azureBlobDownloadTask.doTask(rowString);
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
 
         map.put(AbstractTask.DEFAULT_KEY, BlobModelPath);
         azureBlobDownloadTask.doTask(map);

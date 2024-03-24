@@ -85,7 +85,7 @@ public class CsvSplitter {
             int timestampColIndex = 0;
             DateTime date = null;
             if (datasetType.equals("TAXI")) {
-                timestampColIndex = 3;
+                timestampColIndex = 2;
                 date =
                         DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
                                 .parseDateTime(nextLine[timestampColIndex]);
@@ -101,6 +101,9 @@ public class CsvSplitter {
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
                 // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
                 //		nextLine[timestampColIndex]);
+            } else if (datasetType.equals("FIT")) {
+                timestampColIndex = 1;
+                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
             }
 
             long ts = date.getMillis();

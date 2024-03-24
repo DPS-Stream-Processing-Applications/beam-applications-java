@@ -131,24 +131,61 @@ public class SenMlParse extends AbstractTask<String, Map> {
                 // dataset
             }
 
-            mapkeyValues.put("timestamp", String.valueOf(baseTime));
-            mapkeyValues.put("taxi_identifier", inputData[0]);
-            mapkeyValues.put("pickup_datetime", inputData[1]);
-            mapkeyValues.put("pickup_longitude", inputData[5]);
-            mapkeyValues.put("pickup_latitude", inputData[6]);
-            mapkeyValues.put("dropoff_longitude", inputData[7]);
-            mapkeyValues.put("dropoff_latitude", inputData[8]);
-            mapkeyValues.put("payment_type", inputData[9]);
-            mapkeyValues.put("hack_license", inputData[0]);
-            mapkeyValues.put("dropoff_datetime", inputData[2]);
-            mapkeyValues.put("trip_time_in_secs", inputData[3]);
-            mapkeyValues.put("trip_distance", inputData[4]);
-            mapkeyValues.put("fare_amount", inputData[10]);
-            mapkeyValues.put("surcharge", inputData[11]);
-            mapkeyValues.put("mta_tax", inputData[12]);
-            mapkeyValues.put("tip_amount", inputData[13]);
-            mapkeyValues.put("tolls_amount", inputData[14]);
-            mapkeyValues.put("total_amount", inputData[15]);
+            if (dataSetType.equals("TAXI")) {
+                mapkeyValues.put("timestamp", String.valueOf(baseTime));
+                mapkeyValues.put("taxi_identifier", inputData[0]);
+                mapkeyValues.put("pickup_datetime", inputData[1]);
+                mapkeyValues.put("pickup_longitude", inputData[5]);
+                mapkeyValues.put("pickup_latitude", inputData[6]);
+                mapkeyValues.put("dropoff_longitude", inputData[7]);
+                mapkeyValues.put("dropoff_latitude", inputData[8]);
+                mapkeyValues.put("payment_type", inputData[9]);
+                mapkeyValues.put("hack_license", inputData[0]);
+                mapkeyValues.put("dropoff_datetime", inputData[2]);
+                mapkeyValues.put("trip_time_in_secs", inputData[3]);
+                mapkeyValues.put("trip_distance", inputData[4]);
+                mapkeyValues.put("fare_amount", inputData[10]);
+                mapkeyValues.put("surcharge", inputData[11]);
+                mapkeyValues.put("mta_tax", inputData[12]);
+                mapkeyValues.put("tip_amount", inputData[13]);
+                mapkeyValues.put("tolls_amount", inputData[14]);
+                mapkeyValues.put("total_amount", inputData[15]);
+            } else if (dataSetType.equals("FIT")) {
+                mapkeyValues.put("timestamp", String.valueOf(baseTime));
+                mapkeyValues.put("subjectId", inputData[0]);
+                mapkeyValues.put("acc_chest_x", inputData[1]);
+                mapkeyValues.put("acc_chest_y", inputData[2]);
+                mapkeyValues.put("acc_chest_z", inputData[3]);
+
+                mapkeyValues.put("ecg_lead_1", inputData[4]);
+                mapkeyValues.put("ecg_lead_2", inputData[5]);
+
+                mapkeyValues.put("acc_ankle_x", inputData[6]);
+                mapkeyValues.put("acc_ankle_y", inputData[7]);
+                mapkeyValues.put("acc_ankle_z", inputData[8]);
+
+                mapkeyValues.put("gyro_ankle_x", inputData[9]);
+                mapkeyValues.put("gyro_ankle_y", inputData[10]);
+                mapkeyValues.put("gyro_ankle_z", inputData[11]);
+
+                mapkeyValues.put("magnetometer_ankle_x", inputData[12]);
+                mapkeyValues.put("magnetometer_ankle_y", inputData[13]);
+                mapkeyValues.put("magnetometer_ankle_z", inputData[14]);
+
+                mapkeyValues.put("acc_arm_x", inputData[15]);
+                mapkeyValues.put("acc_arm_y", inputData[16]);
+                mapkeyValues.put("acc_arm_z", inputData[17]);
+
+                mapkeyValues.put("gyro_arm_x", inputData[18]);
+                mapkeyValues.put("gyro_arm_y", inputData[19]);
+                mapkeyValues.put("gyro_arm_z", inputData[20]);
+
+                mapkeyValues.put("magnetometer_arm_x", inputData[21]);
+                mapkeyValues.put("magnetometer_arm_y", inputData[22]);
+                mapkeyValues.put("magnetometer_arm_z", inputData[23]);
+
+                mapkeyValues.put("label", inputData[24]);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

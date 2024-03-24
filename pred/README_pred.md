@@ -24,7 +24,19 @@ flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoNa
 flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --input ./pred/src/main/resources/datasets/TAXI_sample_data_senml.csv --experiRunId TAXI-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./pred/src/main/resources/configs/all_tasks.properties --taskName bench
 ```
 
+<!--
+```bash
+flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --input /home/jona/Documents/Bachelor_thesis/Datasets/output_TAXI_small.csv --experiRunId TAXI-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./pred/src/main/resources/configs/all_tasks.properties --taskName bench
+```
+-->
+
 ### Example command for FIT-Data
 ```bash
 flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --input ./pred/src/main/resources/datasets/FIT_sample_data_senml.csv --experiRunId FIT-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./pred/src/main/resources/configs/all_tasks.properties --taskName bench
 ```
+
+<!--
+```bash
+flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --input /home/jona/Documents/Bachelor_thesis/Datasets/output_FIT.csv --experiRunId FIT-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./pred/src/main/resources/configs/all_tasks.properties --taskName bench
+```
+-->

@@ -104,51 +104,52 @@ public class EventGen {
         // 3. Attach this thread to ThreadPool
         if (!isJson) {
             this.launch(csvFileName, outCSVFileName, experimentDurationMillis);
-        }
-        try {
-            int numThreads = GlobalConstants.numThreads;
-            // double scalingFactor = GlobalConstants.accFactor;
-            String datasetType = "";
-            if (outCSVFileName.contains("TAXI")) {
-                datasetType = "TAXI"; // GlobalConstants.dataSetType = "TAXI";
-            } else if (outCSVFileName.contains("SYS")) {
-                datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
-            } else if (outCSVFileName.contains("PLUG")) {
-                datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
-            } else if (outCSVFileName.contains("SENML")) {
-                datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
+        } else {
+            try {
+                int numThreads = GlobalConstants.numThreads;
+                // double scalingFactor = GlobalConstants.accFactor;
+                String datasetType = "";
+                if (outCSVFileName.contains("TAXI")) {
+                    datasetType = "TAXI"; // GlobalConstants.dataSetType = "TAXI";
+                } else if (outCSVFileName.contains("SYS")) {
+                    datasetType = "SYS"; // GlobalConstants.dataSetType = "SYS";
+                } else if (outCSVFileName.contains("PLUG")) {
+                    datasetType = "PLUG"; // GlobalConstants.dataSetType = "PLUG";
+                } else if (outCSVFileName.contains("SENML")) {
+                    datasetType = "SENML"; // GlobalConstants.dataSetType = "PLUG";
+                }
+
+                List<TableClass> nestedList =
+                        JsonSplitter.roundRobinSplitJsonToMemory(
+                                csvFileName, numThreads, scalingFactor, datasetType);
+                this.executorService = Executors.newFixedThreadPool(numThreads);
+
+                Semaphore sem1 = new Semaphore(0);
+
+                Semaphore sem2 = new Semaphore(0);
+
+                SubEventGen[] subEventGenArr = new SubEventGen[numThreads];
+                for (int i = 0; i < numThreads; i++) {
+                    // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));
+                    subEventGenArr[i] = new SubEventGen(this.iseg, nestedList.get(i), sem1, sem2);
+                    this.executorService.execute(subEventGenArr[i]);
+                }
+
+                sem1.acquire(numThreads);
+                // set the start time to all the thread objects
+                long experiStartTs = System.currentTimeMillis();
+                for (int i = 0; i < numThreads; i++) {
+                    // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));
+                    subEventGenArr[i].experiStartTime = experiStartTs;
+                    if (experimentDurationMillis > 0)
+                        subEventGenArr[i].experiDuration = experimentDurationMillis;
+                    this.executorService.execute(subEventGenArr[i]);
+                }
+                sem2.release(numThreads);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error in launching EventGen " + e);
             }
-
-            List<TableClass> nestedList =
-                    JsonSplitter.roundRobinSplitJsonToMemory(
-                            csvFileName, numThreads, scalingFactor, datasetType);
-            this.executorService = Executors.newFixedThreadPool(numThreads);
-
-            Semaphore sem1 = new Semaphore(0);
-
-            Semaphore sem2 = new Semaphore(0);
-
-            SubEventGen[] subEventGenArr = new SubEventGen[numThreads];
-            for (int i = 0; i < numThreads; i++) {
-                // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));
-                subEventGenArr[i] = new SubEventGen(this.iseg, nestedList.get(i), sem1, sem2);
-                this.executorService.execute(subEventGenArr[i]);
-            }
-
-            sem1.acquire(numThreads);
-            // set the start time to all the thread objects
-            long experiStartTs = System.currentTimeMillis();
-            for (int i = 0; i < numThreads; i++) {
-                // this.executorService.execute(new SubEventGen(this.iseg, nestedList.get(i)));
-                subEventGenArr[i].experiStartTime = experiStartTs;
-                if (experimentDurationMillis > 0)
-                    subEventGenArr[i].experiDuration = experimentDurationMillis;
-                this.executorService.execute(subEventGenArr[i]);
-            }
-            sem2.release(numThreads);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error in launching EventGen " + e);
         }
     }
 }

@@ -24,8 +24,13 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
 
     private static int useMsgField;
     private static Random rn;
-    private static String dataSetPath;
+    private final String dataSetPath;
     private boolean isJson;
+
+    public AzureTableRangeQueryTaskTAXI(String dataSetPath) {
+        this.dataSetPath = dataSetPath;
+        this.setJson(dataSetPath.contains("senml"));
+    }
 
     /***
      *
@@ -152,9 +157,8 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
                 // the input CSV message as input for count
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
+
                 // FIXME! Here could be the full dataset
-                dataSetPath = p_.getProperty("TRAIN.DATASET_SENML_NAME_TAXI");
-                this.setJson(dataSetPath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }

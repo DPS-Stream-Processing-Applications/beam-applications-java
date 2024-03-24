@@ -86,7 +86,7 @@ public class JsonSplitter {
 
             int timestampColIndex = 0;
             DateTime date = null;
-            //FIXME
+            // FIXME
             datasetType = "SENML";
             if (datasetType.equals("TAXI")) {
                 timestampColIndex = 3;

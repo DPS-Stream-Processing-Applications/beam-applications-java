@@ -4,9 +4,8 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.GRID_data;
 
 import java.util.Random;
 
+//FIXME: Implement real logic
 public class GridDataGenerator {
-
-    private String meterid, ts, energyconsumed;
 
     public static GRID_data generateRandomGridData() {
         GRID_data gridData = new GRID_data();

@@ -198,7 +198,7 @@ class SubEventGen implements Runnable {
                 if (delay > 10) { // sleep only if it is non-trivial time. We will catch up on sleep
                     // later.
                     try {
-                        //System.out.println("Sleeping for " + delay);
+                        // System.out.println("Sleeping for " + delay);
                         Thread.sleep(delay);
                     } catch (InterruptedException e) {
                         e.printStackTrace();

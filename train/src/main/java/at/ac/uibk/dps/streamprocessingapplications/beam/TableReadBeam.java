@@ -20,6 +20,7 @@ import java.util.Properties;
 public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     private static Logger l;
     private final String datatype;
+    private final String trainDataSet;
     private Properties p;
     private AzureTableRangeQueryTaskFIT azureTableRangeQueryTaskFIT;
     private AzureTableRangeQueryTaskSYS azureTableRangeQueryTaskSYS;
@@ -30,9 +31,11 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     // private TupleTag<String> rowKeyEnd = new TupleTag<>();
     private AzureTableRangeQueryTaskTAXI azureTableRangeQueryTaskTAXI;
 
-    public TableReadBeam(Properties p_, String outCSVFileName, String datatype) {
+    public TableReadBeam(
+            Properties p_, String outCSVFileName, String datatype, String trainDataSet) {
         this.p = p_;
         this.datatype = datatype;
+        this.trainDataSet = trainDataSet;
     }
 
     public static void initLogger(Logger l_) {
@@ -43,20 +46,19 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     public void setup() {
         initLogger(LoggerFactory.getLogger("APP"));
         if (datatype.equals("FIT")) {
-            azureTableRangeQueryTaskFIT = new AzureTableRangeQueryTaskFIT();
+            azureTableRangeQueryTaskFIT = new AzureTableRangeQueryTaskFIT(trainDataSet);
             azureTableRangeQueryTaskFIT.setup(l, p);
         }
         if (datatype.equals("GRID")) {
-            azureTableRangeQueryTaskGRID = new AzureTableRangeQueryTaskGRID();
+            azureTableRangeQueryTaskGRID = new AzureTableRangeQueryTaskGRID(trainDataSet);
             azureTableRangeQueryTaskGRID.setup(l, p);
         }
         if (datatype.equals("SYS")) {
-            azureTableRangeQueryTaskSYS =
-                    new AzureTableRangeQueryTaskSYS(p.getProperty("TRAIN.DATASET_FULL_NAME_SYS"));
+            azureTableRangeQueryTaskSYS = new AzureTableRangeQueryTaskSYS(trainDataSet);
             azureTableRangeQueryTaskSYS.setup(l, p);
         }
         if (datatype.equals("TAXI")) {
-            azureTableRangeQueryTaskTAXI = new AzureTableRangeQueryTaskTAXI();
+            azureTableRangeQueryTaskTAXI = new AzureTableRangeQueryTaskTAXI(trainDataSet);
             azureTableRangeQueryTaskTAXI.setup(l, p);
         }
     }

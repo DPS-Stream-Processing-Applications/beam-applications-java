@@ -22,9 +22,14 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
     private static int startRowKey;
     private static int endRowKey;
     private static int useMsgField;
-    private static String dataSetFilePath;
     private static Random rn;
+    private final String dataSetPath;
     private boolean isJson;
+
+    public AzureTableRangeQueryTaskGRID(String dataSetPath) {
+        this.dataSetPath = dataSetPath;
+        this.setJson(dataSetPath.contains("senml"));
+    }
 
     /***
      *
@@ -155,8 +160,6 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
                 // the input CSV message as input for count
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
-                dataSetFilePath = p_.getProperty("TRAIN.DATASET_FULL_NAME_GRID");
-                this.setJson(dataSetFilePath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }
@@ -202,12 +205,12 @@ public class AzureTableRangeQueryTaskGRID extends AbstractTask {
 
         }
          */
+        // FIXME! The GridGenerator is only random, because of lack of data
         for (long i = 0; i <= 10; i++) {
             resultList.add(GridDataGenerator.generateRandomGridData());
         }
 
         Iterable<GRID_data> result = resultList;
-
         super.setLastResult(result);
 
         return Float.valueOf(Lists.newArrayList(result).size()); // may need updation

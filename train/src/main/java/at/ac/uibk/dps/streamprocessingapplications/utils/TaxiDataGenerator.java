@@ -15,9 +15,9 @@ import java.util.Random;
 
 public class TaxiDataGenerator {
     private static long rowToParse = 0;
-    private String dataSetPath;
+    private final String dataSetPath;
 
-    private boolean isCsvFile;
+    private final boolean isCsvFile;
 
     public TaxiDataGenerator(String dataSetPath, boolean isCsvFile) {
         this.dataSetPath = dataSetPath;

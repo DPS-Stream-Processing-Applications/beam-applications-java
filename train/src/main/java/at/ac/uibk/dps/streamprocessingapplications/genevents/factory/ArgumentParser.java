@@ -15,7 +15,7 @@ public class ArgumentParser {
     public static ArgumentClass parserCLI(String[] args) {
         ParameterTool params = ParameterTool.fromArgs(args);
 
-        if (args == null || params.getNumberOfParameters() != 8) {
+        if (params.getNumberOfParameters() != 9) {
             System.out.println("invalid number of arguments");
             return null;
         } else {
@@ -28,6 +28,7 @@ public class ArgumentParser {
             argumentClass.setOutputDirName(params.get("outputDir"));
             argumentClass.setTasksPropertiesFilename(params.get("taskProp"));
             argumentClass.setTasksName(params.get("taskName"));
+            argumentClass.setInputTrainDataset(params.get("inputTrainSet"));
             return argumentClass;
         }
     }

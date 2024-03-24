@@ -23,8 +23,13 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
     private static int useMsgField;
     private static Random rn;
-    private static String dataSetFilePath;
+    private final String dataSetPath;
     private boolean isJson;
+
+    public AzureTableRangeQueryTaskFIT(String dataSetPath) {
+        this.dataSetPath = dataSetPath;
+        this.setJson(dataSetPath.contains("senml"));
+    }
 
     /***
      *
@@ -154,8 +159,6 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
                 // the input CSV message as input for count
                 startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
                 endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
-                dataSetFilePath = p_.getProperty("TRAIN.DATASET_FULL_NAME_FIT");
-                this.setJson(dataSetFilePath.contains("senml"));
                 rn = new Random();
                 doneSetup = true;
             }
@@ -186,7 +189,7 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
         super.setLastResult(result);
 
-        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
+        return (float) Lists.newArrayList(result).size(); // may need updation
     }
 
     public Float doTaskLogicDummy(Map map) {
@@ -202,15 +205,13 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
 
         }
          */
-        FitDataGenerator fitDataGenerator = new FitDataGenerator(dataSetFilePath, isJson);
+        FitDataGenerator fitDataGenerator = new FitDataGenerator(dataSetPath, isJson);
         for (long i = 0; i <= 10; i++) {
             resultList.add(fitDataGenerator.getNextDataEntry());
         }
 
-        Iterable<FIT_data> result = resultList;
+        super.setLastResult(resultList);
 
-        super.setLastResult(result);
-
-        return Float.valueOf(Lists.newArrayList(result).size()); // may need updation
+        return (float) Lists.newArrayList(resultList).size();
     }
 }

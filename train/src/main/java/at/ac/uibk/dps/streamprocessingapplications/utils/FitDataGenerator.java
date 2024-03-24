@@ -107,6 +107,24 @@ public class FitDataGenerator {
                 if (rowToParse == 0) {
                     rowToParse = 1;
                 }
+                CSVReader reader = new CSVReader(new FileReader(csvFile), ',');
+                String[] row;
+                int currentRow = 0;
+                while ((row = reader.readNext()) != null && currentRow < rowToParse) {
+                    currentRow++;
+                }
+                if (row != null) {
+                    fitData.setAcc_ankle_x(row[7]);
+                    fitData.setAcc_ankle_y(row[8]);
+                    fitData.setAcc_ankle_z(row[9]);
+                    fitData.setAcc_arm_x(row[16]);
+                    fitData.setAcc_arm_y(row[17]);
+                    fitData.setAcc_arm_z(row[18]);
+                    fitData.setAcc_chest_x(row[2]);
+                    fitData.setAcc_chest_y(row[3]);
+                    fitData.setAcc_chest_z(row[4]);
+                    fitData.setEcg_lead_1(row[5]);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Error when reading row " + e);

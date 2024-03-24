@@ -7,6 +7,7 @@ public class ArgumentClass {
     String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
     String topoName;
     String inputDatasetPathName; // Full path along with File Name
+    String inputTrainDataset;
     String experiRunId;
     double scalingFactor; // Deceleration factor with respect to seconds.
     String outputDirName; // Path where the output log file from spout and sink has to be kept
@@ -75,5 +76,13 @@ public class ArgumentClass {
 
     public void setTasksPropertiesFilename(String tasksPropertiesFilename) {
         this.tasksPropertiesFilename = tasksPropertiesFilename;
+    }
+
+    public String getInputTrainDataset() {
+        return inputTrainDataset;
+    }
+
+    public void setInputTrainDataset(String inputTrainDataset) {
+        this.inputTrainDataset = inputTrainDataset;
     }
 }

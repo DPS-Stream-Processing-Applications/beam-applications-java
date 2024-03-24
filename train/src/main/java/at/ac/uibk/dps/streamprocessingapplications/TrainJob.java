@@ -62,6 +62,7 @@ public class TrainJob {
         String taskPropFilename = argumentClass.getTasksPropertiesFilename();
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
         String inputFileName = argumentClass.getInputDatasetPathName();
+        String trainDataSet = argumentClass.getInputTrainDataset();
 
         long linesCount = countLines(inputFileName);
         String dataSetType = checkDataType(inputFileName);
@@ -95,8 +96,17 @@ public class TrainJob {
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply(
                         "Table Read",
-                        ParDo.of(new TableReadBeam(p_, spoutLogFileName, dataSetType)));
-
+                        ParDo.of(
+                                new TableReadBeam(
+                                        p_, spoutLogFileName, dataSetType, trainDataSet)));
+        dataFromAzureDB.apply(
+                ParDo.of(
+                        new DoFn<DbEntry, Void>() {
+                            @ProcessElement
+                            public void processElement(ProcessContext c) {
+                                System.out.println("Db: " + c.element()); // Log the element
+                            }
+                        }));
         dataFromAzureDB.apply(
                 ParDo.of(
                         new DoFn<DbEntry, Void>() {

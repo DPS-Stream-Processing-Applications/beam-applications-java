@@ -88,6 +88,7 @@ public class CityDataGenerator {
                         }
                     }
                 }
+                //FIXME: Complete logic for a normal csv file
             } else {
                 if (rowToParse == 0) {
                     rowToParse = 1;

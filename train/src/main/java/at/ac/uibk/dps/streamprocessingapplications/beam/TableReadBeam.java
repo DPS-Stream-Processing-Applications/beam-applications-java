@@ -9,13 +9,12 @@ import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTas
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskGRID;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskSYS;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureTableRangeQueryTaskTAXI;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     private static Logger l;

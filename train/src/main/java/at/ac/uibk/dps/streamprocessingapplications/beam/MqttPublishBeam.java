@@ -4,13 +4,12 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobUploadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTPublishTask;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
 
@@ -32,12 +31,12 @@ public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
 
         mqttPublishTask = new MQTTPublishTask();
 
-        mqttPublishTask.setup(l, p);
+        // mqttPublishTask.setup(l, p);
     }
 
     @Teardown
     public void cleanup() {
-        mqttPublishTask.tearDown();
+        // mqttPublishTask.tearDown();
     }
 
     @ProcessElement
@@ -49,11 +48,14 @@ public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, filename);
         Float res = 93f;
+        /*
         try {
             res = mqttPublishTask.doTask(map);
         } catch (IOException e) {
-            throw new IOException(e.getMessage());
+            l.info("error when setting up mqttpublish");
         }
+
+         */
         out.output(new MqttPublishEntry(msgId));
     }
 }

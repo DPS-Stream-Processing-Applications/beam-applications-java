@@ -6,8 +6,9 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-
-import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -53,8 +54,13 @@ public class FitDataGenerator {
         FIT_data fitData = new FIT_data();
         try {
             if (isCsvFile) {
+                InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+                if (inputStream == null) {
+                    throw new IOException("Resource not found: " + dataSetPath);
+                }
+
                 Gson gson = new Gson();
-                CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+                CSVReader reader = new CSVReader(new InputStreamReader(inputStream), '|');
                 String[] row;
                 int currentRow = 0;
                 while ((row = reader.readNext()) != null && currentRow < rowToParse) {
@@ -107,7 +113,12 @@ public class FitDataGenerator {
                 if (rowToParse == 0) {
                     rowToParse = 1;
                 }
-                CSVReader reader = new CSVReader(new FileReader(csvFile), ',');
+                InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+                if (inputStream == null) {
+                    throw new IOException("Resource not found: " + dataSetPath);
+                }
+
+                CSVReader reader = new CSVReader(new InputStreamReader(inputStream), '|');
                 String[] row;
                 int currentRow = 0;
                 while ((row = reader.readNext()) != null && currentRow < rowToParse) {

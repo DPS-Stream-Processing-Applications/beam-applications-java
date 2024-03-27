@@ -2,9 +2,7 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 import org.apache.flink.api.java.utils.ParameterTool;
 
-/**
- * Created by tarun on 28/5/15.
- */
+/** Created by tarun on 28/5/15. */
 public class ArgumentParser {
 
     /*
@@ -15,20 +13,20 @@ public class ArgumentParser {
     public static ArgumentClass parserCLI(String[] args) {
         ParameterTool params = ParameterTool.fromArgs(args);
 
-        if (params.getNumberOfParameters() != 9) {
+        if (params.getNumberOfParameters() != 5) {
             System.out.println("invalid number of arguments");
             return null;
         } else {
             ArgumentClass argumentClass = new ArgumentClass();
             argumentClass.setDeploymentMode(params.get("deploymentMode"));
             argumentClass.setTopoName(params.get("topoName"));
-            argumentClass.setInputDatasetPathName(params.get("input"));
+            // argumentClass.setInputDatasetPathName(params.get("input"));
             argumentClass.setExperiRunId(params.get("experiRunId"));
             argumentClass.setScalingFactor(Double.parseDouble(params.get("scalingFactor")));
-            argumentClass.setOutputDirName(params.get("outputDir"));
-            argumentClass.setTasksPropertiesFilename(params.get("taskProp"));
+            // argumentClass.setOutputDirName(params.get("outputDir"));
+            // argumentClass.setTasksPropertiesFilename(params.get("taskProp"));
             argumentClass.setTasksName(params.get("taskName"));
-            argumentClass.setInputTrainDataset(params.get("inputTrainSet"));
+            // argumentClass.setInputTrainDataset(params.get("inputTrainSet"));
             return argumentClass;
         }
     }

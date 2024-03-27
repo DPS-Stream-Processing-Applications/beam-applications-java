@@ -6,9 +6,9 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
-
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -50,8 +50,13 @@ public class CityDataGenerator {
         SYS_City sysCity = new SYS_City();
         try {
             if (isCsvFile) {
+                InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetFileName);
+                if (inputStream == null) {
+                    throw new IOException("Resource not found: " + dataSetFileName);
+                }
+
                 Gson gson = new Gson();
-                CSVReader reader = new CSVReader(new FileReader(csvFile), '|');
+                CSVReader reader = new CSVReader(new InputStreamReader(inputStream), '|');
                 String[] row;
                 int currentRow = 0;
                 while ((row = reader.readNext()) != null && currentRow < rowToParse) {
@@ -88,7 +93,7 @@ public class CityDataGenerator {
                         }
                     }
                 }
-                //FIXME: Complete logic for a normal csv file
+                // FIXME: Complete logic for a normal csv file
             } else {
                 if (rowToParse == 0) {
                     rowToParse = 1;

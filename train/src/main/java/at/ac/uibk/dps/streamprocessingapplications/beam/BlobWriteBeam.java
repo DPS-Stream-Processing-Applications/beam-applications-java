@@ -4,13 +4,12 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.BlobUploadEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.TrainEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AzureBlobUploadTask;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlobWriteBeam extends DoFn<TrainEntry, BlobUploadEntry> {
 

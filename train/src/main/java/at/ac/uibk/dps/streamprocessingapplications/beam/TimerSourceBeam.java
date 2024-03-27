@@ -4,14 +4,13 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
-import org.apache.beam.sdk.transforms.DoFn;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.beam.sdk.transforms.DoFn;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
@@ -219,7 +218,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         String uLogfilename = this.outSpoutCSVLogFileName + msgId;
         this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
 
-        ba = new BatchedFileLogging(uLogfilename, "test");
+        // ba = new BatchedFileLogging(uLogfilename, "test");
     }
 
     @ProcessElement
@@ -265,7 +264,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
             sendMessages++;
             try {
                 //				msgId++;
-                ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId);
+                // ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId);
                 // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
             } catch (Exception e) {
                 e.printStackTrace();

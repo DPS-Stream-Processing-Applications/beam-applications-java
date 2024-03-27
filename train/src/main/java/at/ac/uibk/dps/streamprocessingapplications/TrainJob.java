@@ -4,27 +4,32 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
+import java.io.*;
+import java.util.Properties;
+import java.util.Scanner;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
-import java.io.*;
-import java.util.Properties;
-
 public class TrainJob {
 
-    public static long countLines(String csvFile) {
+    public static long countLines(String resourceFileName) {
         long lines = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-            while (reader.readLine() != null) lines++;
+        try (InputStream inputStream = TrainJob.class.getResourceAsStream(resourceFileName)) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines++;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error when counting lines in csv-file:" + e);
+            throw new RuntimeException(
+                    "Error when counting lines in resource file: " + e.getMessage());
         }
         return lines;
     }
@@ -41,6 +46,27 @@ public class TrainJob {
             return "GRID";
         }
         return null;
+    }
+
+    public static void test() {
+        // Load a resource file as an input stream
+        InputStream inputStream =
+                TrainJob.class.getResourceAsStream(
+                        "/resources/datasets/TAXI_sample_data_senml.csv");
+        if (inputStream != null) {
+            // Process the input stream (e.g., read content)
+            // Example: Read content line by line
+            try (Scanner scanner = new Scanner(inputStream)) {
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    System.out.println(line);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Resource not found!");
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -61,15 +87,51 @@ public class TrainJob {
         String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
         String taskPropFilename = argumentClass.getTasksPropertiesFilename();
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
-        String inputFileName = argumentClass.getInputDatasetPathName();
-        String trainDataSet = argumentClass.getInputTrainDataset();
+        // String inputFileName = argumentClass.getInputDatasetPathName();
+        // String trainDataSet = argumentClass.getInputTrainDataset();
+        String expriRunId = argumentClass.getExperiRunId();
+
+        String dataSetType = checkDataType(expriRunId);
+
+        // FIXME for different datasets!
+        String trainDataSet = "";
+        String inputFileName = "";
+        switch (dataSetType) {
+            case "TAXI":
+                trainDataSet = "/resources/datasets/TAXI_sample_data_senml.csv";
+                inputFileName = "/resources/datasets/inputFileForTimerSpout-TAXI.csv";
+                break;
+            case "SYS":
+                trainDataSet = "/resources/datasets/SYS_sample_data_senml.csv";
+                inputFileName = "/resources/datasets/inputFileForTimerSpout-CITY.csv";
+
+                break;
+            case "FIT":
+                trainDataSet = "/resources/datasets/FIT_sample_data_senml.csv";
+                inputFileName = "/resources/datasets/inputFileForTimerSpout-FIT.csv";
+
+                break;
+            default:
+                throw new RuntimeException("Type not recognized");
+        }
 
         long linesCount = countLines(inputFileName);
-        String dataSetType = checkDataType(inputFileName);
+
+        /*
+              Properties p_ = new Properties();
+              InputStream input = new FileInputStream(taskPropFilename);
+              p_.load(input);
+
+        */
 
         Properties p_ = new Properties();
-        InputStream input = new FileInputStream(taskPropFilename);
-        p_.load(input);
+        try (InputStream input =
+                TrainJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+            p_.load(input);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         FlinkPipelineOptions options =
                 PipelineOptionsFactory.create()
@@ -81,8 +143,8 @@ public class TrainJob {
         // PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
 
-        PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
-        inputFile = p.apply(Create.of("test"));
+        PCollection<String> inputFile = p.apply(Create.of("test"));
+
         PCollection<SourceEntry> timerSource =
                 inputFile.apply(
                         "Timer Source",
@@ -99,22 +161,6 @@ public class TrainJob {
                         ParDo.of(
                                 new TableReadBeam(
                                         p_, spoutLogFileName, dataSetType, trainDataSet)));
-        dataFromAzureDB.apply(
-                ParDo.of(
-                        new DoFn<DbEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println("Db: " + c.element()); // Log the element
-                            }
-                        }));
-        dataFromAzureDB.apply(
-                ParDo.of(
-                        new DoFn<DbEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                System.out.println(c.element());
-                            }
-                        }));
 
         PCollection<TrainEntry> linearRegressionTrain =
                 dataFromAzureDB.apply(

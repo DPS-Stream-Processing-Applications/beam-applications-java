@@ -1,10 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import org.slf4j.Logger;
 
 public interface ITask<T, U> {
     public void setup(Logger l_, Properties p_) throws IOException;
@@ -14,7 +13,7 @@ public interface ITask<T, U> {
      *
      * @param map the input message
      * @return null if there is no message output, Float.MIN_FLOAT if there is an error, output from
-     * the logic otherwise.
+     *     the logic otherwise.
      */
     public Float doTask(Map<String, T> map) throws IOException;
 

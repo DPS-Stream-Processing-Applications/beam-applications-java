@@ -7,9 +7,8 @@ import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableQuery;
-import org.slf4j.Logger;
-
 import java.util.*;
+import org.slf4j.Logger;
 
 public class AzureTableRangeQueryTaskSYS extends AbstractTask {
 

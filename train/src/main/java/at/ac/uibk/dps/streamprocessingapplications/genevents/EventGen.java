@@ -4,7 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.CsvSplitter
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.JsonSplitter;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.TableClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.utils.GlobalConstants;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -192,7 +191,7 @@ class SubEventGen implements Runnable {
                 long delay =
                         deltaTs
                                 - (currentTs
-                                - experiRestartTime); // how long until this event should be
+                                        - experiRestartTime); // how long until this event should be
                 // sent?
                 // delay = 1000;
                 if (delay > 10) { // sleep only if it is non-trivial time. We will catch up on sleep

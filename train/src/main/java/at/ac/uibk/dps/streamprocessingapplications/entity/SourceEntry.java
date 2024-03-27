@@ -16,8 +16,7 @@ public class SourceEntry implements Serializable {
         this.rowKeyEnd = rowKeyEnd;
     }
 
-    public SourceEntry() {
-    }
+    public SourceEntry() {}
 
     public String getRowString() {
         return rowString;

@@ -1,13 +1,13 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import com.opencsv.CSVReader;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Splits the CSV file in round-robin manner and stores it to individual files based on the number
@@ -20,8 +20,8 @@ public class CsvSplitter {
     public static int peakRate;
 
     public static List<String> extractHeadersFromCSV(String inputFileName) {
-        try {
-            CSVReader reader = new CSVReader(new FileReader(inputFileName));
+        try (InputStream inputStream = TrainJob.class.getResourceAsStream(inputFileName);
+                CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
             String[] headers = reader.readNext(); // use .intern() later
             reader.close();
             List<String> headerList = new ArrayList<String>();
@@ -40,7 +40,11 @@ public class CsvSplitter {
     public static List<TableClass> roundRobinSplitCsvToMemory(
             String inputSortedCSVFileName, int numThreads, double accFactor, String datasetType)
             throws IOException {
-        CSVReader reader = new CSVReader(new FileReader(inputSortedCSVFileName));
+        InputStream inputStream = TrainJob.class.getResourceAsStream(inputSortedCSVFileName);
+        if (inputStream == null) {
+            throw new IOException("Resource not found: " + inputSortedCSVFileName);
+        }
+        CSVReader reader = new CSVReader(new InputStreamReader(inputStream));
         String[] nextLine;
         int ctr = 0;
         String[] headers = reader.readNext(); // use .intern() later
@@ -122,9 +126,9 @@ public class CsvSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                * (1.0 / accFactor)
-                                * 60
-                                * 1000; // accFactor is actually the scaling factor or
+                                        * (1.0 / accFactor)
+                                        * 60
+                                        * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
                 // System.out.println("GOTSTART TS : "  + ts + " cut off " + cutOffTimeStamp);
             }

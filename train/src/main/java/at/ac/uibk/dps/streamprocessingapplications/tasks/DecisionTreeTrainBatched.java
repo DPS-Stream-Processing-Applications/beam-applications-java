@@ -1,16 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
+import java.io.*;
+import java.util.Map;
+import java.util.Properties;
 import org.slf4j.Logger;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * This task should only be run from a single thread to avoid overwriting output model file.
@@ -58,7 +54,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
             //			System.out.println(("Model is - "+j48tree.toString()));
 
             // saving the model
-            weka.core.SerializationHelper.write(modelFilePath, j48tree);
+            // weka.core.SerializationHelper.write(modelFilePath, j48tree);
 
         } catch (Exception e) {
             l.warn("error training decision tree", e);
@@ -87,6 +83,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
                 //					instanceHeader = WekaUtil.readFileToString(arffFilePath,
                 // StandardCharsets.UTF_8);
                 instanceHeader = p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
+                instanceHeader = "/resources/model/DecisionTreeClassify-SYS.arff";
 
                 doneSetup = true;
             }
@@ -94,7 +91,26 @@ public class DecisionTreeTrainBatched extends AbstractTask {
         // setup for NON-static fields
         instancesCount = 0;
 
-        instancesBuf = new StringBuffer(instanceHeader);
+        StringBuffer stringBuffer;
+        try (InputStream inputStream =
+                TrainJob.class.getResourceAsStream(
+                        "/resources/model/DecisionTreeClassify-SYS.arff")) {
+            if (inputStream == null) {
+                throw new RuntimeException(
+                        "Resource not found: /resources/model/DecisionTreeClassify-SYS.arff");
+            }
+            // Read the content of the resource
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            stringBuffer = new StringBuffer();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuffer.append(line).append("\n");
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        instancesBuf = (stringBuffer);
 
         //		try {
         //			dummyData=new
@@ -113,8 +129,8 @@ public class DecisionTreeTrainBatched extends AbstractTask {
 
         String m = (String) map.get(AbstractTask.DEFAULT_KEY);
         String filename = (String) map.get("FILENAME");
-        String arffContent = new String(Files.readAllBytes(Paths.get(instanceHeader)));
-        instancesBuf = new StringBuffer(arffContent);
+        // String arffContent = new String(Files.readAllBytes(Paths.get(instanceHeader)));
+        // instancesBuf = new StringBuffer(arffContent);
         ByteArrayOutputStream model = new ByteArrayOutputStream();
         if (l.isInfoEnabled()) l.info("Range query res:{}", m);
         System.out.println(modelFilePath);

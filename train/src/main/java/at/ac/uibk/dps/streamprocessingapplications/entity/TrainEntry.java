@@ -18,8 +18,7 @@ public class TrainEntry implements Serializable {
         this.fileName = fileName;
     }
 
-    public TrainEntry() {
-    }
+    public TrainEntry() {}
 
     public String getModel() {
         return model;

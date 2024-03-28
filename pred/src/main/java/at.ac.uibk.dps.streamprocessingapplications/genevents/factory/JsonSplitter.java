@@ -5,6 +5,7 @@ import java.io.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 interface MyReader {
     String[] readLine() throws IOException;
 
-    void init() throws FileNotFoundException;
+    void init() throws IOException;
 
     public void close() throws IOException;
 }
@@ -220,8 +221,25 @@ class MyCSVReader implements MyReader {
         }
     }
 
-    public void init() throws FileNotFoundException {
-        reader = new CSVReader(new FileReader(inputFileName));
+    public void init() throws IOException {
+        try (InputStream inputStream = MyCSVReader.class.getResourceAsStream(inputFileName)) {
+            if (inputStream == null) {
+                throw new IOException("File not found: " + inputFileName);
+            }
+
+            // Convert the input stream to a BufferedReader
+            try (BufferedReader bufferedReader =
+                    new BufferedReader(new InputStreamReader(inputStream))) {
+                // Read the content of the file into a String
+                String fileContent =
+                        bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+
+                // Initialize the CSVReader with the file content
+                reader = new CSVReader(new java.io.StringReader(fileContent));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("In init mycsv: " + e);
+        }
     }
 
     public void close() throws IOException {
@@ -249,8 +267,15 @@ class MyJSONReader implements MyReader {
     }
 
     public void init() throws FileNotFoundException {
-        reader = new FileReader(inputFileName);
-        bufferedReader = new BufferedReader(reader);
+        try {
+            InputStream inputStream = MyJSONReader.class.getResourceAsStream(inputFileName);
+            if (inputStream == null) {
+                throw new FileNotFoundException("File not found: " + inputFileName);
+            }
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        } catch (IOException e) {
+            throw new RuntimeException("Error initializing MyJSONReader: " + e.getMessage(), e);
+        }
     }
 
     public void close() throws IOException {

@@ -40,7 +40,7 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     public void setup() throws MqttException {
         mqttSubscribeTask = new MQTTSubscribeTask();
         initLogger(LoggerFactory.getLogger("APP"));
-        mqttSubscribeTask.setup(l, p);
+        // mqttSubscribeTask.setup(l, p);
     }
 
     @ProcessElement
@@ -49,8 +49,9 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         // TODO Read packet and forward to next bolt
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, "dummy");
-        mqttSubscribeTask.doTask(map);
+        // mqttSubscribeTask.doTask(map);
         String arg1 = (String) mqttSubscribeTask.getLastResult();
+        arg1 = "test-12";
 
         if (arg1 != null) {
             try {

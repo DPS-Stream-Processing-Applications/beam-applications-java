@@ -35,6 +35,9 @@ tasks.named<Jar>("jar") {
             "Main-Class" to mainClassName,
         )
     }
+    from("src/main/resources") {
+        into("resources")
+    }
     exclude("META-INF/*.SF")
     exclude("META-INF/*.DSA")
     exclude("META-INF/*.RSA")

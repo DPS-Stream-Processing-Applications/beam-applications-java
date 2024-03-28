@@ -123,7 +123,6 @@ public class EventGen {
                         JsonSplitter.roundRobinSplitJsonToMemory(
                                 csvFileName, numThreads, scalingFactor, datasetType);
                 this.executorService = Executors.newFixedThreadPool(numThreads);
-
                 Semaphore sem1 = new Semaphore(0);
 
                 Semaphore sem2 = new Semaphore(0);
@@ -146,9 +145,11 @@ public class EventGen {
                     this.executorService.execute(subEventGenArr[i]);
                 }
                 sem2.release(numThreads);
-            } catch (IOException | InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Error in launching EventGen " + e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }

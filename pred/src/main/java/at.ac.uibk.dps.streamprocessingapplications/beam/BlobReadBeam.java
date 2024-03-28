@@ -15,12 +15,12 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
 
     private static Logger l; // TODO: Ensure logger is initialized before use
     Properties p;
-    String csvFileNameOutSink; // Full path name of the file at the sink bolt
+    // String csvFileNameOutSink; // Full path name of the file at the sink bolt
     AzureBlobDownloadTask azureBlobDownloadTask;
 
-    public BlobReadBeam(Properties p_, String csvFileNameOutSink) {
+    public BlobReadBeam(Properties p_) {
         // FIXME!
-        this.csvFileNameOutSink = csvFileNameOutSink;
+        // this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
     }
 

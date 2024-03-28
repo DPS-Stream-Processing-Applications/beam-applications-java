@@ -30,7 +30,7 @@ public class MqttPublishBeam1 extends DoFn<ErrorEstimateEntry, MqttPublishEntry>
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
         mqttPublishTask = new MQTTPublishTask();
-        mqttPublishTask.setup(l, p);
+        // mqttPublishTask.setup(l, p);
     }
 
     @ProcessElement
@@ -62,13 +62,13 @@ public class MqttPublishBeam1 extends DoFn<ErrorEstimateEntry, MqttPublishEntry>
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-        mqttPublishTask.doTask(map);
+        // mqttPublishTask.doTask(map);
 
         out.output(new MqttPublishEntry(msgId, meta, obsVal));
     }
 
     @Teardown
     public void cleanUp() {
-        mqttPublishTask.tearDown();
+        // mqttPublishTask.tearDown();
     }
 }

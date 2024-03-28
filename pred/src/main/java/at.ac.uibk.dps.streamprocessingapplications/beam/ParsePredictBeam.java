@@ -4,9 +4,7 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -38,48 +36,64 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
     @Setup
     public void setup() {
-
         try {
             initLogger(LoggerFactory.getLogger("APP"));
             senMLParseTask = new SenMlParse(dataSetType, isJson);
             senMLParseTask.setup(l, p);
-            observableFields = new ArrayList();
-            String line;
-            ArrayList<String> metaList = new ArrayList<String>();
-            FileReader reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
-            /* read meta field list from property */
-            String meta = p.getProperty("PARSE.META_FIELD_SCHEMA");
+            observableFields = new ArrayList<>();
+            ArrayList<String> metaList = new ArrayList<>();
 
+            String meta;
+            InputStream inputStream = null;
             if (dataSetType.equals("TAXI")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
-                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_TAXI"));
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream(
+                                        "/resources/datasets/taxi-schema-without-annotation.csv");
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
-            }
-            if (dataSetType.equals("SYS")) {
+            } else if (dataSetType.equals("SYS")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
-                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_SYS"));
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream(
+                                        "/resources/datasets/sys-schema_without_annotationfields.txt");
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
-            }
-            if (dataSetType.equals("FIT")) {
+            } else if (dataSetType.equals("FIT")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
-                reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH_FIT"));
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream("/resources/datasets/mhealth_schema.csv");
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
+            } else {
+                throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
             }
+
+            if (inputStream == null) {
+                throw new FileNotFoundException("CSV schema file not found");
+            }
+
+            InputStreamReader reader = new InputStreamReader(inputStream);
+            BufferedReader br = new BufferedReader(reader);
+
+            /* read meta field list from property */
             metaFields = meta.split(",");
-            for (int i = 0; i < metaFields.length; i++) {
-                metaList.add(metaFields[i]);
+            for (String metaField : metaFields) {
+                metaList.add(metaField);
             }
+
             /* read csv schema to read fields observable into a list
             excluding meta fields read above */
-            BufferedReader br = new BufferedReader(reader);
-            line = br.readLine();
+            String line = br.readLine();
             String[] obsType = line.split(",");
-            for (int i = 0; i < obsType.length; i++) {
-                if (!metaList.contains(obsType[i])) {
-                    observableFields.add(obsType[i]);
+            for (String field : obsType) {
+                if (!metaList.contains(field)) {
+                    observableFields.add(field);
                 }
             }
-        } catch (Exception e) {
+
+            br.close();
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error when setting up ParsePredictBeam: " + e);
         }

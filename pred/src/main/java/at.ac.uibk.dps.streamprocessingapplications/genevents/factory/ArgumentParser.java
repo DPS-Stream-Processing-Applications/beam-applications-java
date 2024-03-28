@@ -13,7 +13,7 @@ public class ArgumentParser {
     public static ArgumentClass parserCLI(String[] args) {
         ParameterTool params = ParameterTool.fromArgs(args);
 
-        if (args == null || params.getNumberOfParameters() != 8) {
+        if (args == null || params.getNumberOfParameters() != 5) {
             System.out.println("invalid number of arguments " + params.getNumberOfParameters());
             return null;
         } else {

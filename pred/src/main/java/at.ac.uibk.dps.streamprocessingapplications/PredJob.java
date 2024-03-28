@@ -4,7 +4,10 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
@@ -16,13 +19,19 @@ import org.apache.beam.sdk.values.PCollectionList;
 
 public class PredJob {
 
-    public static long countLines(String csvFile) {
+    public static long countLines(String resourceFileName) {
         long lines = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-            while (reader.readLine() != null) lines++;
+        try (InputStream inputStream = PredJob.class.getResourceAsStream(resourceFileName)) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines++;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error when counting lines in csv-file " + e);
+            throw new RuntimeException(
+                    "Error when counting lines in resource file: " + e.getMessage());
         }
         return lines;
     }
@@ -47,7 +56,7 @@ public class PredJob {
             System.out.println("ERROR! INVALID NUMBER OF ARGUMENTS");
             return;
         }
-        boolean isJson = argumentClass.getInputDatasetPathName().contains("senml");
+
         String logFilePrefix =
                 argumentClass.getTopoName()
                         + "-"
@@ -55,20 +64,46 @@ public class PredJob {
                         + "-"
                         + argumentClass.getScalingFactor()
                         + ".log";
-        String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
-        // String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
-        String taskPropFilename = argumentClass.getTasksPropertiesFilename();
-        String inputFileName = argumentClass.getInputDatasetPathName();
+        // String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
+        // String taskPropFilename = argumentClass.getTasksPropertiesFilename();
+        // String inputFileName = argumentClass.getInputDatasetPathName();
+        // String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
+        String expriRunId = argumentClass.getExperiRunId();
 
         Properties p_ = new Properties();
-        InputStream input = new FileInputStream(taskPropFilename);
-        p_.load(input);
-        long lines = countLines(inputFileName);
-        String dataSetType = checkDataType(inputFileName);
+        try (InputStream input =
+                PredJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+            p_.load(input);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String inputFileName;
+        String dataSetType = checkDataType(expriRunId);
         if (dataSetType == null) {
             throw new RuntimeException("Type could not be detected");
         }
+        switch (dataSetType) {
+            case "TAXI":
+                inputFileName = "/resources/datasets/TAXI_sample_data_senml.csv";
+                break;
+            case "SYS":
+                inputFileName = "/resources/datasets/SYS_sample_data_senml.csv";
+
+                break;
+            case "FIT":
+                inputFileName = "/resources/datasets/FIT_sample_data_senml.csv";
+
+                break;
+            default:
+                throw new RuntimeException("Type not recognized");
+        }
+
+        long lines = countLines(inputFileName);
+
+        boolean isJson = inputFileName.contains("senml");
 
         FlinkPipelineOptions options =
                 PipelineOptionsFactory.create()
@@ -79,14 +114,13 @@ public class PredJob {
 
         Pipeline p = Pipeline.create(options);
 
-        // PCollection<String> inputFile = p.apply(TextIO.read().from(inputFileName));
         PCollection<String> inputFile = p.apply(Create.of("test"));
 
         PCollection<MqttSubscribeEntry> sourceDataMqtt =
                 inputFile.apply("MQTT Subscribe", ParDo.of(new MqttSubscribeBeam(p_)));
 
         PCollection<BlobReadEntry> blobRead =
-                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_, sinkLogFileName)));
+                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
@@ -151,7 +185,7 @@ public class PredJob {
                         .and(publish2)
                         .apply("Merge PCollections", Flatten.pCollections());
 
-        PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+        PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink()));
         PCollection<Long> count = out.apply("Count", Count.globally());
         count.apply(
                 ParDo.of(
@@ -161,6 +195,7 @@ public class PredJob {
                                 System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
+
         p.run();
     }
 }

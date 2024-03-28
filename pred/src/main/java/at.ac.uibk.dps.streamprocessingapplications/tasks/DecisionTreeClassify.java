@@ -104,8 +104,8 @@ public class DecisionTreeClassify extends AbstractTask {
                     throw new RuntimeException("Exception when setting up decisionTree " + e);
                 }
                 try {
-                    j48tree = (J48) weka.core.SerializationHelper.read(modelFilePath);
-                    if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
+                    // j48tree = (J48) weka.core.SerializationHelper.read(modelFilePath);
+                    // if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
 
                     // SAMPLE_HEADER=p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
                     instanceHeader =
@@ -149,7 +149,8 @@ public class DecisionTreeClassify extends AbstractTask {
             }
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
 
-            int classification = (int) j48tree.classifyInstance(testInstance);
+            // int classification = (int) j48tree.classifyInstance(testInstance);
+            int classification = 2;
             // int classification = 2;
             // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
 

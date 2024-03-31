@@ -13,60 +13,21 @@ public class OnTimeTestStream {
             "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
                 + " 50, \"t\": 1645467200}")
         .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 25.7, \"t\": 1645467500}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 51, \"t\": 1645467500}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 26.2, \"t\": 1645467800}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 52, \"t\": 1645467800}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 26.8, \"t\": 1645468100}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 53, \"t\": 1645468100}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 27.1, \"t\": 1645468400}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 54, \"t\": 1645468400}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 27.5, \"t\": 1645468700}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 55, \"t\": 1645468700}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 27.9, \"t\": 1645469000}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 56, \"t\": 1645469000}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 28.3, \"t\": 1645469300}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 57, \"t\": 1645469300}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 28.7, \"t\": 1645469600}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 58, \"t\": 1645469600}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
-        .addElements(
-            "{\"bn\": \"temperature_sensor\", \"n\": \"temperature\", \"u\": \"Cel\","
-                + " \"v\": 29.2, \"t\": 1645469900}",
-            "{\"bn\": \"humidity_sensor\", \"n\": \"humidity\", \"u\": \"%RH\", \"v\":"
-                + " 59, \"t\": 1645469900}")
-        .advanceProcessingTime(Duration.standardMinutes(5))
+        /*{
+          "e":
+          [
+            {"u":"string","n":"source","sv":"ci4lr75sl000802ypo4qrcjda23"},
+            {"v":"6.1668213","u":"lon","n":"longitude"},
+            {"v":"46.1927629","u":"lat","n":"latitude"},
+            {"v":"8","u":"far","n":"temperature"},
+            {"v":"53.7","u":"per","n":"humidity"},
+            {"v":"0","u":"per","n":"light"},
+            {"v":"411.02","u":"per","n":"dust"},
+            {"v":"140","u":"per","n":"airquality_raw"}
+          ],
+          "bt":1422748800000
+          }
+        */
         .advanceWatermarkToInfinity();
   }
 }

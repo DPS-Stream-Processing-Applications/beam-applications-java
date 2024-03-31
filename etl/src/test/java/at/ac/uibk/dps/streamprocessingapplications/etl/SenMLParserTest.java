@@ -77,8 +77,34 @@ class SenMLParserTest {
   }
 
   @Test
+  void parseSenMLPack_empty() {
+    JSONArray pack = new JSONArray(List.of());
+    String packSenMLString = pack.toString();
+
+    assertEquals(Set.of(), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+  }
+
+  @Test
+  void parseSenMLPack_oneElement() {
+    JSONArray pack = new JSONArray(List.of(jsonObject1));
+    String packSenMLString = pack.toString();
+
+    assertEquals(Set.of(record1), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+  }
+
+  @Test
   void parseSenMLPack_twoElements() {
     JSONArray pack = new JSONArray(List.of(jsonObject1, jsonObject2));
+    String packSenMLString = pack.toString();
+
+    assertEquals(Set.of(record1, record2), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+  }
+
+  @Test
+  void parseSenMLPack_twoElementsWithOneMissingBasename_InfersBaseName() {
+    JSONObject jsonObject2NoBaseName = new JSONObject(jsonObject2.toString());
+    jsonObject2NoBaseName.remove("bn");
+    JSONArray pack = new JSONArray(List.of(jsonObject1, jsonObject2NoBaseName));
     String packSenMLString = pack.toString();
 
     assertEquals(Set.of(record1, record2), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));

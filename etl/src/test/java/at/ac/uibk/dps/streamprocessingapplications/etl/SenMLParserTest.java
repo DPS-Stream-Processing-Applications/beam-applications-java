@@ -4,11 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +46,7 @@ class SenMLParserTest {
                 record1.getTime().getEpochSecond()));
     senMLString1 = jsonObject1.toString();
 
-   record2 =
+    record2 =
         new SenMLRecordDouble(
             "149298F6D390FA640E80B41ED31199C5",
             "pickup_datetime",
@@ -81,7 +79,8 @@ class SenMLParserTest {
     JSONArray pack = new JSONArray(List.of());
     String packSenMLString = pack.toString();
 
-    assertEquals(Set.of(), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+    assertEquals(
+        Set.of(), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
   }
 
   @Test
@@ -89,7 +88,9 @@ class SenMLParserTest {
     JSONArray pack = new JSONArray(List.of(jsonObject1));
     String packSenMLString = pack.toString();
 
-    assertEquals(Set.of(record1), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+    assertEquals(
+        Set.of(record1),
+        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
   }
 
   @Test
@@ -97,7 +98,9 @@ class SenMLParserTest {
     JSONArray pack = new JSONArray(List.of(jsonObject1, jsonObject2));
     String packSenMLString = pack.toString();
 
-    assertEquals(Set.of(record1, record2), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+    assertEquals(
+        Set.of(record1, record2),
+        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
   }
 
   @Test
@@ -107,6 +110,8 @@ class SenMLParserTest {
     JSONArray pack = new JSONArray(List.of(jsonObject1, jsonObject2NoBaseName));
     String packSenMLString = pack.toString();
 
-    assertEquals(Set.of(record1, record2), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+    assertEquals(
+        Set.of(record1, record2),
+        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
   }
 }

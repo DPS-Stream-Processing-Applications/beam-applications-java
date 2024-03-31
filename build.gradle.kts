@@ -21,6 +21,7 @@ subprojects {
                 importOrder()
                 googleJavaFormat().reflowLongStrings()
                 formatAnnotations()
+            toggleOffOn()
         }
     }
 }

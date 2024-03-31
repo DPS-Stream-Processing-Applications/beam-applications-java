@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.json.JSONObject;
 
 /**
  * WARN: This is not a full implementation of the SenML specification it only implements a subset!
@@ -18,11 +17,11 @@ import org.json.JSONObject;
  *   <li>bn
  *   <li>n
  *   <li>u
- *   <li>v / sv / bv
+ *   <li>exactly one of v / vs / vb / vd
  *   <li>t
  * </ul>
  */
-public abstract class SenMLRecord<T> implements Serializable {
+public abstract class AbstractSenMLRecord<T> implements Serializable {
   @Nullable private String baseName;
 
   @Nullable private String name;
@@ -30,31 +29,18 @@ public abstract class SenMLRecord<T> implements Serializable {
   @Nullable private T value;
   @Nullable private Instant time;
 
-  public SenMLRecord(String senMLString) {
-    JSONObject record = new JSONObject(senMLString);
-    this.baseName = record.has("bn") ? record.optString("bn") : null;
-    this.name = record.has("n") ? record.optString("n") : null;
-    this.unit = record.has("u") ? record.optString("u") : null;
-
-    /* INFO:
-     * As specified in <a href="https://datatracker.ietf.org/doc/html/rfc8427#section-4.2">section 4.2</a>
-     * a SenML record can only contain **one** or **zero** value labels.
-     * This value can be of type `number`, `boolean`, `string` or `data`.
-     * The corresponding labels are: "v", "sv", and "bv".
-     */
-    // Set<String> supportedValueLabels = Set.of("v", "vb", "vs", "vd");
-    // this.value =
-    // record.keySet().stream()
-    // .filter(supportedValueLabels::contains)
-    // .map(record::optString)
-    // .findFirst()
-    //  .orElse(null);
-
-    this.time =
-        record.has("t") ? Instant.ofEpochSecond(Long.parseLong(record.optString("t"))) : null;
-  }
-
-  public SenMLRecord(@Nullable String baseName, @Nullable String name, @Nullable String unit, @Nullable T value, @Nullable Instant time) {
+  /* INFO:
+   * As specified in <a href="https://datatracker.ietf.org/doc/html/rfc8427#section-4.2">section 4.2</a>
+   * a SenML record can only contain **one** or **zero** value labels.
+   * This value can be of type `number`, `boolean`, `string` or `data`.
+   * The corresponding labels are: "v", "sv", and "bv".
+   */
+  public AbstractSenMLRecord(
+      @Nullable String baseName,
+      @Nullable String name,
+      @Nullable String unit,
+      @Nullable T value,
+      @Nullable Instant time) {
     this.baseName = baseName;
     this.name = name;
     this.unit = unit;
@@ -76,7 +62,8 @@ public abstract class SenMLRecord<T> implements Serializable {
 
   @Nullable public T getValue() {
     return this.value;
-  };
+  }
+  ;
 
   @Nullable public Instant getTime() {
     return time;
@@ -86,11 +73,31 @@ public abstract class SenMLRecord<T> implements Serializable {
     return this.getBaseName() + this.getName();
   }
 
+  public void setBaseName(@Nullable String baseName) {
+    this.baseName = baseName;
+  }
+
+  public void setName(@Nullable String name) {
+    this.name = name;
+  }
+
+  public void setUnit(@Nullable String unit) {
+    this.unit = unit;
+  }
+
+  public void setValue(@Nullable T value) {
+    this.value = value;
+  }
+
+  public void setTime(@Nullable Instant time) {
+    this.time = time;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof SenMLRecord)) return false;
-    SenMLRecord<?> that = (SenMLRecord<?>) o;
+    if (!(o instanceof AbstractSenMLRecord)) return false;
+    AbstractSenMLRecord<?> that = (AbstractSenMLRecord<?>) o;
     return Objects.equals(getBaseName(), that.getBaseName())
         && Objects.equals(getName(), that.getName())
         && Objects.equals(getUnit(), that.getUnit())
@@ -101,5 +108,24 @@ public abstract class SenMLRecord<T> implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(getBaseName(), getName(), getUnit(), getValue(), getTime());
+  }
+
+  @Override
+  public String toString() {
+    return "AbstractSenMLRecord{"
+        + "baseName='"
+        + baseName
+        + '\''
+        + ", name='"
+        + name
+        + '\''
+        + ", unit='"
+        + unit
+        + '\''
+        + ", value="
+        + value
+        + ", time="
+        + time
+        + '}';
   }
 }

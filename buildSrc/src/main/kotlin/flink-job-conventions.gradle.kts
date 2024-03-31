@@ -1,5 +1,10 @@
 plugins {
     id("java")
+    /* NOTE:
+     * Using the Java `toolchain` a specific java version and implementation can be specified.
+     * the following resolver allows gradle to install this java version if it is not available on the build machine.
+     */
+    // id("org.gradle.toolchains.foojay-resolver-convention")
 }
 
 repositories {
@@ -22,6 +27,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
+        vendor = JvmVendorSpec.ADOPTOPENJDK
     }
 
 tasks.named<Test>("test") {

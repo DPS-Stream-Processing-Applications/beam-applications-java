@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.SenMLParser;
+import at.ac.uibk.dps.streamprocessingapplications.etl.SenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ public class FilterAndInterpolateOutliers
         .apply(
             "Parse SenMLRecord POJO",
             MapElements.into(TypeDescriptor.of(SenMLRecordDouble.class))
-                .via(SenMLParser::parseJsonStringWithV))
+                .via(SenMLParserJSON::parseWithV))
         .apply(
             "Group records by full name",
             new GroupSenMLRecordsByFullName<SenMLRecordDouble>(

@@ -25,7 +25,7 @@ public class SenMLRecordString extends AbstractSenMLRecord<String> {
                 this.getName(),
                 "u",
                 this.getUnit(),
-                "v",
+                "vs",
                 this.getValue(),
                 "t",
                 this.getTime()))

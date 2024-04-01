@@ -111,5 +111,5 @@ public abstract class AbstractSenMLRecord<T> implements Serializable {
   }
 
   @Override
-  public abstract  String toString();
+  public abstract String toString();
 }

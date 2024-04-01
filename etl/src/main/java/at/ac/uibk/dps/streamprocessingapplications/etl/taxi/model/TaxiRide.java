@@ -21,7 +21,8 @@ public class TaxiRide {
   private SenMLRecordDouble tollsAmount;
   private SenMLRecordDouble totalAmount;
 
-  public TaxiRide(){}
+  public TaxiRide() {}
+
   public TaxiRide(
       SenMLRecordString taxiIdentifier,
       SenMLRecordString hackLicense,

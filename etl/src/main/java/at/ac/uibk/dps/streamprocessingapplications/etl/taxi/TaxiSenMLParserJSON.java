@@ -75,7 +75,8 @@ public class TaxiSenMLParserJSON {
             .collect(
                 Collectors.toMap(jsonObject -> jsonObject.getString("n"), JSONObject::toString));
 
-    // TODO: Allow for Falues to not exist and pass them as null. Right now `parseWith()` throws NullPointerException.
+    // TODO: Allow for Values to not exist and pass them as null. Right now `parseWith()` throws
+    // NullPointerException.
     return new TaxiRide(
         SenMLParserJSON.parseWithVS(recordNameToRecordString.get("taxi_identifier")),
         SenMLParserJSON.parseWithVS(recordNameToRecordString.get("hack_license")),

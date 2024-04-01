@@ -10,8 +10,8 @@ import java.util.function.Function;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SenMLParser {
-  public static SenMLRecordDouble parseJsonStringWithV(String senMLJson) {
+public class SenMLParserJSON {
+  public static SenMLRecordDouble parseWithV(String senMLJson) {
     JSONObject record = new JSONObject(senMLJson);
 
     String baseName = record.has("bn") ? record.optString("bn") : null;
@@ -24,7 +24,7 @@ public class SenMLParser {
     return new SenMLRecordDouble(baseName, name, unit, value, time);
   }
 
-  public static SenMLRecordString parseJsonStringWithVS(String senMLJson) {
+  public static SenMLRecordString parseWithVS(String senMLJson) {
     JSONObject record = new JSONObject(senMLJson);
 
     String baseName = record.has("bn") ? record.optString("bn") : null;

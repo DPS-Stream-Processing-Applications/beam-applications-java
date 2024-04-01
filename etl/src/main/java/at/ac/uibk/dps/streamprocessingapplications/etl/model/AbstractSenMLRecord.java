@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
  *   <li>bn
  *   <li>n
  *   <li>u
- *   <li>exactly one of v / vs / vb / vd
+ *   <li>exactly one of v / vs
  *   <li>t
  * </ul>
  */
@@ -111,21 +111,5 @@ public abstract class AbstractSenMLRecord<T> implements Serializable {
   }
 
   @Override
-  public String toString() {
-    return "AbstractSenMLRecord{"
-        + "baseName='"
-        + baseName
-        + '\''
-        + ", name='"
-        + name
-        + '\''
-        + ", unit='"
-        + unit
-        + '\''
-        + ", value="
-        + value
-        + ", time="
-        + time
-        + '}';
-  }
+  public abstract  String toString();
 }

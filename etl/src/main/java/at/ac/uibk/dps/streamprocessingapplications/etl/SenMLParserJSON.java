@@ -49,12 +49,14 @@ public class SenMLParserJSON {
     T baseRecord = recordParser.apply(recordPack.getJSONObject(0).toString());
     records.add(baseRecord);
     recordPack.remove(0);
+    String baseName = baseRecord.getName();
     recordPack
         .iterator()
         .forEachRemaining(
             json -> {
               T record = recordParser.apply(json.toString());
-              if (record.getBaseName() == null) {
+              // NOTE: Add basename to every record
+              if (baseName != null && record.getBaseName() == null) {
                 record.setBaseName(baseRecord.getBaseName());
               }
               records.add(record);

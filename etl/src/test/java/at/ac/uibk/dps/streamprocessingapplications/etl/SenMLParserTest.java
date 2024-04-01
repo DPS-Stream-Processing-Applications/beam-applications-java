@@ -71,7 +71,7 @@ class SenMLParserTest {
 
   @Test
   void parseJsonStringWithV() {
-    assertEquals(record1, SenMLParser.parseJsonStringWithV(senMLString1));
+    assertEquals(record1, SenMLParserJSON.parseWithV(senMLString1));
   }
 
   @Test
@@ -80,7 +80,7 @@ class SenMLParserTest {
     String packSenMLString = pack.toString();
 
     assertEquals(
-        Set.of(), SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+        Set.of(), SenMLParserJSON.parseSenMLPack(packSenMLString, SenMLParserJSON::parseWithV));
   }
 
   @Test
@@ -90,7 +90,7 @@ class SenMLParserTest {
 
     assertEquals(
         Set.of(record1),
-        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+        SenMLParserJSON.parseSenMLPack(packSenMLString, SenMLParserJSON::parseWithV));
   }
 
   @Test
@@ -100,7 +100,7 @@ class SenMLParserTest {
 
     assertEquals(
         Set.of(record1, record2),
-        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+        SenMLParserJSON.parseSenMLPack(packSenMLString, SenMLParserJSON::parseWithV));
   }
 
   @Test
@@ -112,6 +112,6 @@ class SenMLParserTest {
 
     assertEquals(
         Set.of(record1, record2),
-        SenMLParser.parseSenMLPack(packSenMLString, SenMLParser::parseJsonStringWithV));
+        SenMLParserJSON.parseSenMLPack(packSenMLString, SenMLParserJSON::parseWithV));
   }
 }

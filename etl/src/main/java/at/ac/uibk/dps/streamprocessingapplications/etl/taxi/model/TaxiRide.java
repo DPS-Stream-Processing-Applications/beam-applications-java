@@ -92,7 +92,7 @@ public class TaxiRide implements Serializable {
     return Optional.ofNullable(tripTimeInSecs.getValue());
   }
 
-  public void setTripTimeInSecs(double tripTimeInSecs) {
+  public void setTripTimeInSecs(Double tripTimeInSecs) {
     this.tripTimeInSecs.setValue(tripTimeInSecs);
   }
 
@@ -100,7 +100,7 @@ public class TaxiRide implements Serializable {
     return Optional.ofNullable(tripDistance.getValue());
   }
 
-  public void setTripDistance(double tripDistance) {
+  public void setTripDistance(Double tripDistance) {
     this.tripDistance.setValue(tripDistance);
   }
 
@@ -148,7 +148,7 @@ public class TaxiRide implements Serializable {
     return Optional.ofNullable(fareAmount.getValue());
   }
 
-  public void setFareAmount(double fareAmount) {
+  public void setFareAmount(Double fareAmount) {
     this.fareAmount.setValue(fareAmount);
   }
 
@@ -172,7 +172,7 @@ public class TaxiRide implements Serializable {
     return Optional.ofNullable(tipAmount.getValue());
   }
 
-  public void setTipAmount(double tipAmount) {
+  public void setTipAmount(Double tipAmount) {
     this.tipAmount.setValue(tipAmount);
   }
 
@@ -180,7 +180,7 @@ public class TaxiRide implements Serializable {
     return Optional.ofNullable(tollsAmount.getValue());
   }
 
-  public void setTollsAmount(double tollsAmount) {
+  public void setTollsAmount(Double tollsAmount) {
     this.tollsAmount.setValue(tollsAmount);
   }
 

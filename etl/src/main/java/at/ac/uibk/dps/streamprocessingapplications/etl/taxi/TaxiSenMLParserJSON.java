@@ -66,7 +66,6 @@ public class TaxiSenMLParserJSON {
             .map( // Convert record json string to `JSONObject`
                 json -> {
                   JSONObject jsonObject = new JSONObject(json.toString());
-                  // NOTE: Add basename to each record if not already present
                   if (finalBaseName != null && !jsonObject.has("bn")) {
                     jsonObject.put("bn", finalBaseName);
                   }
@@ -75,7 +74,7 @@ public class TaxiSenMLParserJSON {
             .collect(
                 Collectors.toMap(jsonObject -> jsonObject.getString("n"), JSONObject::toString));
 
-    return TaxiSenMLParserJSON.buildTaxiRideFromMap(recordNameToRecordString);
+    return buildTaxiRideFromMap(recordNameToRecordString);
   }
 
   private static TaxiRide buildTaxiRideFromMap(Map<String, String> recordNameToRecordString) {

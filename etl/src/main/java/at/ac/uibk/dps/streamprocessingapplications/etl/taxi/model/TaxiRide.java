@@ -2,6 +2,10 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordString;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class TaxiRide {
   private SenMLRecordString taxiIdentifier;
@@ -58,128 +62,128 @@ public class TaxiRide {
     this.totalAmount = totalAmount;
   }
 
-  public String getTaxiIdentifier() {
-    return taxiIdentifier.getValue();
+  public Optional<String> getTaxiIdentifier() {
+    return Optional.ofNullable(taxiIdentifier.getValue());
   }
 
   public void setTaxiIdentifier(String taxiIdentifier) {
     this.taxiIdentifier.setValue(taxiIdentifier);
   }
 
-  public String getHackLicense() {
-    return hackLicense.getValue();
+  public Optional<String> getHackLicense() {
+    return Optional.ofNullable(hackLicense.getValue());
   }
 
   public void setHackLicense(String hackLicense) {
     this.hackLicense.setValue(hackLicense);
   }
 
-  public String getPickupDatetime() {
-    return pickupDatetime.getValue();
+  public Optional<String> getPickupDatetime() {
+    return Optional.ofNullable(pickupDatetime.getValue());
   }
 
   public void setPickupDatetime(String pickupDatetime) {
     this.pickupDatetime.setValue(pickupDatetime);
   }
 
-  public double getTripTimeInSecs() {
-    return tripTimeInSecs.getValue();
+  public Optional<Double> getTripTimeInSecs() {
+    return Optional.ofNullable(tripTimeInSecs.getValue());
   }
 
   public void setTripTimeInSecs(double tripTimeInSecs) {
     this.tripTimeInSecs.setValue(tripTimeInSecs);
   }
 
-  public double getTripDistance() {
-    return tripDistance.getValue();
+  public Optional<Double> getTripDistance() {
+    return Optional.ofNullable(tripDistance.getValue());
   }
 
   public void setTripDistance(double tripDistance) {
     this.tripDistance.setValue(tripDistance);
   }
 
-  public Double getPickupLongitude() {
-    return pickupLongitude.getValue();
+  public Optional<Double> getPickupLongitude() {
+    return Optional.ofNullable(pickupLongitude.getValue());
   }
 
   public void setPickupLongitude(Double pickupLongitude) {
     this.pickupLongitude.setValue(pickupLongitude);
   }
 
-  public Double getPickupLatitude() {
-    return pickupLatitude.getValue();
+  public Optional<Double> getPickupLatitude() {
+    return Optional.ofNullable(pickupLatitude.getValue());
   }
 
   public void setPickupLatitude(Double pickupLatitude) {
     this.pickupLatitude.setValue(pickupLatitude);
   }
 
-  public Double getDropoffLongitude() {
-    return dropoffLongitude.getValue();
+  public Optional<Double> getDropoffLongitude() {
+    return Optional.ofNullable(dropoffLongitude.getValue());
   }
 
   public void setDropoffLongitude(Double dropoffLongitude) {
     this.dropoffLongitude.setValue(dropoffLongitude);
   }
 
-  public Double getDropoffLatitude() {
-    return dropoffLatitude.getValue();
+  public Optional<Double> getDropoffLatitude() {
+    return Optional.ofNullable(dropoffLatitude.getValue());
   }
 
   public void setDropoffLatitude(Double dropoffLatitude) {
     this.dropoffLatitude.setValue(dropoffLatitude);
   }
 
-  public String getPaymentType() {
-    return paymentType.getValue();
+  public Optional<String> getPaymentType() {
+    return Optional.ofNullable(paymentType.getValue());
   }
 
   public void setPaymentType(String paymentType) {
     this.paymentType.setValue(paymentType);
   }
 
-  public double getFareAmount() {
-    return fareAmount.getValue();
+  public Optional<Double> getFareAmount() {
+    return Optional.ofNullable(fareAmount.getValue());
   }
 
   public void setFareAmount(double fareAmount) {
     this.fareAmount.setValue(fareAmount);
   }
 
-  public double getSurcharge() {
-    return surcharge.getValue();
+  public Optional<Double> getSurcharge() {
+    return Optional.ofNullable(surcharge.getValue());
   }
 
   public void setSurcharge(double surcharge) {
     this.surcharge.setValue(surcharge);
   }
 
-  public double getMtaTax() {
-    return mtaTax.getValue();
+  public Optional<Double> getMtaTax() {
+    return Optional.ofNullable(mtaTax.getValue());
   }
 
   public void setMtaTax(double mtaTax) {
     this.mtaTax.setValue(mtaTax);
   }
 
-  public double getTipAmount() {
-    return tipAmount.getValue();
+  public Optional<Double> getTipAmount() {
+    return Optional.ofNullable(tipAmount.getValue());
   }
 
   public void setTipAmount(double tipAmount) {
     this.tipAmount.setValue(tipAmount);
   }
 
-  public double getTollsAmount() {
-    return tollsAmount.getValue();
+  public Optional<Double> getTollsAmount() {
+    return Optional.ofNullable(tollsAmount.getValue());
   }
 
   public void setTollsAmount(double tollsAmount) {
     this.tollsAmount.setValue(tollsAmount);
   }
 
-  public double getTotalAmount() {
-    return totalAmount.getValue();
+  public Optional<Double> getTotalAmount() {
+    return Optional.ofNullable(totalAmount.getValue());
   }
 
   public void setTotalAmount(double totalAmount) {
@@ -188,25 +192,69 @@ public class TaxiRide {
 
   @Override
   public String toString() {
-    return "["
-        + String.join(
-            ",",
-            taxiIdentifier.toString(),
-            hackLicense.toString(),
-            pickupDatetime.toString(),
-            tripTimeInSecs.toString(),
-            tripDistance.toString(),
-            pickupLongitude.toString(),
-            pickupLatitude.toString(),
-            dropoffLongitude.toString(),
-            dropoffLatitude.toString(),
-            paymentType.toString(),
-            fareAmount.toString(),
-            surcharge.toString(),
-            mtaTax.toString(),
-            tipAmount.toString(),
-            tollsAmount.toString(),
-            totalAmount.toString())
-        + ']';
+    List<String> nonNullFields = new ArrayList<>();
+
+    Optional.ofNullable(taxiIdentifier).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(hackLicense).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(pickupDatetime).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(tripTimeInSecs).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(tripDistance).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(pickupLongitude).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(pickupLatitude).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(dropoffLongitude).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(dropoffLatitude).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(paymentType).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(fareAmount).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(surcharge).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(mtaTax).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(tipAmount).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(tollsAmount).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(totalAmount).ifPresent(value -> nonNullFields.add(value.toString()));
+
+    return "[" + String.join(",", nonNullFields) + "]";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TaxiRide)) return false;
+    TaxiRide taxiRide = (TaxiRide) o;
+    return Objects.equals(getTaxiIdentifier(), taxiRide.getTaxiIdentifier())
+        && Objects.equals(getHackLicense(), taxiRide.getHackLicense())
+        && Objects.equals(getPickupDatetime(), taxiRide.getPickupDatetime())
+        && Objects.equals(getTripTimeInSecs(), taxiRide.getTripTimeInSecs())
+        && Objects.equals(getTripDistance(), taxiRide.getTripDistance())
+        && Objects.equals(getPickupLongitude(), taxiRide.getPickupLongitude())
+        && Objects.equals(getPickupLatitude(), taxiRide.getPickupLatitude())
+        && Objects.equals(getDropoffLongitude(), taxiRide.getDropoffLongitude())
+        && Objects.equals(getDropoffLatitude(), taxiRide.getDropoffLatitude())
+        && Objects.equals(getPaymentType(), taxiRide.getPaymentType())
+        && Objects.equals(getFareAmount(), taxiRide.getFareAmount())
+        && Objects.equals(getSurcharge(), taxiRide.getSurcharge())
+        && Objects.equals(getMtaTax(), taxiRide.getMtaTax())
+        && Objects.equals(getTipAmount(), taxiRide.getTipAmount())
+        && Objects.equals(getTollsAmount(), taxiRide.getTollsAmount())
+        && Objects.equals(getTotalAmount(), taxiRide.getTotalAmount());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        getTaxiIdentifier(),
+        getHackLicense(),
+        getPickupDatetime(),
+        getTripTimeInSecs(),
+        getTripDistance(),
+        getPickupLongitude(),
+        getPickupLatitude(),
+        getDropoffLongitude(),
+        getDropoffLatitude(),
+        getPaymentType(),
+        getFareAmount(),
+        getSurcharge(),
+        getMtaTax(),
+        getTipAmount(),
+        getTollsAmount(),
+        getTotalAmount());
   }
 }

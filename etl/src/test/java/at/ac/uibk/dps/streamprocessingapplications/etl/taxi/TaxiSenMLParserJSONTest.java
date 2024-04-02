@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Test;
 
 class TaxiSenMLParserJSONTest {
 
+  // TODO: Add proper tests
   @Test
-  void parseSenMLPack() {
+  void parseSenMLPack_allExpectedRecords() {
     String test =
         "[{\"u\":\"string\",\"n\":\"taxi_identifier\",\"vs\":\"149298F6D390FA640E80B41ED31199C5\"},"
             + "{\"n\":\"hack_license\",\"u\":\"string\",\"vs\":\"08F944E76118632BE09B9D4B04C7012A\"},{\"u\":\"time\",\"n\":\"pickup_datetime\",\"vs\":\"2013-01-13"

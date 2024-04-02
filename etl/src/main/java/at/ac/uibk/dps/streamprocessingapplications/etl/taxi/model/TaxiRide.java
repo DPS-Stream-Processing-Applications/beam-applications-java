@@ -2,12 +2,14 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordString;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class TaxiRide {
+public class TaxiRide implements Serializable {
   private SenMLRecordString taxiIdentifier;
   private SenMLRecordString hackLicense;
   private SenMLRecordString pickupDatetime;

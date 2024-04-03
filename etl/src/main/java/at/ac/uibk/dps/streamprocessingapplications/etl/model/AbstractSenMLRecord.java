@@ -21,13 +21,12 @@ import javax.annotation.Nullable;
  *   <li>t
  * </ul>
  */
-public abstract class AbstractSenMLRecord<T> implements Serializable {
-  @Nullable private String baseName;
-
-  @Nullable private String name;
-  @Nullable private String unit;
-  @Nullable private T value;
-  @Nullable private Instant time;
+public abstract class AbstractSenMLRecord<T extends Object> implements Serializable {
+  private String baseName;
+  private String name;
+  private String unit;
+  private T value;
+  private Instant time;
 
   /* INFO:
    * As specified in <a href="https://datatracker.ietf.org/doc/html/rfc8427#section-4.2">section 4.2</a>
@@ -36,36 +35,35 @@ public abstract class AbstractSenMLRecord<T> implements Serializable {
    * The corresponding labels are: "v", "sv", and "bv".
    */
   public AbstractSenMLRecord(
-      @Nullable String baseName,
-      @Nullable String name,
-      @Nullable String unit,
-      @Nullable T value,
-      @Nullable Instant time) {
-    this.baseName = baseName;
-    this.name = name;
-    this.unit = unit;
-    this.value = value;
-    this.time = time;
+          String baseName,
+          String name,
+          String unit,
+          T value,
+          Instant time) {
+    this.setBaseName(baseName);
+    this.setName(name);
+    this.setUnit(unit);
+    this.setValue(value);
+    this.setTime(time);
   }
 
-  @Nullable public String getBaseName() {
+  public String getBaseName() {
     return baseName;
   }
 
-  @Nullable public String getName() {
+  public String getName() {
     return name;
   }
 
-  @Nullable public String getUnit() {
+  public String getUnit() {
     return unit;
   }
 
-  @Nullable public T getValue() {
+  public T getValue() {
     return this.value;
   }
-  ;
 
-  @Nullable public Instant getTime() {
+  public Instant getTime() {
     return time;
   }
 
@@ -73,23 +71,23 @@ public abstract class AbstractSenMLRecord<T> implements Serializable {
     return this.getBaseName() + this.getName();
   }
 
-  public void setBaseName(@Nullable String baseName) {
+  public void setBaseName(String baseName) {
     this.baseName = baseName;
   }
 
-  public void setName(@Nullable String name) {
+  public void setName(String name) {
     this.name = name;
   }
 
-  public void setUnit(@Nullable String unit) {
+  public void setUnit(String unit) {
     this.unit = unit;
   }
 
-  public void setValue(@Nullable T value) {
+  public void setValue(T value) {
     this.value = value;
   }
 
-  public void setTime(@Nullable Instant time) {
+  public void setTime(Instant time) {
     this.time = time;
   }
 

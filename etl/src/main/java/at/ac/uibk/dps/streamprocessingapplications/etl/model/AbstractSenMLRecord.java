@@ -3,7 +3,6 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.model;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 /**
  * WARN: This is not a full implementation of the SenML specification it only implements a subset!
@@ -34,12 +33,7 @@ public abstract class AbstractSenMLRecord<T extends Object> implements Serializa
    * This value can be of type `number`, `boolean`, `string` or `data`.
    * The corresponding labels are: "v", "sv", and "bv".
    */
-  public AbstractSenMLRecord(
-          String baseName,
-          String name,
-          String unit,
-          T value,
-          Instant time) {
+  public AbstractSenMLRecord(String baseName, String name, String unit, T value, Instant time) {
     this.setBaseName(baseName);
     this.setName(name);
     this.setUnit(unit);

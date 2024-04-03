@@ -2,7 +2,6 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordString;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

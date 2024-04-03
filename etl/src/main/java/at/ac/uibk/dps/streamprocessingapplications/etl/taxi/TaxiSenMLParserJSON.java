@@ -97,22 +97,21 @@ public class TaxiSenMLParserJSON {
     String totalAmountString = recordNameToRecordString.get("total_amount");
 
     return new TaxiRide(
-            taxiIdentifierString != null ? SenMLParserJSON.parseWithVS(taxiIdentifierString) : null,
-            hackLicenseString != null ? SenMLParserJSON.parseWithVS(hackLicenseString) : null,
-            pickupDatetimeString != null ? SenMLParserJSON.parseWithVS(pickupDatetimeString) : null,
-            tripTimeInSecsString != null ? SenMLParserJSON.parseWithV(tripTimeInSecsString) : null,
-            tripDistanceString != null ? SenMLParserJSON.parseWithV(tripDistanceString) : null,
-            pickupLongitudeString != null ? SenMLParserJSON.parseWithV(pickupLongitudeString) : null,
-            pickupLatitudeString != null ? SenMLParserJSON.parseWithV(pickupLatitudeString) : null,
-            dropoffLongitudeString != null ? SenMLParserJSON.parseWithV(dropoffLongitudeString) : null,
-            dropoffLatitudeString != null ? SenMLParserJSON.parseWithV(dropoffLatitudeString) : null,
-            paymentTypeString != null ? SenMLParserJSON.parseWithVS(paymentTypeString) : null,
-            fareAmountString != null ? SenMLParserJSON.parseWithV(fareAmountString) : null,
-            surchargeString != null ? SenMLParserJSON.parseWithV(surchargeString) : null,
-            mtaTaxString != null ? SenMLParserJSON.parseWithV(mtaTaxString) : null,
-            tipAmountString != null ? SenMLParserJSON.parseWithV(tipAmountString) : null,
-            tollsAmountString != null ? SenMLParserJSON.parseWithV(tollsAmountString) : null,
-            totalAmountString != null ? SenMLParserJSON.parseWithV(totalAmountString) : null
-    );
+        taxiIdentifierString != null ? SenMLParserJSON.parseWithVS(taxiIdentifierString) : null,
+        hackLicenseString != null ? SenMLParserJSON.parseWithVS(hackLicenseString) : null,
+        pickupDatetimeString != null ? SenMLParserJSON.parseWithVS(pickupDatetimeString) : null,
+        tripTimeInSecsString != null ? SenMLParserJSON.parseWithV(tripTimeInSecsString) : null,
+        tripDistanceString != null ? SenMLParserJSON.parseWithV(tripDistanceString) : null,
+        pickupLongitudeString != null ? SenMLParserJSON.parseWithV(pickupLongitudeString) : null,
+        pickupLatitudeString != null ? SenMLParserJSON.parseWithV(pickupLatitudeString) : null,
+        dropoffLongitudeString != null ? SenMLParserJSON.parseWithV(dropoffLongitudeString) : null,
+        dropoffLatitudeString != null ? SenMLParserJSON.parseWithV(dropoffLatitudeString) : null,
+        paymentTypeString != null ? SenMLParserJSON.parseWithVS(paymentTypeString) : null,
+        fareAmountString != null ? SenMLParserJSON.parseWithV(fareAmountString) : null,
+        surchargeString != null ? SenMLParserJSON.parseWithV(surchargeString) : null,
+        mtaTaxString != null ? SenMLParserJSON.parseWithV(mtaTaxString) : null,
+        tipAmountString != null ? SenMLParserJSON.parseWithV(tipAmountString) : null,
+        tollsAmountString != null ? SenMLParserJSON.parseWithV(tollsAmountString) : null,
+        totalAmountString != null ? SenMLParserJSON.parseWithV(totalAmountString) : null);
   }
 }

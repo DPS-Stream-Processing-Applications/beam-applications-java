@@ -43,15 +43,19 @@ public class BloomFilterTransform extends PTransform<PCollection<TaxiRide>, PCol
      * The bloom filter model file was adopted from the `riot-bench` repository
      * and this is their funnel implementation.
      */
-    final Funnel<String> funnel = (memberId, sink) -> sink.putString(memberId, Charsets.UTF_8);
-    final String MODEL_FILE_PATH = "bloomfilter-TAXI.model";
+    final Funnel<String> FUNNEL = (memberId, sink) -> sink.putString(memberId, Charsets.UTF_8);
+    String modelFilePath = "bloomfilter-TAXI.model";
     ClassLoader classLoader = getClass().getClassLoader();
     BloomFilter<String> bloomFilter;
 
-    try (InputStream inputStream = classLoader.getResourceAsStream(MODEL_FILE_PATH)) {
-      bloomFilter = BloomFilter.readFrom(inputStream, funnel);
+    try (InputStream inputStream = classLoader.getResourceAsStream(modelFilePath)) {
+      if (inputStream == null) {
+        LOGGER.error(String.format("`InputStream` from path \"%s\" is null.", modelFilePath));
+        return Optional.empty();
+      }
+      bloomFilter = BloomFilter.readFrom(inputStream, FUNNEL);
     } catch (IOException e) {
-      LOGGER.error(String.format("Unable to build bloom filter from path: %s", MODEL_FILE_PATH));
+      LOGGER.error("Unable to build `BloomFilter` from input stream.");
       return Optional.empty();
     }
 

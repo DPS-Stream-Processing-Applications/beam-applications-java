@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation("org.json:json:20240205")
+    implementation("com.google.guava:guava:33.1.0-jre")
 }
 
 tasks.named<Jar>("jar") {

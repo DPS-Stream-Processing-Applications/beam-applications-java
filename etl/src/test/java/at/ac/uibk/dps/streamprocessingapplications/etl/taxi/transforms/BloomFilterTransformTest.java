@@ -2,6 +2,8 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import java.nio.charset.StandardCharsets;
+
+import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.BloomFilterTransform;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;

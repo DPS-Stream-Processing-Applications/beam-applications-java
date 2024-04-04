@@ -12,6 +12,9 @@ application {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://packages.confluent.io/maven/") // Add Confluent repository
+    }
 }
 
 dependencies {
@@ -26,6 +29,9 @@ dependencies {
     implementation("com.opencsv:opencsv:3.3")
     implementation("org.apache.commons:commons-math3:3.5")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2")
+    implementation("org.apache.kafka:kafka-clients:3.0.0")
+    // https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-kafka
+    implementation("org.apache.beam:beam-sdks-java-io-kafka:2.55.0")
 }
 
 tasks.named<Test>("test") {

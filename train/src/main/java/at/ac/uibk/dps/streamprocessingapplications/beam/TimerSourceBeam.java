@@ -1,16 +1,20 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
+import static java.time.Duration.ofMillis;
+import static java.util.Collections.singleton;
+
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
+import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.kafka.clients.consumer.*;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
@@ -20,27 +24,41 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
     String outSpoutCSVLogFileName;
     String experiRunId;
     double scalingFactor;
-    BatchedFileLogging ba;
     long msgId;
 
     long numberLines;
+
+    private final long POLL_TIMEOUT_MS = 1000;
+
+    private final String TOPIC_NAME;
+
+    private MyKafkaConsumer myKafkaConsumer;
 
     public TimerSourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
             double scalingFactor,
             String experiRunId,
-            long lines) {
+            long lines,
+            String bootstrapserver,
+            String topic) {
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.scalingFactor = scalingFactor;
         this.experiRunId = experiRunId;
         this.numberLines = lines;
+        this.myKafkaConsumer = new MyKafkaConsumer(bootstrapserver, "group-1", 1000, topic, lines);
+        this.TOPIC_NAME = topic;
     }
 
     public TimerSourceBeam(
-            String csvFileName, String outSpoutCSVLogFileName, double scalingFactor, long lines) {
-        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines);
+            String csvFileName,
+            String outSpoutCSVLogFileName,
+            double scalingFactor,
+            long lines,
+            String bootstrapserver,
+            String topic) {
+        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines, bootstrapserver, topic);
     }
 
     @Setup
@@ -213,10 +231,10 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         }
 
         //		msgId=r.nextInt(10000);
-        this.eventGen = new EventGen(this, this.scalingFactor);
-        this.eventQueue = new LinkedBlockingQueue<List<String>>();
-        String uLogfilename = this.outSpoutCSVLogFileName + msgId;
-        this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
+        // this.eventGen = new EventGen(this, this.scalingFactor);
+        // this.eventQueue = new LinkedBlockingQueue<List<String>>();
+        // String uLogfilename = this.outSpoutCSVLogFileName + msgId;
+        // this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
 
         // ba = new BatchedFileLogging(uLogfilename, "test");
     }
@@ -226,49 +244,58 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         // allow multiple tuples to be emitted per next tuple.
         // Discouraged? https://groups.google.com/forum/#!topic/storm-user/SGwih7vPiDE
         // int count = 0, MAX_COUNT = 10; // FIXME?
+        KafkaConsumer<Long, byte[]> kafkaConsumer;
+        kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
+        kafkaConsumer.subscribe(singleton(TOPIC_NAME), myKafkaConsumer);
+
         int sendMessages = 0;
         while (sendMessages < numberLines) {
-            // while (count < MAX_COUNT) {
+            /*
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
             if (entry == null) {
                 // System.out.println("I am exiting");
                 // return;
                 continue;
             }
+
+             */
             // count++;
+            /*
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
             for (String s : entry) {
                 rowStringBuf.append(",").append(s);
             }
-            String rowString = rowStringBuf.toString().substring(1);
-            String ROWKEYSTART = rowString.split(",")[2];
-            String ROWKEYEND = rowString.split(",")[3];
-            ;
-            // System.out.println("rowString:" + rowString.split(",")[2]);
+             */
 
-            values.setRowString(rowString);
-            msgId++;
-            values.setMsgid(Long.toString(msgId));
-
-            values.setRowKeyStart(ROWKEYSTART);
-            values.setRowKeyEnd(ROWKEYEND);
-
-            // sending rowkeystart and rowkeyend
-            //			rowStringBuf.
-            //			rowString.split(",")[3];
-
-            //
-
-            out.output(values);
-            sendMessages++;
             try {
-                //				msgId++;
-                // ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId);
-                // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
+                // Poll for new records from Kafka
+                ConsumerRecords<Long, byte[]> records =
+                        kafkaConsumer.poll(ofMillis(POLL_TIMEOUT_MS));
+                if (!records.isEmpty()) {
+                    for (ConsumerRecord<Long, byte[]> record : records) {
+                        SourceEntry values = new SourceEntry();
+                        String rowString = new String(record.value());
+                        String ROWKEYSTART = rowString.split(",")[2];
+                        String ROWKEYEND = rowString.split(",")[3];
+                        values.setRowString(rowString);
+                        msgId++;
+                        values.setMsgid(Long.toString(msgId));
+                        values.setRowKeyStart(ROWKEYSTART);
+                        values.setRowKeyEnd(ROWKEYEND);
+                        out.output(values);
+                        sendMessages++;
+                    }
+                }
+            } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
+                // Handle invalid offset or no offset found errors when auto.reset.policy is not set
+                System.out.println(
+                        "Invalid or no offset found, and auto.reset.policy unset, using latest");
+                throw new RuntimeException(e);
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Exception when writing to batchLogger " + e);
+                // Handle other exceptions, including retriable ones
+                System.err.println(e.getMessage());
+                throw new RuntimeException(e);
             }
         }
     }

@@ -13,7 +13,7 @@ public class ArgumentParser {
     public static ArgumentClass parserCLI(String[] args) {
         ParameterTool params = ParameterTool.fromArgs(args);
 
-        if (params.getNumberOfParameters() != 5) {
+        if (params.getNumberOfParameters() != 7) {
             System.out.println("invalid number of arguments");
             return null;
         } else {
@@ -27,6 +27,8 @@ public class ArgumentParser {
             // argumentClass.setTasksPropertiesFilename(params.get("taskProp"));
             argumentClass.setTasksName(params.get("taskName"));
             // argumentClass.setInputTrainDataset(params.get("inputTrainSet"));
+            argumentClass.setBootStrapServerKafka(params.get("bootstrap"));
+            argumentClass.setKafkaTopic(params.get("topic"));
             return argumentClass;
         }
     }

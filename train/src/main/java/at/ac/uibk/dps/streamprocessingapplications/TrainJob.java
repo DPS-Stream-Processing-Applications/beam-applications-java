@@ -4,9 +4,11 @@ import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
-import java.util.Scanner;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -48,27 +50,6 @@ public class TrainJob {
         return null;
     }
 
-    public static void test() {
-        // Load a resource file as an input stream
-        InputStream inputStream =
-                TrainJob.class.getResourceAsStream(
-                        "/resources/datasets/TAXI_sample_data_senml.csv");
-        if (inputStream != null) {
-            // Process the input stream (e.g., read content)
-            // Example: Read content line by line
-            try (Scanner scanner = new Scanner(inputStream)) {
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    System.out.println(line);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Resource not found!");
-        }
-    }
-
     public static void main(String[] args) throws Exception {
 
         ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
@@ -85,17 +66,14 @@ public class TrainJob {
                         + argumentClass.getScalingFactor()
                         + ".log";
         String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
-        String taskPropFilename = argumentClass.getTasksPropertiesFilename();
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
-        // String inputFileName = argumentClass.getInputDatasetPathName();
-        // String trainDataSet = argumentClass.getInputTrainDataset();
         String expriRunId = argumentClass.getExperiRunId();
 
         String dataSetType = checkDataType(expriRunId);
 
         // FIXME for different datasets!
-        String trainDataSet = "";
-        String inputFileName = "";
+        String trainDataSet;
+        String inputFileName;
         switch (dataSetType) {
             case "TAXI":
                 trainDataSet = "/resources/datasets/TAXI_sample_data_senml.csv";
@@ -140,8 +118,16 @@ public class TrainJob {
         options.setRunner(FlinkRunner.class);
         options.setParallelism(1);
 
+        // Map<String, Object> kafkaProps = new HashMap<>();
+
+        // kafkaProps.setProperty("auto.offset.reset", "latest"); // Start reading from the latest
+        // offsets
+
         // PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
+
+        String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
+        String kafkaTopic = argumentClass.getKafkaTopic();
 
         PCollection<String> inputFile = p.apply(Create.of("test"));
 
@@ -153,7 +139,9 @@ public class TrainJob {
                                         inputFileName,
                                         spoutLogFileName,
                                         argumentClass.getScalingFactor(),
-                                        (linesCount - 1))));
+                                        (linesCount - 1),
+                                        kafkaBootstrapServers,
+                                        kafkaTopic)));
 
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply(

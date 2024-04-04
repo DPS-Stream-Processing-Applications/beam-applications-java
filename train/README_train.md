@@ -21,17 +21,17 @@ After starting the cluster as described in the main-README, execute the commands
 
 #### Example command for the CITY dataset
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology  --experiRunId SYS-210 --scalingFactor 0.001 --taskName bench
+flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology  --experiRunId SYS-210 --scalingFactor 0.001 --taskName bench --bootstrap xxx.x --topic test-1
 ```
 
 #### Example command for the FIT dataset
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId FIT-210 --scalingFactor 0.001 --taskName bench
+flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId FIT-210 --scalingFactor 0.001 --taskName bench --bootstrap xxx.x --topic test-1
 ```
 
 #### Example command for the TAXI dataset
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId TAXI-210 --scalingFactor 0.001 --taskName bench
+flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId TAXI-210 --scalingFactor 0.001 --taskName bench --bootstrap xxx.x --topic test-1
 ```
 
 

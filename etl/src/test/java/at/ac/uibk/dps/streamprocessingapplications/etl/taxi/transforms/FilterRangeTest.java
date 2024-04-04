@@ -1,6 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.testing.PAssert;
@@ -20,24 +19,8 @@ public class FilterRangeTest {
 
   @Test
   public void filterRange_withTripTimeInSecsLessThanOrEqual140_isSetToNull() {
-    TaxiRide outOfRangeTripTime =
-        new TaxiRide(
-            null,
-            null,
-            null,
-            new SenMLRecordDouble("", "", "", 140.0, null),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+    TaxiRide outOfRangeTripTime = new TaxiRide();
+    outOfRangeTripTime.setTripTimeInSecs(140.0);
     TestStream<TaxiRide> createEvents =
         TestStream.create(SerializableCoder.of(TaxiRide.class))
             .addElements(outOfRangeTripTime)
@@ -50,24 +33,8 @@ public class FilterRangeTest {
 
   @Test
   public void filterRange_withTripTimeInSecs141_isUnchanged() {
-    TaxiRide withinRangeTrimTime =
-        new TaxiRide(
-            null,
-            null,
-            null,
-            new SenMLRecordDouble("", "", "", 141.0, null),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+    TaxiRide withinRangeTrimTime = new TaxiRide();
+    withinRangeTrimTime.setTripTimeInSecs(141.0);
     TestStream<TaxiRide> createEvents =
         TestStream.create(SerializableCoder.of(TaxiRide.class))
             .addElements(withinRangeTrimTime)

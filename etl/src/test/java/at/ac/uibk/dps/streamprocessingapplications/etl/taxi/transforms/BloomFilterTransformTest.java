@@ -1,7 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordDouble;
-import at.ac.uibk.dps.streamprocessingapplications.etl.model.SenMLRecordString;
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import java.nio.charset.StandardCharsets;
 import org.apache.beam.sdk.coders.SerializableCoder;

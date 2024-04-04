@@ -38,8 +38,6 @@ public class FilterRangeTest {
             null,
             null,
             null);
-    // BUG: setting explicitly throws `NullPointerException`
-    // outOfRangeTripTime.setTripTimeInSecs(140.0);
     TestStream<TaxiRide> createEvents =
         TestStream.create(SerializableCoder.of(TaxiRide.class))
             .addElements(outOfRangeTripTime)
@@ -70,8 +68,6 @@ public class FilterRangeTest {
             null,
             null,
             null);
-    // BUG: setting explicitly throws `NullPointerException`
-    // outOfRangeTripTime.setTripTimeInSecs(140.0);
     TestStream<TaxiRide> createEvents =
         TestStream.create(SerializableCoder.of(TaxiRide.class))
             .addElements(withinRangeTrimTime)

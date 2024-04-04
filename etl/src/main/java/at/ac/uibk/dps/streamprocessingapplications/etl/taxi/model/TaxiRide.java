@@ -26,7 +26,23 @@ public class TaxiRide implements Serializable {
   private SenMLRecordDouble tollsAmount;
   private SenMLRecordDouble totalAmount;
 
-  public TaxiRide() {}
+  public TaxiRide() {
+    this.taxiIdentifier = new SenMLRecordString(null, "taxi_identifier", "string", null, null);
+    this.hackLicense = new SenMLRecordString(null, "hack_license", "string", null, null);
+    this.pickupDatetime = new SenMLRecordString(null, "hack_license", "time", null, null);
+    this.tripTimeInSecs = new SenMLRecordDouble(null, "trip_time_in_secs", "s", null, null);
+    this.pickupLongitude = new SenMLRecordDouble(null, "pickup_longitude", "deg", null, null);
+    this.pickupLatitude = new SenMLRecordDouble(null, "pickup_latitude", "deg", null, null);
+    this.dropoffLongitude = new SenMLRecordDouble(null, "dropoff_longitude", "deg", null, null);
+    this.dropoffLatitude = new SenMLRecordDouble(null, "dropoff_latitude", "deg", null, null);
+    this.paymentType = new SenMLRecordString(null, "payment_type", "payment_type", null, null);
+    this.fareAmount = new SenMLRecordDouble(null, "fare_amount", "dollar", null, null);
+    this.surcharge = new SenMLRecordDouble(null, "surcharge", "%", null, null);
+    this.mtaTax = new SenMLRecordDouble(null, "mta_tax", "%", null, null);
+    this.tipAmount = new SenMLRecordDouble(null, "tip_amount", "dollar", null, null);
+    this.tollsAmount = new SenMLRecordDouble(null, "tolls_amount", "dollar", null, null);
+    this.totalAmount = new SenMLRecordDouble(null, "total_amount", "dollar", null, null);
+  }
 
   public TaxiRide(
       SenMLRecordString taxiIdentifier,

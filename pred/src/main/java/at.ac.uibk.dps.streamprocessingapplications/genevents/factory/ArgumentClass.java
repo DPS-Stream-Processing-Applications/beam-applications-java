@@ -10,6 +10,24 @@ public class ArgumentClass {
     String outputDirName; // Path where the output log file from spout and sink has to be kept
     String tasksPropertiesFilename;
     String tasksName;
+    String bootStrapServerKafka;
+    String kafkaTopic;
+
+    public String getBootStrapServerKafka() {
+        return bootStrapServerKafka;
+    }
+
+    public void setBootStrapServerKafka(String bootStrapServerKafka) {
+        this.bootStrapServerKafka = bootStrapServerKafka;
+    }
+
+    public String getKafkaTopic() {
+        return kafkaTopic;
+    }
+
+    public void setKafkaTopic(String kafkaTopic) {
+        this.kafkaTopic = kafkaTopic;
+    }
 
     public String getTasksName() {
         return tasksName;

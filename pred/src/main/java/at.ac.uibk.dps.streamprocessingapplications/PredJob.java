@@ -102,7 +102,8 @@ public class PredJob {
         }
 
         long lines = countLines(inputFileName);
-
+        String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
+        String kafkaTopic = argumentClass.getKafkaTopic();
         boolean isJson = inputFileName.contains("senml");
 
         FlinkPipelineOptions options =
@@ -130,8 +131,10 @@ public class PredJob {
                                         inputFileName,
                                         spoutLogFileName,
                                         argumentClass.getScalingFactor(),
-                                        lines)));
-        /*
+                                        lines,
+                                        kafkaBootstrapServers,
+                                        kafkaTopic)));
+
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply(
                         "SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
@@ -195,9 +198,6 @@ public class PredJob {
                                 System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
-                        
-         */
-
         p.run();
     }
 }

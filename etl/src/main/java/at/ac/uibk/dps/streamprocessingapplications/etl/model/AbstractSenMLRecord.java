@@ -93,7 +93,7 @@ public abstract class AbstractSenMLRecord<T extends Object> implements Serializa
     return Objects.equals(getBaseName(), that.getBaseName())
         && Objects.equals(getName(), that.getName())
         && Objects.equals(getUnit(), that.getUnit())
-        && Objects.equals(getValue(), that.getValue())
+        // && Objects.equals(getValue(), that.getValue())
         && Objects.equals(getTime(), that.getTime());
   }
 

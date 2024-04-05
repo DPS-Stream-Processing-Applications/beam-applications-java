@@ -2,17 +2,11 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.model;
 
 import java.time.Instant;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.json.JSONObject;
 
 public class SenMLRecordDouble extends AbstractSenMLRecord<Double> {
 
-  public SenMLRecordDouble(
-      @Nullable String baseName,
-      @Nullable String name,
-      @Nullable String unit,
-      @Nullable Double value,
-      @Nullable Instant time) {
+  public SenMLRecordDouble(String baseName, String name, String unit, Double value, Instant time) {
     super(baseName, name, unit, value, time);
   }
 
@@ -27,5 +21,16 @@ public class SenMLRecordDouble extends AbstractSenMLRecord<Double> {
     Optional.ofNullable(getTime()).ifPresent(val -> jsonObject.put("t", val));
 
     return jsonObject.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    SenMLRecordDouble that = (SenMLRecordDouble) o;
+    Double thisValue = this.getValue();
+    Double thatValue = that.getValue();
+    if (thisValue == null && thatValue == null) return true;
+    if (thisValue == null || thatValue == null) return false;
+
+    return super.equals(o) && Math.abs(thisValue - thatValue) < 0.0001;
   }
 }

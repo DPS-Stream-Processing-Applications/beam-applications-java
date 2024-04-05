@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
 import java.io.IOException;
 import java.io.InputStream;

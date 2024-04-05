@@ -1,7 +1,8 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import java.util.List;
 import java.util.function.Function;

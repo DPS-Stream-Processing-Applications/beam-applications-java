@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import java.util.Optional;
@@ -27,7 +27,7 @@ import org.apache.beam.sdk.values.TypeDescriptor;
  * tolls_amount:2.50:18.00
  * }</pre>
  */
-public class RangeFilter extends PTransform<PCollection<TaxiRide>, PCollection<TaxiRide>> {
+public class RangeFilterFunction extends PTransform<PCollection<TaxiRide>, PCollection<TaxiRide>> {
 
   @Override
   public PCollection<TaxiRide> expand(PCollection<TaxiRide> input) {
@@ -37,23 +37,23 @@ public class RangeFilter extends PTransform<PCollection<TaxiRide>, PCollection<T
                 taxiRide -> {
                   setNullIf(
                       taxiRide::getTripTimeInSecs,
-                      RangeFilter::isTripTimeOutOfRange,
+                      RangeFilterFunction::isTripTimeOutOfRange,
                       taxiRide::setTripTimeInSecs);
                   setNullIf(
                       taxiRide::getTripDistance,
-                      RangeFilter::isTripDistanceOutOfRange,
+                      RangeFilterFunction::isTripDistanceOutOfRange,
                       taxiRide::setTripDistance);
                   setNullIf(
                       taxiRide::getFareAmount,
-                      RangeFilter::isFareAmountOutOfRange,
+                      RangeFilterFunction::isFareAmountOutOfRange,
                       taxiRide::setFareAmount);
                   setNullIf(
                       taxiRide::getTipAmount,
-                      RangeFilter::isTipAmountOutOfRange,
+                      RangeFilterFunction::isTipAmountOutOfRange,
                       taxiRide::setTipAmount);
                   setNullIf(
                       taxiRide::getTollsAmount,
-                      RangeFilter::isTollsAmountOutOfRange,
+                      RangeFilterFunction::isTollsAmountOutOfRange,
                       taxiRide::setTollsAmount);
 
                   return taxiRide;

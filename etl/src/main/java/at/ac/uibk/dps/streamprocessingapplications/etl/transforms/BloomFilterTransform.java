@@ -15,22 +15,22 @@ import org.apache.logging.log4j.Logger;
 public class BloomFilterTransform<T> extends PTransform<PCollection<T>, PCollection<T>> {
 
   private static final Logger LOGGER = LogManager.getLogger(BloomFilterTransform.class);
-  private final Optional<BloomFilter<T>> bloomFilter;
+  private final BloomFilter<T> bloomFilter;
 
   public BloomFilterTransform(BloomFilter<T> bloomFilter) {
-    this.bloomFilter = Optional.ofNullable(bloomFilter);
+    this.bloomFilter = bloomFilter;
   }
 
   @Override
   public PCollection<T> expand(PCollection<T> input) {
-    if (this.bloomFilter.isEmpty()) {
+    if (this.bloomFilter == null) {
       LOGGER.info("Bloom filter not available. Falling back to no op.");
       return input;
     }
-    return input.apply(Filter.by(this.bloomFilter.get()::mightContain));
+    return input.apply(Filter.by(this.bloomFilter::mightContain));
   }
 
-  private Optional<BloomFilter<String>> buildBloomFromResource(String filePath) {
+  private Optional<BloomFilter<String>> buildBloomFilterFromResource(String filePath) {
     /* WARN:
      * Do NOT replace this funnel! It has to be the same as the one used to create the serialized model.
      * The bloom filter model file was adopted from the `riot-bench` repository

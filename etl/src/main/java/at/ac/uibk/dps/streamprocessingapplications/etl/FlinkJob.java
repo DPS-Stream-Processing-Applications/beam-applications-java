@@ -1,6 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.FilterAndInterpolateOutliers;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
@@ -64,7 +63,6 @@ public class FlinkJob {
 
     pipeline
         .apply("Read data", Create.of(sensorValues))
-        .apply(new FilterAndInterpolateOutliers())
         .apply(ParDo.of(new FlinkJob.PrintFn()));
 
     pipeline.run();

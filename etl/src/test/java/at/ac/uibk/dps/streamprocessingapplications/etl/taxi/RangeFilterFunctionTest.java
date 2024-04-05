@@ -1,6 +1,7 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.RangeFilterFunction;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
@@ -9,7 +10,7 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class FilterRangeTest {
+public class RangeFilterFunctionTest {
   TestPipeline pipeline;
 
   @BeforeEach
@@ -26,7 +27,7 @@ public class FilterRangeTest {
             .addElements(outOfRangeTripTime)
             .advanceWatermarkToInfinity();
 
-    PCollection<TaxiRide> actual = pipeline.apply(createEvents).apply(new RangeFilter());
+    PCollection<TaxiRide> actual = pipeline.apply(createEvents).apply(new RangeFilterFunction());
 
     PAssert.that(actual).containsInAnyOrder(new TaxiRide());
   }
@@ -40,7 +41,7 @@ public class FilterRangeTest {
             .addElements(withinRangeTrimTime)
             .advanceWatermarkToInfinity();
 
-    PCollection<TaxiRide> actual = pipeline.apply(createEvents).apply(new RangeFilter());
+    PCollection<TaxiRide> actual = pipeline.apply(createEvents).apply(new RangeFilterFunction());
 
     PAssert.that(actual).containsInAnyOrder(withinRangeTrimTime);
   }

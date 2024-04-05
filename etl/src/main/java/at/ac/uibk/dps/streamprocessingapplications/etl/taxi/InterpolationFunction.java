@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl.taxi.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
 import java.util.ArrayList;

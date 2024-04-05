@@ -53,11 +53,11 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
 
             e.printStackTrace();
         }
-        this.eventGen = new EventGen(this, this.scalingFactor);
-        this.eventQueue = new LinkedBlockingQueue<>();
-        String uLogfilename = this.outSpoutCSVLogFileName + msgId;
+        //this.eventGen = new EventGen(this, this.scalingFactor);
+        //this.eventQueue = new LinkedBlockingQueue<>();
+        //String uLogfilename = this.outSpoutCSVLogFileName + msgId;
         boolean isJson = csvFileName.contains("senml");
-        this.eventGen.launch(this.csvFileName, uLogfilename, -1, isJson); // Launch threads
+        //this.eventGen.launch(this.csvFileName, uLogfilename, -1, isJson); // Launch threads
     }
 
     @ProcessElement
@@ -65,11 +65,13 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
             throws IOException {
         long count = 1, MAX_COUNT = 100; // FIXME?
         while (count < numberLines) {
+            /*
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
             if (entry == null) {
                 // return;
                 continue;
             }
+             */
             SourceEntry values = new SourceEntry();
             StringBuilder rowStringBuf = new StringBuilder();
             for (String s : entry) {

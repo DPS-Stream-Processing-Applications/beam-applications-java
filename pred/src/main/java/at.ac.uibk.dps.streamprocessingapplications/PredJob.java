@@ -131,7 +131,7 @@ public class PredJob {
                                         spoutLogFileName,
                                         argumentClass.getScalingFactor(),
                                         lines)));
-
+        /*
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply(
                         "SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
@@ -195,6 +195,8 @@ public class PredJob {
                                 System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
+                        
+         */
 
         p.run();
     }

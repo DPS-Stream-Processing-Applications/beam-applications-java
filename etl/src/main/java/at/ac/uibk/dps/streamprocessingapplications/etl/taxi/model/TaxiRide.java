@@ -31,6 +31,7 @@ public class TaxiRide implements Serializable {
     this.hackLicense = new SenMLRecordString(null, "hack_license", "string", null, null);
     this.pickupDatetime = new SenMLRecordString(null, "hack_license", "time", null, null);
     this.tripTimeInSecs = new SenMLRecordDouble(null, "trip_time_in_secs", "s", null, null);
+    this.tripDistance = new SenMLRecordDouble(null, "trip_distance", "m", null, null);
     this.pickupLongitude = new SenMLRecordDouble(null, "pickup_longitude", "deg", null, null);
     this.pickupLatitude = new SenMLRecordDouble(null, "pickup_latitude", "deg", null, null);
     this.dropoffLongitude = new SenMLRecordDouble(null, "dropoff_longitude", "deg", null, null);
@@ -236,22 +237,22 @@ public class TaxiRide implements Serializable {
     if (this == o) return true;
     if (!(o instanceof TaxiRide)) return false;
     TaxiRide taxiRide = (TaxiRide) o;
-    return Objects.equals(getTaxiIdentifier(), taxiRide.getTaxiIdentifier())
-        && Objects.equals(getHackLicense(), taxiRide.getHackLicense())
-        && Objects.equals(getPickupDatetime(), taxiRide.getPickupDatetime())
-        && Objects.equals(getTripTimeInSecs(), taxiRide.getTripTimeInSecs())
-        && Objects.equals(getTripDistance(), taxiRide.getTripDistance())
-        && Objects.equals(getPickupLongitude(), taxiRide.getPickupLongitude())
-        && Objects.equals(getPickupLatitude(), taxiRide.getPickupLatitude())
-        && Objects.equals(getDropoffLongitude(), taxiRide.getDropoffLongitude())
-        && Objects.equals(getDropoffLatitude(), taxiRide.getDropoffLatitude())
-        && Objects.equals(getPaymentType(), taxiRide.getPaymentType())
-        && Objects.equals(getFareAmount(), taxiRide.getFareAmount())
-        && Objects.equals(getSurcharge(), taxiRide.getSurcharge())
-        && Objects.equals(getMtaTax(), taxiRide.getMtaTax())
-        && Objects.equals(getTipAmount(), taxiRide.getTipAmount())
-        && Objects.equals(getTollsAmount(), taxiRide.getTollsAmount())
-        && Objects.equals(getTotalAmount(), taxiRide.getTotalAmount());
+    return Objects.equals(this.taxiIdentifier, taxiRide.taxiIdentifier)
+        && Objects.equals(this.hackLicense, taxiRide.hackLicense)
+        && Objects.equals(this.pickupDatetime, taxiRide.pickupDatetime)
+        && Objects.equals(this.tripTimeInSecs, taxiRide.tripTimeInSecs)
+        && Objects.equals(this.tripDistance, taxiRide.tripDistance)
+        && Objects.equals(this.pickupLongitude, taxiRide.pickupLongitude)
+        && Objects.equals(this.pickupLatitude, taxiRide.pickupLatitude)
+        && Objects.equals(this.dropoffLongitude, taxiRide.dropoffLongitude)
+        && Objects.equals(this.dropoffLatitude, taxiRide.dropoffLatitude)
+        && Objects.equals(this.paymentType, taxiRide.paymentType)
+        && Objects.equals(this.fareAmount, taxiRide.fareAmount)
+        && Objects.equals(this.surcharge, taxiRide.surcharge)
+        && Objects.equals(this.mtaTax, taxiRide.mtaTax)
+        && Objects.equals(this.tipAmount, taxiRide.tipAmount)
+        && Objects.equals(this.tollsAmount, taxiRide.tollsAmount)
+        && Objects.equals(this.totalAmount, taxiRide.totalAmount);
   }
 
   @Override

@@ -1,8 +1,6 @@
-package at.ac.uibk.dps.streamprocessingapplications.etl;
+package at.ac.uibk.dps.streamporcessingapplications.stats;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunction;
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.RangeFilterFunction;
-import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.ETLPipeline;
+import at.ac.uibk.dps.streamporcessingapplications.stats.transforms.STATSPipeline;
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
@@ -26,15 +24,10 @@ public class FlinkJob {
     pipeline
         .apply(Create.of(TaxiTestObjects.testPacks))
         .apply(
-            new ETLPipeline<>(
-                TypeDescriptor.of(TaxiRide.class),
-                TaxiSenMLParserJSON::parseSenMLPack,
-                new RangeFilterFunction(),
-                TaxiTestObjects.buildTestBloomFilter(),
-                new InterpolationFunction(),
-                5))
+            new STATSPipeline<>(
+                TypeDescriptor.of(TaxiRide.class), TaxiSenMLParserJSON::parseSenMLPack))
         .apply(MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString))
-        .apply(ParDo.of(new FlinkJob.PrintFn()));
+        .apply(ParDo.of(new PrintFn()));
 
     pipeline.run();
   }

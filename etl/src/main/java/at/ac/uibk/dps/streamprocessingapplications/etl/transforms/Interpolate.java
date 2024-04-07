@@ -1,6 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
-import java.util.function.Function;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.PCollection;
@@ -8,10 +7,13 @@ import org.apache.beam.sdk.values.TypeDescriptor;
 
 public class Interpolate<T> extends PTransform<PCollection<T>, PCollection<T>> {
   private final TypeDescriptor<T> type;
-  private final Function<Iterable<T>, Iterable<T>> interpolationFunction;
+  private final SerializableFunction<Iterable<T>, Iterable<T>> interpolationFunction;
   private final int batchSize;
 
-  Interpolate(TypeDescriptor<T> type, Function<Iterable<T>, Iterable<T>> interpolationFunction, int batchSize) {
+  Interpolate(
+      TypeDescriptor<T> type,
+      SerializableFunction<Iterable<T>, Iterable<T>> interpolationFunction,
+      int batchSize) {
     this.type = type;
     this.interpolationFunction = interpolationFunction;
     this.batchSize = batchSize;

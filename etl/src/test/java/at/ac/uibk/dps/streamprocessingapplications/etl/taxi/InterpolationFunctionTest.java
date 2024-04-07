@@ -2,10 +2,9 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunction;
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import java.util.List;
-import java.util.function.Function;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.junit.jupiter.api.Test;
 
 class InterpolationFunctionTest {
@@ -35,7 +34,8 @@ class InterpolationFunctionTest {
     interpolatedTaxiTrip.setTollsAmount(1.0);
     interpolatedTaxiTrip.setTotalAmount(3.45);
 
-    Function<Iterable<TaxiRide>, Iterable<TaxiRide>> interpolator = new InterpolationFunction();
+    SerializableFunction<Iterable<TaxiRide>, Iterable<TaxiRide>> interpolator =
+        new InterpolationFunction();
 
     Iterable<TaxiRide> actual =
         interpolator.apply(List.of(validTaxiTrip1, validTaxiTrip2, invalidTaxiTrip));

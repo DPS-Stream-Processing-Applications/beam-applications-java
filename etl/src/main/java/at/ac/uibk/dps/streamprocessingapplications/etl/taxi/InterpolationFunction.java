@@ -1,20 +1,21 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 
-public class InterpolationFunction implements Function<Iterable<TaxiRide>, Iterable<TaxiRide>> {
+public class InterpolationFunction
+    implements SerializableFunction<Iterable<TaxiRide>, Iterable<TaxiRide>> {
   private double meanTripTime;
   private double meanTripDistance;
   private double meanFareAmount;
   private double meanTollsAmount;
   private double meanTotalAmount;
 
-  InterpolationFunction() {
+  public InterpolationFunction() {
     this.meanTripTime = 0;
     this.meanTripDistance = 0;
     this.meanFareAmount = 0;
@@ -70,17 +71,5 @@ public class InterpolationFunction implements Function<Iterable<TaxiRide>, Itera
     this.meanFareAmount = validFareAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
     this.meanTollsAmount = validTollsAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
     this.meanTotalAmount = validTotalAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
-  }
-
-  @Override
-  public <V> Function<V, Iterable<TaxiRide>> compose(
-      Function<? super V, ? extends Iterable<TaxiRide>> before) {
-    return Function.super.compose(before);
-  }
-
-  @Override
-  public <V> Function<Iterable<TaxiRide>, V> andThen(
-      Function<? super Iterable<TaxiRide>, ? extends V> after) {
-    return Function.super.andThen(after);
   }
 }

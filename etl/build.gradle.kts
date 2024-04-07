@@ -8,7 +8,10 @@ val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
 
 repositories { mavenCentral() }
 
-dependencies { implementation("org.json:json:20240205") }
+dependencies {
+  implementation("org.json:json:20240205")
+  implementation(project(":shared"))
+}
 
 tasks.named<Jar>("jar") {
   archiveBaseName.set("FlinkJob")

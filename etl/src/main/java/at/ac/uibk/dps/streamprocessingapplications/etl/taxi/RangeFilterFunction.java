@@ -1,14 +1,11 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.TypeDescriptor;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 
 /**
  * Detects values of the `TaxiRide` class that are out of specified ranges and sets them to null.
@@ -27,37 +24,30 @@ import org.apache.beam.sdk.values.TypeDescriptor;
  * tolls_amount:2.50:18.00
  * }</pre>
  */
-public class RangeFilterFunction extends PTransform<PCollection<TaxiRide>, PCollection<TaxiRide>> {
+public class RangeFilterFunction implements SerializableFunction<TaxiRide, TaxiRide> {
 
-  @Override
-  public PCollection<TaxiRide> expand(PCollection<TaxiRide> input) {
-    return input.apply(
-        MapElements.into(TypeDescriptor.of(TaxiRide.class))
-            .via(
-                taxiRide -> {
-                  setNullIf(
-                      taxiRide::getTripTimeInSecs,
-                      RangeFilterFunction::isTripTimeOutOfRange,
-                      taxiRide::setTripTimeInSecs);
-                  setNullIf(
-                      taxiRide::getTripDistance,
-                      RangeFilterFunction::isTripDistanceOutOfRange,
-                      taxiRide::setTripDistance);
-                  setNullIf(
-                      taxiRide::getFareAmount,
-                      RangeFilterFunction::isFareAmountOutOfRange,
-                      taxiRide::setFareAmount);
-                  setNullIf(
-                      taxiRide::getTipAmount,
-                      RangeFilterFunction::isTipAmountOutOfRange,
-                      taxiRide::setTipAmount);
-                  setNullIf(
-                      taxiRide::getTollsAmount,
-                      RangeFilterFunction::isTollsAmountOutOfRange,
-                      taxiRide::setTollsAmount);
+  // @Override
+  public TaxiRide apply(TaxiRide taxiRide) {
+    setNullIf(
+        taxiRide::getTripTimeInSecs,
+        RangeFilterFunction::isTripTimeOutOfRange,
+        taxiRide::setTripTimeInSecs);
+    setNullIf(
+        taxiRide::getTripDistance,
+        RangeFilterFunction::isTripDistanceOutOfRange,
+        taxiRide::setTripDistance);
+    setNullIf(
+        taxiRide::getFareAmount,
+        RangeFilterFunction::isFareAmountOutOfRange,
+        taxiRide::setFareAmount);
+    setNullIf(
+        taxiRide::getTipAmount, RangeFilterFunction::isTipAmountOutOfRange, taxiRide::setTipAmount);
+    setNullIf(
+        taxiRide::getTollsAmount,
+        RangeFilterFunction::isTollsAmountOutOfRange,
+        taxiRide::setTollsAmount);
 
-                  return taxiRide;
-                }));
+    return taxiRide;
   }
 
   /**

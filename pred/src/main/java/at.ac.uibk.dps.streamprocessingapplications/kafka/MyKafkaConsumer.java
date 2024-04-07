@@ -179,7 +179,7 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
                         setLastResult(new String(record.value()));
                     }
                 } else {
-                    setLastResult("test-12");
+                    setLastResult("test-13");
                 }
             } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
                 consumer.seekToEnd(e.partitions());

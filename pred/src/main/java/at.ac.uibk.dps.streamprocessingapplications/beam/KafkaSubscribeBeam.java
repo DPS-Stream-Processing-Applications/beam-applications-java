@@ -25,6 +25,7 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         // this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
         this.spoutLogFileName = spoutLogFileName;
+        initLogger(LoggerFactory.getLogger("APP"));
     }
 
     public KafkaSubscribeBeam(Properties p_, String server, String topic) {
@@ -39,8 +40,9 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
     @Setup
     public void setup() throws MqttException {
-        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-2", 1000, topic, 2);
         initLogger(LoggerFactory.getLogger("APP"));
+        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-2", 1000, topic, 2);
+        myKafkaConsumer.setup(l, p);
     }
 
     @ProcessElement
@@ -50,6 +52,7 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, "dummy");
         // mqttSubscribeTask.doTask(map);
+        myKafkaConsumer.doTask(map);
         String arg1 = myKafkaConsumer.getLastResult();
         // arg1 = "test-12";
 

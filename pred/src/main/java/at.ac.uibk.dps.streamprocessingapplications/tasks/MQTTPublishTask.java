@@ -13,7 +13,7 @@ import org.slf4j.Logger;
  *
  * @author shukla, simmhan
  */
-public class MQTTPublishTask extends AbstractTask implements MqttCallback {
+public class MQTTPublishTask extends AbstractTask<String, String> implements MqttCallback {
 
     // static fields common to all threads
     private static final Object SETUP_LOCK = new Object();

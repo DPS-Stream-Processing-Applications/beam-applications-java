@@ -3,6 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.kafka;
 import static java.time.Duration.ofMillis;
 import static java.util.Collections.singleton;
 
+import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,7 @@ import org.apache.kafka.common.errors.RetriableException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.LongDeserializer;
 
-public class MyKafkaConsumer
+public class MyKafkaConsumer extends AbstractTask<String, String>
         implements ConsumerRebalanceListener, OffsetCommitCallback, Serializable {
     private String BOOTSTRAP_SERVERS;
     private String GROUP_ID;
@@ -163,5 +164,34 @@ public class MyKafkaConsumer
                 System.exit(1);
             }
         }
+    }
+
+    @Override
+    protected Float doTaskLogic(Map<String, String> map) {
+        try (var consumer = createKafkaConsumer()) {
+            kafkaConsumer = consumer;
+            consumer.subscribe(singleton(TOPIC_NAME), this);
+            try {
+                // Poll for new records from Kafka
+                ConsumerRecords<Long, byte[]> records = consumer.poll(ofMillis(POLL_TIMEOUT_MS));
+                if (!records.isEmpty()) {
+                    for (ConsumerRecord<Long, byte[]> record : records) {
+                        setLastResult(new String(record.value()));
+                    }
+                } else {
+                    setLastResult("test-12");
+                }
+            } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
+                consumer.seekToEnd(e.partitions());
+                consumer.commitSync();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+                if (!retriable(e)) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        }
+        return 1f;
     }
 }

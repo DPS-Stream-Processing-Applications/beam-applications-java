@@ -27,7 +27,6 @@ public class FlinkJob {
 
     Pipeline pipeline = Pipeline.create(options);
 
-
     pipeline
         .apply(Create.of(TaxiTestObjects.testPacks))
         .apply(

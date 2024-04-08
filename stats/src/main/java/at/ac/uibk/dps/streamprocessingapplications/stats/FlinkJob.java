@@ -3,6 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.stats;
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.AveragingFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.DistinctCountFunction;
 import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.STATSPipeline;
 import java.util.Objects;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
@@ -30,6 +31,7 @@ public class FlinkJob {
                 TypeDescriptor.of(TaxiRide.class),
                 TaxiSenMLParserJSON::parseSenMLPack,
                 new AveragingFunction(),
+                new DistinctCountFunction(),
                 5))
         .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
         .apply(ParDo.of(new PrintFn()));

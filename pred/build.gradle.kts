@@ -27,6 +27,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:3.0.0")
     // https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-kafka
     implementation("org.apache.beam:beam-sdks-java-io-kafka:2.55.0")
+    implementation("org.mongodb:mongodb-driver-sync:4.3.4")
 }
 
 tasks.named<Test>("test") {

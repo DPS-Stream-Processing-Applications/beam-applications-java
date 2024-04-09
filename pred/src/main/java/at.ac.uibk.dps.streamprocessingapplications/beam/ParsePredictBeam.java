@@ -3,6 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.tasks.ReadFromDatabaseTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
 import java.io.*;
 import java.util.ArrayList;
@@ -24,10 +25,23 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
     private boolean isJson;
 
-    public ParsePredictBeam(Properties p_, String dataSetType, boolean isJson) {
+    private ReadFromDatabaseTask readFromDatabaseTask;
+
+    private String connectionUrl;
+
+    private String dataBaseName;
+
+    public ParsePredictBeam(
+            Properties p_,
+            String dataSetType,
+            boolean isJson,
+            String connectionUrl,
+            String dataBaseName) {
         p = p_;
         this.dataSetType = dataSetType;
         this.isJson = isJson;
+        this.connectionUrl = connectionUrl;
+        this.dataBaseName = dataBaseName;
     }
 
     public static void initLogger(Logger l_) {
@@ -41,40 +55,61 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             senMLParseTask = new SenMlParse(dataSetType, isJson);
             senMLParseTask.setup(l, p);
             observableFields = new ArrayList<>();
+            readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
+            readFromDatabaseTask.setup(l, p);
             ArrayList<String> metaList = new ArrayList<>();
 
             String meta;
-            InputStream inputStream = null;
+            // InputStream inputStream = null;
+            byte[] csvContent = null;
             if (dataSetType.equals("TAXI")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
+                /*
                 inputStream =
                         this.getClass()
                                 .getResourceAsStream(
                                         "/resources/datasets/taxi-schema-without-annotation.csv");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "taxi-schema-without-annotation_csv");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
             } else if (dataSetType.equals("SYS")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
+                /*
                 inputStream =
                         this.getClass()
                                 .getResourceAsStream(
                                         "/resources/datasets/sys-schema_without_annotationfields.txt");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "sys-schema_without_annotationfields_txt");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
             } else if (dataSetType.equals("FIT")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
+                /*
                 inputStream =
                         this.getClass()
                                 .getResourceAsStream("/resources/datasets/mhealth_schema.csv");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "mhealth_schema_csv");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
             } else {
                 throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
             }
 
-            if (inputStream == null) {
-                throw new FileNotFoundException("CSV schema file not found");
-            }
-
-            InputStreamReader reader = new InputStreamReader(inputStream);
-            BufferedReader br = new BufferedReader(reader);
+            // InputStreamReader reader = new InputStreamReader(inputStream);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
             /* read meta field list from property */
             metaFields = meta.split(",");

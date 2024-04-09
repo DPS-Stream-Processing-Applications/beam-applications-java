@@ -13,13 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
 
-    private static Logger l; // TODO: Ensure logger is initialized before use
+    private static Logger l;
     Properties p;
     // String csvFileNameOutSink; // Full path name of the file at the sink bolt
     AzureBlobDownloadTask azureBlobDownloadTask;
 
     public BlobReadBeam(Properties p_) {
-        // FIXME!
         // this.csvFileNameOutSink = csvFileNameOutSink;
         p = p_;
     }

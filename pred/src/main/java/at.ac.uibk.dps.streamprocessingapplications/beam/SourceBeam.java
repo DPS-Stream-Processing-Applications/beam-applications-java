@@ -18,7 +18,6 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     String csvFileName;
     String outSpoutCSVLogFileName;
     String experiRunId;
-    double scalingFactor;
     long msgId;
 
     long numberLines;
@@ -32,14 +31,12 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     public SourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
-            double scalingFactor,
             String experiRunId,
             long lines,
             String bootstrapserver,
             String topic) {
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
-        this.scalingFactor = scalingFactor;
         this.experiRunId = experiRunId;
         this.numberLines = lines;
         this.TOPIC_NAME = topic;
@@ -49,11 +46,10 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     public SourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
-            double scalingFactor,
             long lines,
             String bootstrapserver,
             String topic) {
-        this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines, bootstrapserver, topic);
+        this(csvFileName, outSpoutCSVLogFileName, "", lines, bootstrapserver, topic);
     }
 
     @Setup

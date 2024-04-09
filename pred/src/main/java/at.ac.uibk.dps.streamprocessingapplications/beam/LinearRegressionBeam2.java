@@ -23,9 +23,16 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
     private Properties p;
     private String dataSetType;
 
-    public LinearRegressionBeam2(Properties p_, String dataSetType) {
+    private String databaseUrl;
+
+    private String databaseName;
+
+    public LinearRegressionBeam2(
+            Properties p_, String dataSetType, String databaseUrl, String databaseName) {
         p = p_;
         this.dataSetType = dataSetType;
+        this.databaseName = databaseName;
+        this.databaseUrl = databaseUrl;
     }
 
     public static void initLogger(Logger l_) {
@@ -34,7 +41,7 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
 
     @Setup
     public void setup() throws MqttException {
-        linearRegressionPredictor = new LinearRegressionPredictor();
+        linearRegressionPredictor = new LinearRegressionPredictor(databaseUrl, databaseName);
         initLogger(LoggerFactory.getLogger("APP"));
         linearRegressionPredictor.setup(l, p);
     }

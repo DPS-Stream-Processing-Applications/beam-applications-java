@@ -1,10 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import at.ac.uibk.dps.streamprocessingapplications.PredJob;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -53,6 +50,12 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "%header format";
     private static Instances instanceHeader;
 
+    private ReadFromDatabaseTask readFromDatabaseTask;
+
+    public LinearRegressionPredictor(String databseUrl, String databaseName) {
+        readFromDatabaseTask = new ReadFromDatabaseTask(databseUrl, databaseName);
+    }
+
     /**
      * @param l_
      * @param p_
@@ -68,19 +71,23 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                                 p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
 
                 // modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
-                modelFilePath = "/resources/datasets/LR-TAXI-Numeric.model";
-
-                if (modelFilePath == null) {
-                    throw new RuntimeException("modelFilePath null");
+                modelFilePath = "LR-TAXI-Numeric_model";
+                readFromDatabaseTask.setup(l, p_);
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", modelFilePath);
+                readFromDatabaseTask.doTask(map);
+                byte[] csvContent = readFromDatabaseTask.getLastResult();
+                if (csvContent == null) {
+                    throw new RuntimeException("csvContent is null");
                 }
 
-                try (InputStream inputStream = PredJob.class.getResourceAsStream(modelFilePath);
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                try {
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                    lr = (LinearRegression) objectInputStream.readObject();
 
-                    if (inputStream == null) {
-                        throw new RuntimeException("Model file not found: " + modelFilePath);
-                    }
+                    BufferedReader bufferedReader =
+                            new BufferedReader(new InputStreamReader(inputStream));
 
                     StringBuilder modelContent = new StringBuilder();
                     String line;
@@ -89,26 +96,20 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     }
 
                     /*
-                    lr =
-                            (LinearRegression)
-                                    weka.core.SerializationHelper.read(
-                                            new ObjectInputStream(inputStream2));
+                    lr = (LinearRegression) SerializationHelper.read(inputStream);
+                    inputStream.close();
 
                      */
-                    lr = null;
-                    // if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
 
-                    /*
                     if (lr == null) {
-                        throw new RuntimeException("lr null");
+                        throw new RuntimeException("lr is null");
                     }
-
-                     */
+                    if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
 
                     // SAMPLE_HEADER = p_.getProperty("PREDICT.LINEAR_REGRESSION.SAMPLE_HEADER");
 
                     if (SAMPLE_HEADER == null) {
-                        throw new RuntimeException("sampleheader null");
+                        throw new RuntimeException("sample_header null");
                     }
 
                     instanceHeader =
@@ -117,7 +118,6 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     if (instanceHeader == null) {
                         throw new RuntimeException("instanceHeader is null");
                     }
-
                     doneSetup = true;
                 } catch (Exception e) {
                     l.warn("error loading decision tree model from file: " + modelFilePath, e);
@@ -149,8 +149,8 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
 
-            // int prediction = (int) lr.classifyInstance(testInstance);
-            int prediction = 1;
+            int prediction = (int) lr.classifyInstance(testInstance);
+            // int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);

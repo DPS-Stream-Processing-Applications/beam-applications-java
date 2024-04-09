@@ -2,10 +2,7 @@ package at.ac.uibk.dps.streamprocessingapplications;
 
 import at.ac.uibk.dps.streamprocessingapplications.beam.*;
 import at.ac.uibk.dps.streamprocessingapplications.database.WriteToDatabase;
-import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
+import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
 import java.io.BufferedReader;
@@ -17,10 +14,9 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,25 +152,19 @@ public class PredJob {
                                 new ParsePredictBeam(
                                         p_, dataSetType, isJson, databaseUrl, databaseName)));
 
-        mlParseData.apply(
-                ParDo.of(
-                        new DoFn<SenMlEntry, Void>() {
-                            @ProcessElement
-                            public void processElement(ProcessContext c) {
-                                LOG.info("Element of PCollection-parse: " + c.element());
-                            }
-                        }));
-
-        /*
         PCollection<LinearRegressionEntry> linearRegression1 =
                 mlParseData.apply(
                         "Multi Var Linear Regression",
-                        ParDo.of(new LinearRegressionBeam1(p_, dataSetType)));
+                        ParDo.of(
+                                new LinearRegressionBeam1(
+                                        p_, dataSetType, databaseUrl, databaseName)));
 
         PCollection<LinearRegressionEntry> linearRegression2 =
                 blobRead.apply(
                         "Multi Var Linear Regression",
-                        ParDo.of(new LinearRegressionBeam2(p_, dataSetType)));
+                        ParDo.of(
+                                new LinearRegressionBeam2(
+                                        p_, dataSetType, databaseUrl, databaseName)));
 
         PCollection<LinearRegressionEntry> linearRegression =
                 PCollectionList.of(linearRegression1)
@@ -233,7 +223,6 @@ public class PredJob {
                             }
                         }));
 
-         */
         p.run();
     }
 }

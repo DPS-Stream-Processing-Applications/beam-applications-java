@@ -19,9 +19,16 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
     LinearRegressionPredictor linearRegressionPredictor;
     private Properties p;
 
-    public LinearRegressionBeam1(Properties p_, String dataSetType) {
+    private String databaseUrl;
+
+    private String databaseName;
+
+    public LinearRegressionBeam1(
+            Properties p_, String dataSetType, String databaseUrl, String databaseName) {
         p = p_;
         this.dataSetType = dataSetType;
+        this.databaseName = databaseName;
+        this.databaseUrl = databaseUrl;
     }
 
     public static void initLogger(Logger l_) {
@@ -30,7 +37,7 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
     @Setup
     public void setup() throws MqttException {
-        linearRegressionPredictor = new LinearRegressionPredictor();
+        linearRegressionPredictor = new LinearRegressionPredictor(databaseUrl, databaseName);
         initLogger(LoggerFactory.getLogger("APP"));
         linearRegressionPredictor.setup(l, p);
     }

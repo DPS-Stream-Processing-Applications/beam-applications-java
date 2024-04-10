@@ -65,8 +65,6 @@ kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
 
 ## Commands
 
-After starting the cluster as described in the main-README, execute the commands below. Make sure to change the --outputDir to a local directory
-
 ### Example command for SYS-Data
 ```bash
 flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1

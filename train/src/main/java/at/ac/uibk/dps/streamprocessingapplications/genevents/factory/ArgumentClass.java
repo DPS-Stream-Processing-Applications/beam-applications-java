@@ -14,6 +14,16 @@ public class ArgumentClass {
     String bootStrapServerKafka;
     String kafkaTopic;
 
+    String databaseUrl;
+
+    public String getDatabaseUrl() {
+        return databaseUrl;
+    }
+
+    public void setDatabaseUrl(String databaseUrl) {
+        this.databaseUrl = databaseUrl;
+    }
+
     public String getBootStrapServerKafka() {
         return bootStrapServerKafka;
     }

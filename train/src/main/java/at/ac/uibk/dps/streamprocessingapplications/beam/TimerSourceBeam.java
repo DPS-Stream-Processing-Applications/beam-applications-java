@@ -10,11 +10,11 @@ import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFile
 import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.TopicPartition;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
@@ -34,6 +34,8 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
 
     private MyKafkaConsumer myKafkaConsumer;
 
+    private Map<TopicPartition, OffsetAndMetadata> pendingOffsets = new HashMap<>();
+
     public TimerSourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
@@ -47,7 +49,10 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
         this.scalingFactor = scalingFactor;
         this.experiRunId = experiRunId;
         this.numberLines = lines;
-        this.myKafkaConsumer = new MyKafkaConsumer(bootstrapserver, "group-1", 1000, topic, lines);
+
+        this.myKafkaConsumer =
+                new MyKafkaConsumer(
+                        bootstrapserver, "group-" + UUID.randomUUID(), 1000, topic, lines);
         this.TOPIC_NAME = topic;
     }
 
@@ -285,7 +290,12 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
                         values.setRowKeyEnd(ROWKEYEND);
                         out.output(values);
                         sendMessages++;
+                        pendingOffsets.put(
+                                new TopicPartition(record.topic(), record.partition()),
+                                new OffsetAndMetadata(record.offset() + 1, null));
                     }
+                    kafkaConsumer.commitAsync(pendingOffsets, myKafkaConsumer);
+                    pendingOffsets.clear();
                 }
             } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
                 // Handle invalid offset or no offset found errors when auto.reset.policy is not set

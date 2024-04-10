@@ -15,7 +15,6 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionList;
 
 public class TrainJob {
 
@@ -71,7 +70,6 @@ public class TrainJob {
 
         String dataSetType = checkDataType(expriRunId);
 
-        // FIXME for different datasets!
         String trainDataSet;
         String inputFileName;
         switch (dataSetType) {
@@ -143,6 +141,8 @@ public class TrainJob {
                                         kafkaBootstrapServers,
                                         kafkaTopic)));
 
+        /*
+
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply(
                         "Table Read",
@@ -184,6 +184,8 @@ public class TrainJob {
                             }
                         }));
 
-        p.run().waitUntilFinish();
+         */
+
+        p.run();
     }
 }

@@ -3,13 +3,15 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
 import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.UUID;
 
 public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     private static long msgid = 1;
@@ -41,7 +43,7 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
-        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-2", 1000, topic);
+        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-" + UUID.randomUUID(), 1000, topic);
         myKafkaConsumer.setup(l, p);
     }
 

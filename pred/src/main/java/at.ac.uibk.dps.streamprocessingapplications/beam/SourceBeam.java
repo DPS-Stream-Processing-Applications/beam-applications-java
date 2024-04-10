@@ -8,6 +8,7 @@ import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.kafka.clients.consumer.*;
@@ -44,7 +45,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.experiRunId = experiRunId;
-        this.myKafkaConsumer = new MyKafkaConsumer(bootstrap, "group-1", 10000, topic);
+        this.myKafkaConsumer = new MyKafkaConsumer(bootstrap, "group-" +UUID.randomUUID(), 10000, topic);
         this.numberLines = lines;
     }
 

@@ -45,7 +45,8 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.experiRunId = experiRunId;
-        this.myKafkaConsumer = new MyKafkaConsumer(bootstrap, "group-" +UUID.randomUUID(), 10000, topic);
+        this.myKafkaConsumer =
+                new MyKafkaConsumer(bootstrap, "group-" + UUID.randomUUID(), 10000, topic);
         this.numberLines = lines;
     }
 

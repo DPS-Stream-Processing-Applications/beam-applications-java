@@ -41,7 +41,7 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
-        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-2", 1000, topic, 2);
+        myKafkaConsumer = new MyKafkaConsumer(bootStrapServer, "group-2", 1000, topic);
         myKafkaConsumer.setup(l, p);
     }
 

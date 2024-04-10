@@ -21,23 +21,17 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
     private String GROUP_ID;
     private long POLL_TIMEOUT_MS;
     private String TOPIC_NAME;
-    private long NUM_MESSAGES;
 
     private KafkaConsumer<Long, byte[]> kafkaConsumer;
     protected AtomicLong messageCount = new AtomicLong(0);
     private Map<TopicPartition, OffsetAndMetadata> pendingOffsets = new HashMap<>();
 
     public MyKafkaConsumer(
-            String BOOTSTRAP_SERVERS,
-            String GROUP_ID,
-            long POLL_TIMEOUT_MS,
-            String TOPIC_NAME,
-            long NUM_MESSAGES) {
+            String BOOTSTRAP_SERVERS, String GROUP_ID, long POLL_TIMEOUT_MS, String TOPIC_NAME) {
         this.BOOTSTRAP_SERVERS = BOOTSTRAP_SERVERS;
         this.GROUP_ID = GROUP_ID;
         this.POLL_TIMEOUT_MS = POLL_TIMEOUT_MS;
         this.TOPIC_NAME = TOPIC_NAME;
-        this.NUM_MESSAGES = NUM_MESSAGES;
     }
 
     public void run() {
@@ -64,9 +58,6 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
                             pendingOffsets.put(
                                     new TopicPartition(record.topic(), record.partition()),
                                     new OffsetAndMetadata(record.offset() + 1, null));
-                            if (messageCount.incrementAndGet() == NUM_MESSAGES) {
-                                break;
-                            }
                         }
                         // Commit pending offsets asynchronously
                         consumer.commitAsync(pendingOffsets, this);
@@ -115,6 +106,10 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
         // Set the offset reset behavior to start consuming from the earliest available offset
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         return new org.apache.kafka.clients.consumer.KafkaConsumer<>(props);
+    }
+
+    public String getTopic() {
+        return TOPIC_NAME;
     }
 
     private void sleep(long ms) {
@@ -193,5 +188,11 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
             }
         }
         return 1f;
+    }
+
+    public void close() {
+        if (kafkaConsumer != null) {
+            kafkaConsumer.close();
+        }
     }
 }

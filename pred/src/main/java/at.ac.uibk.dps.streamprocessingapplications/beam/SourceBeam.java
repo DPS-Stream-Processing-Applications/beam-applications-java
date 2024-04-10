@@ -11,8 +11,12 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.kafka.clients.consumer.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
+
+    private static Logger l;
 
     BlockingQueue<List<String>> eventQueue;
     String csvFileName;
@@ -24,32 +28,33 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
 
     private final long POLL_TIMEOUT_MS = 1000;
 
-    private final String TOPIC_NAME;
-
     private MyKafkaConsumer myKafkaConsumer;
+
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     public SourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
             String experiRunId,
             long lines,
-            String bootstrapserver,
+            String bootstrap,
             String topic) {
         this.csvFileName = csvFileName;
         this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
         this.experiRunId = experiRunId;
+        this.myKafkaConsumer = new MyKafkaConsumer(bootstrap, "group-1", 10000, topic);
         this.numberLines = lines;
-        this.TOPIC_NAME = topic;
-        this.myKafkaConsumer = new MyKafkaConsumer(bootstrapserver, "group-1", 1000, topic, lines);
     }
 
     public SourceBeam(
             String csvFileName,
             String outSpoutCSVLogFileName,
             long lines,
-            String bootstrapserver,
+            String bootstrap,
             String topic) {
-        this(csvFileName, outSpoutCSVLogFileName, "", lines, bootstrapserver, topic);
+        this(csvFileName, outSpoutCSVLogFileName, "", lines, bootstrap, topic);
     }
 
     @Setup
@@ -70,6 +75,8 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         // this.eventQueue = new LinkedBlockingQueue<>();
         // String uLogfilename = this.outSpoutCSVLogFileName + msgId;
         boolean isJson = csvFileName.contains("senml");
+        initLogger(LoggerFactory.getLogger("APP"));
+
         // this.eventGen.launch(this.csvFileName, uLogfilename, -1, isJson); // Launch threads
     }
 
@@ -79,7 +86,8 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
         long count = 1, MAX_COUNT = 100; // FIXME?
         KafkaConsumer<Long, byte[]> kafkaConsumer;
         kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
-        kafkaConsumer.subscribe(singleton(TOPIC_NAME), myKafkaConsumer);
+        kafkaConsumer.subscribe(singleton(myKafkaConsumer.getTopic()), myKafkaConsumer);
+
         while (count < numberLines) {
             /*
             List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
@@ -110,7 +118,6 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
                         "Invalid or no offset found, and auto.reset.policy unset, using latest");
                 throw new RuntimeException(e);
             } catch (Exception e) {
-                // Handle other exceptions, including retriable ones
                 System.err.println(e.getMessage());
                 throw new RuntimeException(e);
             }

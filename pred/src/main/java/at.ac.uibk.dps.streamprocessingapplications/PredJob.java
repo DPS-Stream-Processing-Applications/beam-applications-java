@@ -62,17 +62,9 @@ public class PredJob {
         }
 
         String logFilePrefix =
-                argumentClass.getTopoName()
-                        + "-"
-                        + argumentClass.getExperiRunId()
-                        + "-"
-                        + argumentClass.getScalingFactor()
-                        + ".log";
-        // String sinkLogFileName = argumentClass.getOutputDirName() + "/sink-" + logFilePrefix;
+                argumentClass.getTopoName() + "-" + argumentClass.getExperiRunId() + ".log";
+
         String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
-        // String taskPropFilename = argumentClass.getTasksPropertiesFilename();
-        // String inputFileName = argumentClass.getInputDatasetPathName();
-        // String spoutLogFileName = argumentClass.getOutputDirName() + "/spout-" + logFilePrefix;
         String expriRunId = argumentClass.getExperiRunId();
 
         Properties p_ = new Properties();
@@ -106,7 +98,8 @@ public class PredJob {
         String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
         String kafkaTopic = argumentClass.getKafkaTopic();
         boolean isJson = inputFileName.contains("senml");
-        String databaseUrl = "mongodb://adminuser:password123@192.168.49.2:32000/";
+        // String databaseUrl = "mongodb://adminuser:password123@192.168.49.2:32000/";
+        String databaseUrl = argumentClass.getDatabaseUrl();
         String databaseName = "mydb";
 
         WriteToDatabase writeToDatabase = new WriteToDatabase(databaseUrl, databaseName);
@@ -123,17 +116,6 @@ public class PredJob {
 
         PCollection<String> inputFile = p.apply(Create.of("test"));
 
-        // inputFile.apply("Test", ParDo.of(new ReadDatabaseBeam(p_, databaseUrl, databaseName)));
-
-        PCollection<MqttSubscribeEntry> sourceDataMqtt =
-                inputFile.apply(
-                        "MQTT Subscribe",
-                        ParDo.of(
-                                new KafkaSubscribeBeam(
-                                        p_, kafkaBootstrapServers, "pred-sub-task")));
-        PCollection<BlobReadEntry> blobRead =
-                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
-
         PCollection<SourceEntry> sourceData =
                 inputFile.apply(
                         "Source",
@@ -144,6 +126,16 @@ public class PredJob {
                                         lines,
                                         kafkaBootstrapServers,
                                         kafkaTopic)));
+
+        // inputFile.apply("Test", ParDo.of(new ReadDatabaseBeam(p_, databaseUrl, databaseName)));
+        PCollection<MqttSubscribeEntry> sourceDataMqtt =
+                inputFile.apply(
+                        "MQTT Subscribe",
+                        ParDo.of(
+                                new KafkaSubscribeBeam(
+                                        p_, kafkaBootstrapServers, "pred-sub-task")));
+        PCollection<BlobReadEntry> blobRead =
+                sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
         PCollection<SenMlEntry> mlParseData =
                 sourceData.apply(
@@ -219,7 +211,7 @@ public class PredJob {
                         new DoFn<Long, Void>() {
                             @ProcessElement
                             public void processElement(ProcessContext c) {
-                                LOG.info("Length of PCollection: " + c.element());
+                                LOG.info("Length of PCollection-pred: " + c.element());
                             }
                         }));
 

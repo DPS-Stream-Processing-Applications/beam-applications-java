@@ -1,3 +1,5 @@
+# README for  the pred-application
+
 ## Commandline arguments
 
 * deploymentMode
@@ -10,23 +12,90 @@
 * taskName 
 
 
+
+## General process
+
+1. Start kafka server
+2. Start mongodb server
+3. Find server address of both services
+4. Start flink application
+5. Start kafkaProducer
+
+
+## Setting up MongoDb
+
+I used this tutorial to set it up https://devopscube.com/deploy-mongodb-kubernetes/
+
+```bash
+git clone https://github.com/techiescamp/kubernetes-mongodb
+````
+
+```bash
+kubectl apply -f .
+```
+
+I used this command to get the ip-address and port of my db
+````bash
+minikube service --url mongo-nodeport-svc
+````
+
+Example address: mongodb:
+`mongodb://adminuser:password123@192.168.49.2:32000/`
+
+
+
+## Setting up Apache Kafka
+In the `kafkaProducer` directory is a deployment.yaml file
+```bash
+kubectl apply -f  deployment.yaml -n kafka 
+```
+This will deploy the Apache cluster.
+
+
+Use the following command to get the Kafka-server-bootstrap address
+```bash
+kubectl get kafka my-cluster -o=jsonpath='{.status.listeners[*].bootstrapServers}{"\n"}' -n kafka
+```
+
+This commands tears down the cluster
+
+```bash
+kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
+```
+
 ## Commands
 
 After starting the cluster as described in the main-README, execute the commands below. Make sure to change the --outputDir to a local directory
 
 ### Example command for SYS-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId SYS-210 --scalingFactor 0.001 --taskName bench  --bootstrap xxx.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId SYS-210 --scalingFactor 0.001 --taskName bench  --bootstrap xxx.x --topic test-1 --databaseUrl xxx.x
 ```
 
 ### Example command for TAXI-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId TAXI-210 --scalingFactor 0.001 --taskName bench  --bootstrap xxx.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId TAXI-210 --scalingFactor 0.001 --taskName bench  --bootstrap xxx.x --topic test-1 --databaseUrl xxx.x
 ```
 
 ### Example command for FIT-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId FIT-210 --scalingFactor 0.001 --taskName bench --bootstrap xxx.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --experiRunId FIT-210 --scalingFactor 0.001 --taskName bench --bootstrap xxx.x --topic test-1 --databaseUrl xxx.x
+```
+
+
+## Setting up Apache Kafka Producer
+In the `kafkaProducer` directory is a Dockerfile.
+
+Create the image from Dockerfile:
+
+```bash
+minikube image build -t kafka-producer -f ./Dockerfile .
+```
+
+**Note**
+Please make sure that the bootstrapserver, the application and the expected dataset are correct. 
+```bash
+kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --restart=Never --env="BOOTSTRAP_SERVER=192.168.49.2:31316" --env="APPLICATION=pred" --env="DATASET=SYS" --env="SCALING=0.001" --env="TOPIC=test-1" 
 ```
 
 

@@ -13,18 +13,14 @@ public class ArgumentParser {
     public static ArgumentClass parserCLI(String[] args) {
         ParameterTool params = ParameterTool.fromArgs(args);
 
-        if (args == null || params.getNumberOfParameters() != 7) {
+        if (params.getNumberOfParameters() != 6) {
             System.out.println("invalid number of arguments " + params.getNumberOfParameters());
             return null;
         } else {
             ArgumentClass argumentClass = new ArgumentClass();
-            argumentClass.setDeploymentMode(params.get("deploymentMode"));
             argumentClass.setTopoName(params.get("topoName"));
-            argumentClass.setInputDatasetPathName(params.get("input"));
             argumentClass.setExperiRunId(params.get("experiRunId"));
-            argumentClass.setScalingFactor(Double.parseDouble(params.get("scalingFactor")));
-            argumentClass.setOutputDirName(params.get("outputDir"));
-            argumentClass.setTasksPropertiesFilename(params.get("taskProp"));
+            argumentClass.setDatabaseUrl(params.get("databaseUrl"));
             argumentClass.setTasksName(params.get("taskName"));
             argumentClass.setBootStrapServerKafka(params.get("bootstrap"));
             argumentClass.setKafkaTopic(params.get("topic"));

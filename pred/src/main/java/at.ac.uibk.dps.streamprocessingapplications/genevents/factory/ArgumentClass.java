@@ -2,16 +2,26 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 /** Created by tarun on 28/5/15. */
 public class ArgumentClass {
-    String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
+    // String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
     String topoName;
     String inputDatasetPathName; // Full path along with File Name
     String experiRunId;
-    double scalingFactor; // Deceleration factor with respect to seconds.
+
     String outputDirName; // Path where the output log file from spout and sink has to be kept
     String tasksPropertiesFilename;
     String tasksName;
     String bootStrapServerKafka;
     String kafkaTopic;
+
+    String databaseUrl;
+
+    public String getDatabaseUrl() {
+        return databaseUrl;
+    }
+
+    public void setDatabaseUrl(String databaseUrl) {
+        this.databaseUrl = databaseUrl;
+    }
 
     public String getBootStrapServerKafka() {
         return bootStrapServerKafka;
@@ -45,14 +55,6 @@ public class ArgumentClass {
         this.outputDirName = outputDirName;
     }
 
-    public String getDeploymentMode() {
-        return deploymentMode;
-    }
-
-    public void setDeploymentMode(String deploymentMode) {
-        this.deploymentMode = deploymentMode;
-    }
-
     public String getTopoName() {
         return topoName;
     }
@@ -75,14 +77,6 @@ public class ArgumentClass {
 
     public void setExperiRunId(String experiRunId) {
         this.experiRunId = experiRunId;
-    }
-
-    public double getScalingFactor() {
-        return scalingFactor;
-    }
-
-    public void setScalingFactor(double scalingFactor) {
-        this.scalingFactor = scalingFactor;
     }
 
     public String getTasksPropertiesFilename() {

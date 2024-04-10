@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl;
 
+import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.AnnotationFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.RangeFilterFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.ETLPipeline;
@@ -32,7 +33,8 @@ public class FlinkJob {
                 new RangeFilterFunction(),
                 TaxiTestObjects.buildTestBloomFilter(),
                 new InterpolationFunction(),
-                5))
+                5,
+                new AnnotationFunction()))
         .apply(MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString))
         .apply(ParDo.of(new FlinkJob.PrintFn()));
 

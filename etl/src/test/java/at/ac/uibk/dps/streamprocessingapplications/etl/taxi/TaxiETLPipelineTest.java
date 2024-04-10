@@ -34,7 +34,8 @@ class TaxiETLPipelineTest {
                 new RangeFilterFunction(),
                 TaxiTestObjects.buildTestBloomFilter(),
                 new InterpolationFunction(),
-                5));
+                5,
+                new AnnotationFunction()));
 
     actual
         .apply(MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString))

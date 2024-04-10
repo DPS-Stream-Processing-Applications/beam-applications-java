@@ -1,7 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -28,6 +28,17 @@ public class DecisionTreeTrainBatched extends AbstractTask {
     private int instancesCount = 0;
     private StringBuffer instancesBuf = null;
 
+    private ReadFromDatabaseTask readFromDatabaseTask;
+
+    private String connectionUrl;
+
+    private String dataBaseName;
+
+    public DecisionTreeTrainBatched(String connectionUrl, String dataBaseName) {
+        this.connectionUrl = connectionUrl;
+        this.dataBaseName = dataBaseName;
+    }
+
     /***
      *
      * @param instancesReader
@@ -42,7 +53,6 @@ public class DecisionTreeTrainBatched extends AbstractTask {
             Logger l) {
 
         Instances trainingData = WekaUtil.loadDatasetInstances(instancesReader, l);
-
         if (trainingData == null) return -1;
 
         try {
@@ -58,7 +68,6 @@ public class DecisionTreeTrainBatched extends AbstractTask {
 
         } catch (Exception e) {
             l.warn("error training decision tree", e);
-            System.out.println(e);
             return -2;
         }
 
@@ -84,31 +93,42 @@ public class DecisionTreeTrainBatched extends AbstractTask {
                 // StandardCharsets.UTF_8);
                 instanceHeader = p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
                 instanceHeader = "/resources/model/DecisionTreeClassify-SYS.arff";
-
+                readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
+                readFromDatabaseTask.setup(l, p_);
                 doneSetup = true;
             }
         }
         // setup for NON-static fields
         instancesCount = 0;
 
-        StringBuffer stringBuffer;
-        try (InputStream inputStream =
-                TrainJob.class.getResourceAsStream(
-                        "/resources/model/DecisionTreeClassify-SYS.arff")) {
-            if (inputStream == null) {
-                throw new RuntimeException(
-                        "Resource not found: /resources/model/DecisionTreeClassify-SYS.arff");
-            }
-            // Read the content of the resource
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            stringBuffer = new StringBuffer();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuffer.append(line).append("\n");
-            }
-
+        HashMap<String, String> map = new HashMap<>();
+        map.put("fileName", "DecisionTreeClassify-SYS_arff");
+        try {
+            readFromDatabaseTask.doTask(map);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        byte[] csvContent = readFromDatabaseTask.getLastResult();
+
+        StringBuffer stringBuffer;
+        BufferedReader reader;
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        stringBuffer = new StringBuffer();
+        String line;
+        while (true) {
+            try {
+                if (!((line = reader.readLine()) != null)) break;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            stringBuffer.append(line).append("\n");
         }
         instancesBuf = (stringBuffer);
 
@@ -134,7 +154,6 @@ public class DecisionTreeTrainBatched extends AbstractTask {
         ByteArrayOutputStream model = new ByteArrayOutputStream();
         if (l.isInfoEnabled()) l.info("Range query res:{}", m);
         System.out.println(modelFilePath);
-        String fullFilePath = filename; //  model file updated with MLR-endRowkey.model
         int result = 0;
         try {
 
@@ -142,7 +161,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
             // train and save model
             l.info("instancesBuf-" + instancesBuf.toString());
             StringReader stringReader = new StringReader(instancesBuf.toString());
-            result = decisionTreeTrainAndSaveModel(stringReader, fullFilePath, model, l);
+            result = decisionTreeTrainAndSaveModel(stringReader, filename, model, l);
 
             /*
             if(l.isInfoEnabled()) {
@@ -151,13 +170,13 @@ public class DecisionTreeTrainBatched extends AbstractTask {
              */
 
             super.setLastResult(model);
-            if (result >= 0) return Float.valueOf(0); // success
+            if (result >= 0) return (float) 0; // success
 
         } catch (Exception e) {
             l.warn("error training decision tree" + e);
             throw new RuntimeException(e);
         }
 
-        return Float.valueOf(Float.MIN_VALUE);
+        return Float.MIN_VALUE;
     }
 }

@@ -1,6 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications;
 
 import at.ac.uibk.dps.streamprocessingapplications.beam.*;
+import at.ac.uibk.dps.streamprocessingapplications.database.WriteToDatabase;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
@@ -15,6 +16,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 
 public class TrainJob {
 
@@ -22,8 +24,7 @@ public class TrainJob {
         long lines = 0;
         try (InputStream inputStream = TrainJob.class.getResourceAsStream(resourceFileName)) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
+                while ((reader.readLine()) != null) {
                     lines++;
                 }
             }
@@ -109,17 +110,17 @@ public class TrainJob {
             e.printStackTrace();
         }
 
+        String databaseUrl = argumentClass.getDatabaseUrl();
+        String databaseName = "mydb";
+
+        WriteToDatabase writeToDatabase = new WriteToDatabase(databaseUrl, databaseName);
+        writeToDatabase.prepareDataBaseForApplication();
+
         FlinkPipelineOptions options =
                 PipelineOptionsFactory.create()
-                        // .withValidation()
                         .as(FlinkPipelineOptions.class);
         options.setRunner(FlinkRunner.class);
         options.setParallelism(1);
-
-        // Map<String, Object> kafkaProps = new HashMap<>();
-
-        // kafkaProps.setProperty("auto.offset.reset", "latest"); // Start reading from the latest
-        // offsets
 
         // PipelineOptions options = PipelineOptionsFactory.create();
         Pipeline p = Pipeline.create(options);
@@ -141,8 +142,6 @@ public class TrainJob {
                                         kafkaBootstrapServers,
                                         kafkaTopic)));
 
-        /*
-
         PCollection<DbEntry> dataFromAzureDB =
                 timerSource.apply(
                         "Table Read",
@@ -160,7 +159,8 @@ public class TrainJob {
 
         PCollection<TrainEntry> decisionTreeData =
                 annotatedData.apply(
-                        "Decision Tree Train", ParDo.of(new DecisionTreeBeam(p_, dataSetType)));
+                        "Decision Tree Train",
+                        ParDo.of(new DecisionTreeBeam(p_, dataSetType, databaseUrl, databaseName)));
 
         PCollection<TrainEntry> totalTrainData =
                 PCollectionList.of(linearRegressionTrain)
@@ -170,7 +170,9 @@ public class TrainJob {
                 totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
 
         PCollection<MqttPublishEntry> mqttPublish =
-                blobUpload.apply("MQTT Publish", ParDo.of(new MqttPublishBeam(p_)));
+                blobUpload.apply(
+                        "MQTT Publish",
+                        ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
 
         mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
 
@@ -183,9 +185,6 @@ public class TrainJob {
                                 System.out.println("Length of PCollection: " + c.element());
                             }
                         }));
-
-         */
-
         p.run();
     }
 }

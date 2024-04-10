@@ -1,10 +1,56 @@
+# README for  the train-application
+
+
+## General process
+
+1. Start kafka server
+2. Start mongodb server
+3. Find server address of both services
+4. Start flink application
+5. Start kafkaProducer
+
+
+## Setting up MongoDb
+
+I used this tutorial to set it up https://devopscube.com/deploy-mongodb-kubernetes/
+
+```bash
+git clone https://github.com/techiescamp/kubernetes-mongodb
+````
+
+```bash
+kubectl apply -f .
+```
+
+I used this command to get the ip-address and port of my db
+````bash
+minikube service --url mongo-nodeport-svc
+````
+
+Example address: mongodb:
+`mongodb://adminuser:password123@192.168.49.2:32000/`
 
 
 
+## Setting up Apache Kafka
+In the `kafkaProducer` directory is a deployment.yaml file
+```bash
+kubectl apply -f  deployment.yaml -n kafka 
+```
+This will deploy the Apache cluster.
 
-## Commands 
 
-After starting the cluster as described in the main-README, execute the commands below. Make sure to change the --outputDir to a local directory
+Use the following command to get the Kafka-server-bootstrap address
+```bash
+kubectl get kafka my-cluster -o=jsonpath='{.status.listeners[*].bootstrapServers}{"\n"}' -n kafka
+```
+
+This commands tears down the cluster
+
+```bash
+kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
+```
+
 
 
 
@@ -30,6 +76,21 @@ flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://a
 
 ```
 
+
+## Setting up Apache Kafka Producer
+In the `kafkaProducer` directory is a Dockerfile.
+
+Create the image from Dockerfile:
+
+```bash
+minikube image build -t kafka-producer -f ./Dockerfile .
+```
+
+**Note**
+Please make sure that the bootstrapserver, the application and the expected dataset are correct.
+```bash
+kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --restart=Never --env="BOOTSTRAP_SERVER=192.168.49.2:31316" --env="APPLICATION=train" --env="DATASET=SYS" --env="SCALING=0.001" --env="TOPIC=test-1" 
+```
 
 <!--
 ### Example command for the CITY dataset

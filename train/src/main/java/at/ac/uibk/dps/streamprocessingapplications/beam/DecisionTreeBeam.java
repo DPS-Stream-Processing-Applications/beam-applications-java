@@ -18,9 +18,16 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
     String datasetName = "";
     private Properties p;
 
-    public DecisionTreeBeam(Properties p_, String dataSetType) {
+    private String connectionUrl;
+
+    private String dataBaseName;
+
+    public DecisionTreeBeam(
+            Properties p_, String dataSetType, String connectionUrl, String dataBaseName) {
         this.p = p_;
         this.dataSetType = dataSetType;
+        this.connectionUrl = connectionUrl;
+        this.dataBaseName = dataBaseName;
     }
 
     public static void initLogger(Logger l_) {
@@ -30,7 +37,7 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
     @Setup
     public void setup() throws IOException {
         initLogger(LoggerFactory.getLogger("APP"));
-        decisionTreeTrainBatched = new DecisionTreeTrainBatched();
+        decisionTreeTrainBatched = new DecisionTreeTrainBatched(connectionUrl, dataBaseName);
         decisionTreeTrainBatched.setup(l, p);
         if (dataSetType.equals("SYS")) {
             datasetName = p.getProperty("TRAIN.DATASET_NAME_SYS");

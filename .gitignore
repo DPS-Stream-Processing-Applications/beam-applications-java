@@ -9,4 +9,4 @@ build
 
 
 #Ignore log files
-.log
+*.log

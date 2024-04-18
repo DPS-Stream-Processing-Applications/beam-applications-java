@@ -120,9 +120,9 @@ public class CsvSplitter {
                 cutOffTimeStamp =
                         startTs
                                 + numMins
-                                        * (1.0 / accFactor)
-                                        * 60
-                                        * 1000; // accFactor is actually the scaling factor or
+                                * (1.0 / accFactor)
+                                * 60
+                                * 1000; // accFactor is actually the scaling factor or
                 // deceleration factor
                 // System.out.println("GOTSTART TS : "  + ts + " cut off " + cutOffTimeStamp);
             }

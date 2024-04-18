@@ -93,8 +93,8 @@ minikube image build -t kafka-producer -f ./Dockerfile .
 **Note**
 Please make sure that the bootstrapserver, the application and the expected dataset are correct. 
 ```bash
-kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --restart=Never --env="BOOTSTRAP_SERVER=192.168.49.2:31316" --env="APPLICATION=pred" --env="DATASET=SYS" --env="SCALING=0.001" --env="TOPIC=test-1" 
---env="REP=1" --env="DUP=0"
+kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --restart=Never --env="BOOTSTRAP_SERVER=192.168.49.2:31316" --env="APPLICATION=pred" --env="DATASET=SYS" --env="SCALING=0.001" --env="TOPIC=test-1" --env="REP=1" --env="DUP=0"
+
 ```
 
 

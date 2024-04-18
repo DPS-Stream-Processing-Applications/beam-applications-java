@@ -7,8 +7,8 @@ public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger("APP");
 
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
         String BOOTSTRAP_SERVERS = System.getenv("BOOTSTRAP_SERVER");
         String application = System.getenv("APPLICATION");
         String datasetType = System.getenv("DATASET");
@@ -77,8 +77,6 @@ public class Main {
                 case "FIT":
                     {
                         csvFileName = "/opt/kafkaproducer/resources/pred/FIT_sample_data_senml.csv";
-                        // csvFileName =
-                        // "/opt/kafkaproducer/resources/pred/" + "output_FIT_complete.csv";
                         break;
                     }
                 case "TAXI":

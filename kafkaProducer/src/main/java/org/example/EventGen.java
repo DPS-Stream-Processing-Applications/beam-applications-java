@@ -270,7 +270,7 @@ class SubEventGen implements Runnable {
                 long delay =
                         deltaTs
                                 - (currentTs
-                                        - experiRestartTime); // how long until this event should be
+                                - experiRestartTime); // how long until this event should be
                 // sent?
                 if (delay > 10) {
                     try {

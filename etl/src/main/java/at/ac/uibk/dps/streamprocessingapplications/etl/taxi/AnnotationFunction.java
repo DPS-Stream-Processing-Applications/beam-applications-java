@@ -13,7 +13,6 @@ public class AnnotationFunction implements SerializableFunction<TaxiRide, TaxiRi
   public TaxiRide apply(TaxiRide input) {
     // NOTE: NO seed needed as these values are not used later.
     Random rand = new Random();
-    System.out.println(input);
     input.setTaxiCompany(taxiCompanies[rand.nextInt(taxiCompanies.length)]);
     input.setDriverName(driverNames[rand.nextInt(driverNames.length)]);
     input.setTaxiCity(taxiCities[rand.nextInt(taxiCities.length)]);

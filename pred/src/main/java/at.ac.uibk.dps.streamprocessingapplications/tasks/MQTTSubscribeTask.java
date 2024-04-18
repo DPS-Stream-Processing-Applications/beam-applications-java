@@ -17,13 +17,11 @@ public class MQTTSubscribeTask extends AbstractTask implements MqttCallback {
     private static long counter = 1;
 
     private static String topic;
-
+    public LinkedBlockingQueue<String> incoming = new LinkedBlockingQueue<>(); // added later
     /* local fields assigned to each thread */
     private MqttClient mqttClient;
     private String apolloClient;
     private String apolloURL;
-
-    public LinkedBlockingQueue<String> incoming = new LinkedBlockingQueue<>(); // added later
 
     public MQTTSubscribeTask() throws MqttException {}
 

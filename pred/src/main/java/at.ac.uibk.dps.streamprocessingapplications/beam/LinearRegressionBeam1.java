@@ -14,27 +14,33 @@ import org.slf4j.LoggerFactory;
 
 public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntry> {
 
-    @Setup
-    public void setup() throws MqttException {
-        linearRegressionPredictor = new LinearRegressionPredictor();
-        initLogger(LoggerFactory.getLogger("APP"));
-        System.out.println(l);
-        linearRegressionPredictor.setup(l, p);
-    }
-
+    private static Logger l;
+    private final String dataSetType;
+    LinearRegressionPredictor linearRegressionPredictor;
     private Properties p;
 
-    public LinearRegressionBeam1(Properties p_) {
-        p = p_;
-    }
+    private String databaseUrl;
 
-    private static Logger l;
+    private String databaseName;
+
+    public LinearRegressionBeam1(
+            Properties p_, String dataSetType, String databaseUrl, String databaseName) {
+        p = p_;
+        this.dataSetType = dataSetType;
+        this.databaseName = databaseName;
+        this.databaseUrl = databaseUrl;
+    }
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    LinearRegressionPredictor linearRegressionPredictor;
+    @Setup
+    public void setup() throws MqttException {
+        linearRegressionPredictor = new LinearRegressionPredictor(databaseUrl, databaseName);
+        initLogger(LoggerFactory.getLogger("APP"));
+        linearRegressionPredictor.setup(l, p);
+    }
 
     @ProcessElement
     public void processElement(@Element SenMlEntry input, OutputReceiver<LinearRegressionEntry> out)
@@ -44,7 +50,14 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
         String msgtype = input.getMsgtype();
         String analyticsType = input.getAnalyticType();
 
-        String obsVal = "10,1955.22,27";
+        String obsVal = "";
+
+        if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
+            obsVal = "10,1955.22,27";
+        } else {
+            obsVal = "22.7,49.3,0,1955.22,27";
+        }
+
         String msgId = "0";
 
         if (!msgtype.equals("modelupdate")) {
@@ -56,9 +69,7 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        // Float res; = linearRegressionPredictor.doTask(map);
-        Float res = Float.valueOf("1");
-
+        Float res = linearRegressionPredictor.doTask(map);
         if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
         if (res != null) {

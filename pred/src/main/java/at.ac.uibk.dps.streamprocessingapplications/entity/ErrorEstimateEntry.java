@@ -10,6 +10,15 @@ public class ErrorEstimateEntry implements Serializable {
     private String analyticType;
     private String obsval;
 
+    public ErrorEstimateEntry(
+            String meta, float error, String msgid, String analyticType, String obsval) {
+        this.meta = meta;
+        this.error = error;
+        this.msgid = msgid;
+        this.analyticType = analyticType;
+        this.obsval = obsval;
+    }
+
     public String getMeta() {
         return meta;
     }
@@ -47,15 +56,6 @@ public class ErrorEstimateEntry implements Serializable {
     }
 
     public void setObsval(String obsval) {
-        this.obsval = obsval;
-    }
-
-    public ErrorEstimateEntry(
-            String meta, float error, String msgid, String analyticType, String obsval) {
-        this.meta = meta;
-        this.error = error;
-        this.msgid = msgid;
-        this.analyticType = analyticType;
         this.obsval = obsval;
     }
 

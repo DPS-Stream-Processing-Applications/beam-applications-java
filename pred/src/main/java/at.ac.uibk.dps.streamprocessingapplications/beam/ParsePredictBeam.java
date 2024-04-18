@@ -3,10 +3,9 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.tasks.ReadFromDatabaseTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -16,54 +15,122 @@ import org.slf4j.LoggerFactory;
 
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
-    private Properties p;
-
-    public ParsePredictBeam(Properties p_) {
-        p = p_;
-    }
-
     private static Logger l;
+    private final String dataSetType;
+    SenMlParse senMLParseTask;
+    private Properties p;
+    private ArrayList<String> observableFields;
+    private String[] metaFields;
+    private String idField;
+
+    private boolean isJson;
+
+    private ReadFromDatabaseTask readFromDatabaseTask;
+
+    private String connectionUrl;
+
+    private String dataBaseName;
+
+    public ParsePredictBeam(
+            Properties p_,
+            String dataSetType,
+            boolean isJson,
+            String connectionUrl,
+            String dataBaseName) {
+        p = p_;
+        this.dataSetType = dataSetType;
+        this.isJson = isJson;
+        this.connectionUrl = connectionUrl;
+        this.dataBaseName = dataBaseName;
+    }
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    private ArrayList<String> observableFields;
-    private String[] metaFields;
-    private String idField;
-    SenMlParse senMLParseTask;
-
     @Setup
     public void setup() {
-
         try {
             initLogger(LoggerFactory.getLogger("APP"));
-            senMLParseTask = new SenMlParse();
+            senMLParseTask = new SenMlParse(dataSetType, isJson);
             senMLParseTask.setup(l, p);
-            observableFields = new ArrayList();
-            String line;
-            ArrayList<String> metaList = new ArrayList<String>();
+            observableFields = new ArrayList<>();
+            readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
+            readFromDatabaseTask.setup(l, p);
+            ArrayList<String> metaList = new ArrayList<>();
+
+            String meta;
+            // InputStream inputStream = null;
+            byte[] csvContent = null;
+            if (dataSetType.equals("TAXI")) {
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
+                /*
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream(
+                                        "/resources/datasets/taxi-schema-without-annotation.csv");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "taxi-schema-without-annotation_csv");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
+            } else if (dataSetType.equals("SYS")) {
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
+                /*
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream(
+                                        "/resources/datasets/sys-schema_without_annotationfields.txt");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "sys-schema_without_annotationfields_txt");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
+            } else if (dataSetType.equals("FIT")) {
+                idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
+                /*
+                inputStream =
+                        this.getClass()
+                                .getResourceAsStream("/resources/datasets/mhealth_schema.csv");
+
+                 */
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", "mhealth_schema_csv");
+                readFromDatabaseTask.doTask(map);
+                csvContent = readFromDatabaseTask.getLastResult();
+                meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
+            } else {
+                throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
+            }
+
+            // InputStreamReader reader = new InputStreamReader(inputStream);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
             /* read meta field list from property */
-            String meta = p.getProperty("PARSE.META_FIELD_SCHEMA");
-            idField = p.getProperty("PARSE.ID_FIELD_SCHEMA");
             metaFields = meta.split(",");
-            for (int i = 0; i < metaFields.length; i++) {
-                metaList.add(metaFields[i]);
+            for (String metaField : metaFields) {
+                metaList.add(metaField);
             }
+
             /* read csv schema to read fields observable into a list
             excluding meta fields read above */
-            FileReader reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH"));
-            BufferedReader br = new BufferedReader(reader);
-            line = br.readLine();
+            String line = br.readLine();
             String[] obsType = line.split(",");
-            for (int i = 0; i < obsType.length; i++) {
-                if (metaList.contains(obsType[i]) == false) {
-                    observableFields.add(obsType[i]);
+            for (String field : obsType) {
+                if (!metaList.contains(field)) {
+                    observableFields.add(field);
                 }
             }
-        } catch (Exception e) {
+
+            br.close();
+        } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("Error when setting up ParsePredictBeam: " + e);
         }
     }
 
@@ -103,11 +170,11 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
             }
             meta = meta.deleteCharAt(meta.lastIndexOf(","));
             for (int j = 0; j < observableFields.size(); j++) {
-                obsVal.append((String) resultMap.get((String) observableFields.get(j)));
+                obsVal.append(resultMap.get(observableFields.get(j)));
                 obsVal.append(",");
             }
-            obsVal.substring(0, obsVal.length() - 1);
-
+            obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
+            // obsVal.substring(0, obsVal.length() - 1);
             out.output(
                     new SenMlEntry(
                             msgId,
@@ -120,6 +187,7 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error in ParsePredictBeam " + e);
         }
     }
 

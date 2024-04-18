@@ -13,7 +13,7 @@ import org.slf4j.Logger;
  *
  * @author shukla, simmhan
  */
-public class MQTTPublishTask extends AbstractTask implements MqttCallback {
+public class MQTTPublishTask extends AbstractTask<String, String> implements MqttCallback {
 
     // static fields common to all threads
     private static final Object SETUP_LOCK = new Object();
@@ -25,12 +25,52 @@ public class MQTTPublishTask extends AbstractTask implements MqttCallback {
     private static String apolloURLlist;
 
     private static String topic;
-
+    private static String apolloURL;
+    Random rn = new Random();
     // local fields assigned to each thread
     private MqttClient mqttClient;
     private String apolloClient;
-    private static String apolloURL;
-    Random rn = new Random();
+
+    public static MqttClient connectToMQTT(
+            String apolloURL, String apolloClient, MqttCallback callback, Logger l) {
+
+        try {
+            // clean session, keep alive for 18hrs
+            MqttConnectOptions connOpt = new MqttConnectOptions();
+            connOpt.setCleanSession(true);
+            connOpt.setKeepAliveInterval(
+                    64800); // 18 hr keep connection if no message will get from the client
+            connOpt.setConnectionTimeout(64800);
+            connOpt.setUserName(apolloUserName);
+            connOpt.setPassword(apolloPassword.toCharArray());
+
+            if (l.isInfoEnabled())
+                l.info(
+                        "Apollo Client {}, URL {}, Username {}, Pass {}",
+                        apolloClient,
+                        apolloURL,
+                        apolloUserName,
+                        apolloPassword);
+
+            // client with no persistence
+            MqttClient myClient = new MqttClient(apolloURL, apolloClient, null);
+            //			MqttAsyncClient myClient=new MqttAsyncClient(apolloURL,apolloClient,null);
+
+            myClient.setCallback(callback);
+            myClient.connect(connOpt);
+
+            if (l.isInfoEnabled()) l.info("Connected to Apollo thru client {} - ", myClient);
+
+            return myClient;
+        } catch (Exception e) {
+            System.out.println("Exception in connect to MQTT" + e.getMessage());
+            e.printStackTrace();
+            l.warn(
+                    "unable to create apollo client ID " + apolloClient + " for URL " + apolloURL,
+                    e);
+            return null;
+        }
+    }
 
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
@@ -100,47 +140,6 @@ public class MQTTPublishTask extends AbstractTask implements MqttCallback {
             l.warn("Exception when closing mqtt client" + mqttClient, e);
         }
         return result;
-    }
-
-    public static MqttClient connectToMQTT(
-            String apolloURL, String apolloClient, MqttCallback callback, Logger l) {
-
-        try {
-            // clean session, keep alive for 18hrs
-            MqttConnectOptions connOpt = new MqttConnectOptions();
-            connOpt.setCleanSession(true);
-            connOpt.setKeepAliveInterval(
-                    64800); // 18 hr keep connection if no message will get from the client
-            connOpt.setConnectionTimeout(64800);
-            connOpt.setUserName(apolloUserName);
-            connOpt.setPassword(apolloPassword.toCharArray());
-
-            if (l.isInfoEnabled())
-                l.info(
-                        "Apollo Client {}, URL {}, Username {}, Pass {}",
-                        apolloClient,
-                        apolloURL,
-                        apolloUserName,
-                        apolloPassword);
-
-            // client with no persistence
-            MqttClient myClient = new MqttClient(apolloURL, apolloClient, null);
-            //			MqttAsyncClient myClient=new MqttAsyncClient(apolloURL,apolloClient,null);
-
-            myClient.setCallback(callback);
-            myClient.connect(connOpt);
-
-            if (l.isInfoEnabled()) l.info("Connected to Apollo thru client {} - ", myClient);
-
-            return myClient;
-        } catch (Exception e) {
-            System.out.println("Exception in connect to MQTT" + e.getMessage());
-            e.printStackTrace();
-            l.warn(
-                    "unable to create apollo client ID " + apolloClient + " for URL " + apolloURL,
-                    e);
-            return null;
-        }
     }
 
     @Override

@@ -14,21 +14,13 @@ import org.slf4j.LoggerFactory;
 public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
     private static long msgid = 1;
-
-    MQTTSubscribeTask mqttSubscribeTask;
-
     private static Logger l; // TODO: Ensure logger is initialized before use
-
-    public MqttSubscribeBeam() {}
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
+    MQTTSubscribeTask mqttSubscribeTask;
     String spoutLogFileName = null;
-
     Properties p;
     String csvFileNameOutSink; // Full path name of the file at the sink bolt
+
+    public MqttSubscribeBeam() {}
 
     public MqttSubscribeBeam(Properties p_, String spoutLogFileName) {
         this.csvFileNameOutSink = csvFileNameOutSink;
@@ -40,11 +32,15 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         p = p_;
     }
 
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
+
     @Setup
     public void setup() throws MqttException {
         mqttSubscribeTask = new MQTTSubscribeTask();
         initLogger(LoggerFactory.getLogger("APP"));
-        mqttSubscribeTask.setup(l, p);
+        // mqttSubscribeTask.setup(l, p);
     }
 
     @ProcessElement
@@ -53,14 +49,9 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
         // TODO Read packet and forward to next bolt
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, "dummy");
-        mqttSubscribeTask.doTask(map);
+        // mqttSubscribeTask.doTask(map);
         String arg1 = (String) mqttSubscribeTask.getLastResult();
-        arg1 = "12-test";
-
-        //        if(l.isInfoEnabled())
-        //            l.info("MQTTSubscribeSpout nextTuple {}",arg1);
-
-        // FIXME: split arg1 by colon in to BlobModelPath and analyticsType
+        arg1 = "test-12";
 
         if (arg1 != null) {
             try {
@@ -68,14 +59,16 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
                 // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException("Exception in processElement of MqttBeam " + e);
             }
             if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
+            // System.out.println("arg " + arg1);
             out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
         }
     }
 
     @Teardown
-    public void clearUp() {
+    public void cleanUp() {
         mqttSubscribeTask.tearDown();
     }
 }

@@ -39,12 +39,12 @@ public class GlobalConstants {
         return null;
     }
 
-    public static void setExperimentNumber(String experiRunID) {
-        GlobalConstants.expNum = experiRunID;
-    }
-
     public static String getExperimentNumber() {
         return GlobalConstants.expNum;
+    }
+
+    public static void setExperimentNumber(String experiRunID) {
+        GlobalConstants.expNum = experiRunID;
     }
 
     /*

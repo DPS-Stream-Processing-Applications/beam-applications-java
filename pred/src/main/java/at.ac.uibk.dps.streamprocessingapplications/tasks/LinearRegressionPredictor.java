@@ -1,6 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
-import java.io.StringReader;
+import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -16,17 +17,16 @@ import weka.core.Instances;
 public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
     private static final Object SETUP_LOCK = new Object();
+    // for taxi dataset
+    private static final String SAMPLE_INPUT = "420,1.95,8.00";
+    public static LinearRegression lr;
     // static fields common to all threads
     private static boolean doneSetup = false;
+    // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
     private static int useMsgField;
 
-    private static String modelFilePath;
-    private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
-    // for taxi dataset
-    //	private static final String SAMPLE_INPUT = "420,1.95,8.00";
-
     // private static String SAMPLE_HEADER = "";
-    //			"@RELATION sys_data\n" +
+    //			"@RELATION city_data\n" +
     //			"\n" +
     ////			"@ATTRIBUTE Longi            NUMERIC\n" +
     ////			"@ATTRIBUTE Lat              NUMERIC\n" +
@@ -38,9 +38,9 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
     //			"\n" +
     //			"@DATA\n" +
     //			"%header format";
-
+    private static String modelFilePath;
     private static String SAMPLE_HEADER =
-            "@RELATION sys_data\n"
+            "@RELATION taxi_data\n"
                     + "\n"
                     + "@ATTRIBUTE triptimeInSecs             NUMERIC\n"
                     + "@ATTRIBUTE tripDistance            NUMERIC\n"
@@ -48,9 +48,13 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "\n"
                     + "@DATA\n"
                     + "%header format";
-
     private static Instances instanceHeader;
-    public static LinearRegression lr;
+
+    private ReadFromDatabaseTask readFromDatabaseTask;
+
+    public LinearRegressionPredictor(String databseUrl, String databaseName) {
+        readFromDatabaseTask = new ReadFromDatabaseTask(databseUrl, databaseName);
+    }
 
     /**
      * @param l_
@@ -66,38 +70,59 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                         Integer.parseInt(
                                 p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
 
-                modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
-
-                if (modelFilePath == null) {
-                    throw new RuntimeException("modelFilePath null");
+                // modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
+                modelFilePath = "LR-TAXI-Numeric_model";
+                readFromDatabaseTask.setup(l, p_);
+                HashMap<String, String> map = new HashMap<>();
+                map.put("fileName", modelFilePath);
+                readFromDatabaseTask.doTask(map);
+                byte[] csvContent = readFromDatabaseTask.getLastResult();
+                if (csvContent == null) {
+                    throw new RuntimeException("csvContent is null");
                 }
 
                 try {
-                    lr = (LinearRegression) weka.core.SerializationHelper.read(modelFilePath);
-                    if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                    lr = (LinearRegression) objectInputStream.readObject();
+
+                    BufferedReader bufferedReader =
+                            new BufferedReader(new InputStreamReader(inputStream));
+
+                    StringBuilder modelContent = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        modelContent.append(line).append("\n");
+                    }
+
+                    /*
+                    lr = (LinearRegression) SerializationHelper.read(inputStream);
+                    inputStream.close();
+
+                     */
 
                     if (lr == null) {
-                        throw new RuntimeException("lr null");
+                        throw new RuntimeException("lr is null");
                     }
+                    if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
 
                     // SAMPLE_HEADER = p_.getProperty("PREDICT.LINEAR_REGRESSION.SAMPLE_HEADER");
 
                     if (SAMPLE_HEADER == null) {
-                        throw new RuntimeException("sampleheader null");
+                        throw new RuntimeException("sample_header null");
                     }
 
                     instanceHeader =
                             WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
-                    System.out.println(instanceHeader);
                     if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
                     if (instanceHeader == null) {
                         throw new RuntimeException("instanceHeader is null");
                     }
-
                     doneSetup = true;
                 } catch (Exception e) {
                     l.warn("error loading decision tree model from file: " + modelFilePath, e);
                     doneSetup = false;
+                    throw new RuntimeException("Error loading decision tree model from file " + e);
                 }
             }
         }
@@ -116,13 +141,16 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 testTuple = SAMPLE_INPUT.split(",");
             }
             //			testTuple="22.7,49.3,0,1955.22,27".split(","); //dummy
-            if (instanceHeader == null) {
-                throw new RuntimeException("instanceHeader is null");
-            }
 
             instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
+            if (instanceHeader == null) {
+                throw new RuntimeException("InstanceHeader is null");
+            }
+
             testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
+
             int prediction = (int) lr.classifyInstance(testInstance);
+            // int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);
@@ -135,7 +163,8 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
         } catch (Exception e) {
             l.warn("error with classification of testInstance: " + testInstance, e);
             // set parent to have the actual predictions
-            return super.setLastResult(Float.MIN_VALUE);
+            throw new RuntimeException("Exception in doTaskLogic of Linear_Reg_Pred " + e);
+            // return super.setLastResult(Float.MIN_VALUE);
         }
     }
 }

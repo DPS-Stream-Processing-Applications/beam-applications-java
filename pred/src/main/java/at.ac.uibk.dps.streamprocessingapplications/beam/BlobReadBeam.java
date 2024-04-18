@@ -13,17 +13,15 @@ import org.slf4j.LoggerFactory;
 
 public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
 
+    private static Logger l;
     Properties p;
-    String csvFileNameOutSink; // Full path name of the file at the sink bolt
-
-    public BlobReadBeam(Properties p_) {
-        this.csvFileNameOutSink = csvFileNameOutSink;
-        p = p_;
-    }
-
+    // String csvFileNameOutSink; // Full path name of the file at the sink bolt
     AzureBlobDownloadTask azureBlobDownloadTask;
 
-    private static Logger l; // TODO: Ensure logger is initialized before use
+    public BlobReadBeam(Properties p_) {
+        // this.csvFileNameOutSink = csvFileNameOutSink;
+        p = p_;
+    }
 
     public static void initLogger(Logger l_) {
         l = l_;
@@ -46,14 +44,14 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
         String msgId = input.getMsgid();
 
         //        azureBlobDownloadTask.doTask(rowString);
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
 
         map.put(AbstractTask.DEFAULT_KEY, BlobModelPath);
         azureBlobDownloadTask.doTask(map);
         byte[] BlobModelObject = azureBlobDownloadTask.getLastResult();
 
         if (l.isInfoEnabled())
-            l.info("downloded updated model file {} with size {}", BlobModelPath, 23);
+            l.info("downloaded updated model file {} with size {}", BlobModelPath, 23);
 
         // FIXME: read and emit model for DTC
         out.output(new BlobReadEntry(BlobModelObject, msgId, "modelupdate", analyticsType, "meta"));

@@ -15,6 +15,23 @@ public class SenMlEntry implements Serializable {
 
     private String analyticType;
 
+    public SenMlEntry(
+            String msgid,
+            String sensorID,
+            String meta,
+            String obsType,
+            String obsVal,
+            String msgtype,
+            String analyticType) {
+        this.msgid = msgid;
+        this.sensorID = sensorID;
+        this.meta = meta;
+        this.obsType = obsType;
+        this.obsVal = obsVal;
+        this.msgtype = msgtype;
+        this.analyticType = analyticType;
+    }
+
     public String getSensorID() {
         return sensorID;
     }
@@ -69,23 +86,6 @@ public class SenMlEntry implements Serializable {
 
     public void setObsVal(String obsVal) {
         this.obsVal = obsVal;
-    }
-
-    public SenMlEntry(
-            String msgid,
-            String sensorID,
-            String meta,
-            String obsType,
-            String obsVal,
-            String msgtype,
-            String analyticType) {
-        this.msgid = msgid;
-        this.sensorID = sensorID;
-        this.meta = meta;
-        this.obsType = obsType;
-        obsVal = obsVal;
-        this.msgtype = msgtype;
-        this.analyticType = analyticType;
     }
 
     @Override

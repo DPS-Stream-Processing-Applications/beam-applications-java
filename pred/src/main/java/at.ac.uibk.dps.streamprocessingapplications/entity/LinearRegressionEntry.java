@@ -10,6 +10,15 @@ public class LinearRegressionEntry implements Serializable {
     private String res;
     private String analyticType;
 
+    public LinearRegressionEntry(
+            String meta, String obsval, String msgid, String res, String analyticType) {
+        this.meta = meta;
+        this.obsval = obsval;
+        this.msgid = msgid;
+        this.res = res;
+        this.analyticType = analyticType;
+    }
+
     public String getMeta() {
         return meta;
     }
@@ -82,14 +91,5 @@ public class LinearRegressionEntry implements Serializable {
                 + analyticType
                 + '\''
                 + '}';
-    }
-
-    public LinearRegressionEntry(
-            String meta, String obsval, String msgid, String res, String analyticType) {
-        this.meta = meta;
-        this.obsval = obsval;
-        this.msgid = msgid;
-        this.res = res;
-        this.analyticType = analyticType;
     }
 }

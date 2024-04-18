@@ -13,24 +13,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
-    private Properties p;
-
-    public DecisionTreeBeam2(Properties p_) {
-        p = p_;
-    }
-
     private static Logger l;
+    DecisionTreeClassify decisionTreeClassify;
+    private Properties p;
+    private String dataSetType;
+
+    public DecisionTreeBeam2(Properties p_, String dataSetType) {
+        p = p_;
+        this.dataSetType = dataSetType;
+    }
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    DecisionTreeClassify decisionTreeClassify;
-
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
-        decisionTreeClassify = new DecisionTreeClassify();
+        decisionTreeClassify = new DecisionTreeClassify(dataSetType);
         decisionTreeClassify.setup(l, p);
     }
 
@@ -38,14 +38,18 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     public void processElement(
             @Element SenMlEntry input, DoFn.OutputReceiver<DecisionTreeEntry> out)
             throws IOException {
-        String msgtype = input.getMsgtype();
-        String analyticsType = input.getAnalyticType();
         String sensorMeta = input.getMeta();
 
-        String obsVal = "10,1955.22,27"; // dummy
+        String obsVal = "0";
         String msgId = "0";
+        if (dataSetType.equals("FIT") | dataSetType.equals("TAXI")) {
+            obsVal = "10,1955.22,27"; // dummy
+        }
+        if (dataSetType.equals("SYS")) {
+            obsVal = "22.7,49.3,0,1955.22,27"; // dummy
+        }
 
-        /* We are getting an model update message so we will update the model only*/
+        /* We are getting a model update message so we will update the model only*/
 
         //        if(msgtype.equals("modelupdate") && analyticsType.equals("DTC")){
         //
@@ -59,12 +63,9 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
         //            }
         //        }
 
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        Float res;
-        // Float res = decisionTreeClassify.doTask(map);  // index of result-class/enum as return
-        //        System.out.println("TestS: DT res " +res);
-        res = Float.valueOf("1");
+        Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
         if (res != null) {
             if (res != Float.MIN_VALUE)
                 out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));

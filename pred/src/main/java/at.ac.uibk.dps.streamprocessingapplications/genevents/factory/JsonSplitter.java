@@ -5,11 +5,20 @@ import java.io.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+interface MyReader {
+    String[] readLine() throws IOException;
+
+    void init() throws IOException;
+
+    public void close() throws IOException;
+}
 
 /*
  * Splits the JSON file in round-robin manner and stores it to individual files
@@ -26,16 +35,12 @@ public class JsonSplitter {
             CSVReader reader = new CSVReader(new FileReader(inputFileName));
             String[] headers = reader.readNext(); // use .intern() later
             reader.close();
-            List<String> headerList = new ArrayList<String>();
+            List<String> headerList = new ArrayList<>();
             for (String s : headers) {
                 headerList.add(s);
             }
             return headerList;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -72,7 +77,7 @@ public class JsonSplitter {
         MyJSONReader jsonReader = new MyJSONReader(inputSortedCSVFileName);
         nextLine = jsonReader.readLine();
         while ((nextLine = jsonReader.readLine()) != null) {
-            List<String> row = new ArrayList<String>();
+            List<String> row = new ArrayList<>();
             for (int i = 0; i < nextLine.length; i++) {
                 row.add(nextLine[i]);
             }
@@ -82,6 +87,7 @@ public class JsonSplitter {
 
             int timestampColIndex = 0;
             DateTime date = null;
+            // FIXME!
             datasetType = "SENML";
             if (datasetType.equals("TAXI")) {
                 timestampColIndex = 3;
@@ -94,7 +100,6 @@ public class JsonSplitter {
                 date =
                         ISODateTimeFormat.dateTimeParser()
                                 .parseDateTime(nextLine[timestampColIndex]);
-                System.out.println("date " + date);
             } else if (datasetType.equals("PLUG")) {
                 timestampColIndex = 1;
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
@@ -135,7 +140,6 @@ public class JsonSplitter {
 
         BufferedReader bReader = new BufferedReader(new FileReader(inputFileName));
         String headerLine = bReader.readLine();
-        System.out.println(headerLine);
         String line;
 
         BufferedWriter[] bWriters = new BufferedWriter[numThreads];
@@ -204,14 +208,6 @@ public class JsonSplitter {
     }
 }
 
-interface MyReader {
-    String[] readLine() throws IOException;
-
-    void init() throws FileNotFoundException;
-
-    public void close() throws IOException;
-}
-
 class MyCSVReader implements MyReader {
     public CSVReader reader;
     public String inputFileName;
@@ -221,13 +217,29 @@ class MyCSVReader implements MyReader {
         try {
             init();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public void init() throws FileNotFoundException {
-        reader = new CSVReader(new FileReader(inputFileName));
+    public void init() throws IOException {
+        try (InputStream inputStream = MyCSVReader.class.getResourceAsStream(inputFileName)) {
+            if (inputStream == null) {
+                throw new IOException("File not found: " + inputFileName);
+            }
+
+            // Convert the input stream to a BufferedReader
+            try (BufferedReader bufferedReader =
+                    new BufferedReader(new InputStreamReader(inputStream))) {
+                // Read the content of the file into a String
+                String fileContent =
+                        bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+
+                // Initialize the CSVReader with the file content
+                reader = new CSVReader(new java.io.StringReader(fileContent));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("In init mycsv: " + e);
+        }
     }
 
     public void close() throws IOException {
@@ -250,14 +262,20 @@ class MyJSONReader implements MyReader {
         try {
             init();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public void init() throws FileNotFoundException {
-        reader = new FileReader(inputFileName);
-        bufferedReader = new BufferedReader(reader);
+        try {
+            InputStream inputStream = MyJSONReader.class.getResourceAsStream(inputFileName);
+            if (inputStream == null) {
+                throw new FileNotFoundException("File not found: " + inputFileName);
+            }
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        } catch (IOException e) {
+            throw new RuntimeException("Error initializing MyJSONReader: " + e.getMessage(), e);
+        }
     }
 
     public void close() throws IOException {

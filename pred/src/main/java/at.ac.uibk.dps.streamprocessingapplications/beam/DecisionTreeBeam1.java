@@ -18,24 +18,24 @@ import weka.core.SerializationHelper;
 
 public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
 
+    private static Logger l;
+    private final String dataSetType;
+    DecisionTreeClassify decisionTreeClassify;
     private Properties p;
 
-    public DecisionTreeBeam1(Properties p_) {
+    public DecisionTreeBeam1(Properties p_, String dataSetType) {
         p = p_;
+        this.dataSetType = dataSetType;
     }
-
-    private static Logger l;
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    DecisionTreeClassify decisionTreeClassify;
-
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
-        decisionTreeClassify = new DecisionTreeClassify();
+        decisionTreeClassify = new DecisionTreeClassify(dataSetType);
         decisionTreeClassify.setup(l, p);
     }
 
@@ -46,19 +46,25 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
         String analyticsType = input.getAnalyticType();
         String sensorMeta = input.getMeta();
 
-        String obsVal = "10,1955.22,27"; // dummy
+        String obsVal = "0";
         String msgId = "0";
+        if (dataSetType.equals("FIT") | dataSetType.equals("TAXI")) {
+            obsVal = "10,1955.22,27"; // dummy
+        }
+        if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+            obsVal = "22.7,49.3,0,1955.22,27"; // dummy
+        }
 
-        /* We are getting an model update message so we will update the model only*/
+        /* We are getting a model update message so we will update the model only*/
 
         if (msgtype.equals("modelupdate") && analyticsType.equals("DTC")) {
-            byte[] BlobModelObject = (byte[]) input.getBlobModelObject();
+            byte[] BlobModelObject = input.getBlobModelObject();
             InputStream bytesInputStream = new ByteArrayInputStream(BlobModelObject);
             //        	ByteArrayInputStream BlobModelObject= (ByteArrayInputStream)
             // input.getValueByField("BlobModelObject");
             // do nothing for now
             //            byte[] blobModelObjects = input.getBinaryByField("BlobModelObject");
-            //            p.setProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH",)
+            //            p.setProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH")
 
             // TODO:  1- Either write model file to local disk - no task code change
             // TODO:  2- Pass it as bytestream , update the code for task
@@ -85,18 +91,16 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
         //            }
         //        }
 
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
         map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        Float res;
-        // Float res = decisionTreeClassify.doTask(map);  // index of result-class/enum as return
-        //        System.out.println("TestS: DT res " +res);
-        res = Float.valueOf("1");
+
+        Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
         if (res != null) {
             if (res != Float.MIN_VALUE)
                 out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));
             else {
                 if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBolt");
-                throw new RuntimeException();
+                throw new RuntimeException("Error when classifying");
             }
         }
     }

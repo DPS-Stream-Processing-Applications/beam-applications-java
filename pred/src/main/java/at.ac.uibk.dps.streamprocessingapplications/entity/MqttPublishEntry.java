@@ -8,6 +8,12 @@ public class MqttPublishEntry implements Serializable {
     private String meta;
     private String obsval;
 
+    public MqttPublishEntry(String msgid, String meta, String obsval) {
+        this.msgid = msgid;
+        this.meta = meta;
+        this.obsval = obsval;
+    }
+
     public String getMsgid() {
         return msgid;
     }
@@ -43,12 +49,6 @@ public class MqttPublishEntry implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(msgid);
-    }
-
-    public MqttPublishEntry(String msgid, String meta, String obsval) {
-        this.msgid = msgid;
-        this.meta = meta;
-        this.obsval = obsval;
     }
 
     @Override

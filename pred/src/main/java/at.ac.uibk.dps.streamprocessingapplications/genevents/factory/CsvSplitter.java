@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
+import at.ac.uibk.dps.streamprocessingapplications.PredJob;
 import com.opencsv.CSVReader;
 import java.io.*;
 import java.text.ParseException;
@@ -24,8 +25,8 @@ public class CsvSplitter {
     public static int peakRate;
 
     public static List<String> extractHeadersFromCSV(String inputFileName) {
-        try {
-            CSVReader reader = new CSVReader(new FileReader(inputFileName));
+        try (InputStream inputStream = PredJob.class.getResourceAsStream(inputFileName);
+                CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
             String[] headers = reader.readNext(); // use .intern() later
             reader.close();
             List<String> headerList = new ArrayList<String>();
@@ -34,10 +35,8 @@ public class CsvSplitter {
             }
             return headerList;
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -48,7 +47,11 @@ public class CsvSplitter {
     public static List<TableClass> roundRobinSplitCsvToMemory(
             String inputSortedCSVFileName, int numThreads, double accFactor, String datasetType)
             throws IOException {
-        CSVReader reader = new CSVReader(new FileReader(inputSortedCSVFileName));
+        InputStream inputStream = PredJob.class.getResourceAsStream(inputSortedCSVFileName);
+        if (inputStream == null) {
+            throw new IOException("Resource not found: " + inputSortedCSVFileName);
+        }
+        CSVReader reader = new CSVReader(new InputStreamReader(inputStream));
         String[] nextLine;
         int ctr = 0;
         String[] headers = reader.readNext(); // use .intern() later
@@ -87,7 +90,7 @@ public class CsvSplitter {
             int timestampColIndex = 0;
             DateTime date = null;
             if (datasetType.equals("TAXI")) {
-                timestampColIndex = 3;
+                timestampColIndex = 2;
                 date =
                         DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
                                 .parseDateTime(nextLine[timestampColIndex]);
@@ -103,6 +106,9 @@ public class CsvSplitter {
                 date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
                 // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
                 //		nextLine[timestampColIndex]);
+            } else if (datasetType.equals("FIT")) {
+                timestampColIndex = 1;
+                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
             }
 
             long ts = date.getMillis();

@@ -10,6 +10,15 @@ public class DecisionTreeEntry implements Serializable {
     private String res;
     private String analyticType;
 
+    public DecisionTreeEntry(
+            String meta, String obsval, String msgid, String res, String analyticType) {
+        this.meta = meta;
+        this.obsval = obsval;
+        this.msgid = msgid;
+        this.res = res;
+        this.analyticType = analyticType;
+    }
+
     public String getMeta() {
         return meta;
     }
@@ -47,15 +56,6 @@ public class DecisionTreeEntry implements Serializable {
     }
 
     public void setAnalyticType(String analyticType) {
-        this.analyticType = analyticType;
-    }
-
-    public DecisionTreeEntry(
-            String meta, String obsval, String msgid, String res, String analyticType) {
-        this.meta = meta;
-        this.obsval = obsval;
-        this.msgid = msgid;
-        this.res = res;
         this.analyticType = analyticType;
     }
 

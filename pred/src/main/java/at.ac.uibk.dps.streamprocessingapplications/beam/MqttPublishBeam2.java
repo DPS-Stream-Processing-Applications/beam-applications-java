@@ -14,25 +14,23 @@ import org.slf4j.LoggerFactory;
 
 public class MqttPublishBeam2 extends DoFn<DecisionTreeEntry, MqttPublishEntry> {
 
+    private static Logger l;
+    MQTTPublishTask mqttPublishTask;
     private Properties p;
 
     public MqttPublishBeam2(Properties p_) {
         p = p_;
     }
 
-    private static Logger l;
-
     public static void initLogger(Logger l_) {
         l = l_;
     }
-
-    MQTTPublishTask mqttPublishTask;
 
     @Setup
     public void setup() throws MqttException {
         initLogger(LoggerFactory.getLogger("APP"));
         mqttPublishTask = new MQTTPublishTask();
-        mqttPublishTask.setup(l, p);
+        // mqttPublishTask.setup(l, p);
     }
 
     @ProcessElement
@@ -64,13 +62,13 @@ public class MqttPublishBeam2 extends DoFn<DecisionTreeEntry, MqttPublishEntry> 
 
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-        mqttPublishTask.doTask(map);
+        // mqttPublishTask.doTask(map);
 
         out.output(new MqttPublishEntry(msgId, meta, obsVal));
     }
 
     @Teardown
-    public void clearUp() {
-        mqttPublishTask.tearDown();
+    public void cleanUp() {
+        // mqttPublishTask.tearDown();
     }
 }

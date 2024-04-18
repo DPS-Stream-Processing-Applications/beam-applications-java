@@ -1,15 +1,8 @@
-package at.ac.uibk.dps.streamprocessingapplications.stats;
+package at.ac.uibk.dps.streamporcessingapplications.stats;
 
+import at.ac.uibk.dps.streamporcessingapplications.stats.transforms.STATSPipeline;
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.AveragingFunction;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.DistinctCountFunction;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanGetter;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanSetter;
-import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.KalmanFilterFunction;
-import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.STATSPipeline;
-import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.SlidingLinearRegression;
-import java.util.Objects;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;

@@ -14,6 +14,7 @@ public class ETLPipeline<T> extends PTransform<PCollection<String>, PCollection<
   private final BloomFilter<T> bloomFilter;
   private final SerializableFunction<Iterable<T>, Iterable<T>> interpolator;
   private final int interpolationBatchSize;
+  private final SerializableFunction<T, T> annotationFunction;
 
   public ETLPipeline(
       TypeDescriptor<T> typeDescriptor,
@@ -21,13 +22,15 @@ public class ETLPipeline<T> extends PTransform<PCollection<String>, PCollection<
       SerializableFunction<T, T> rangeFilter,
       BloomFilter<T> bloomFilter,
       SerializableFunction<Iterable<T>, Iterable<T>> interpolator,
-      int interpolationBatchSize) {
+      int interpolationBatchSize,
+      SerializableFunction<T, T> annotationFunction) {
     this.typeDescriptor = typeDescriptor;
     this.parser = parser;
     this.rangeFilter = rangeFilter;
     this.bloomFilter = bloomFilter;
     this.interpolator = interpolator;
     this.interpolationBatchSize = interpolationBatchSize;
+    this.annotationFunction = annotationFunction;
   }
 
   @Override
@@ -38,6 +41,7 @@ public class ETLPipeline<T> extends PTransform<PCollection<String>, PCollection<
         .apply("BloomFilter", new BloomFilterTransform<>(this.bloomFilter))
         .apply(
             "Interpolate",
-            new Interpolate<>(this.typeDescriptor, this.interpolator, this.interpolationBatchSize));
+            new Interpolate<>(this.typeDescriptor, this.interpolator, this.interpolationBatchSize))
+        .apply("Annotate", MapElements.into(this.typeDescriptor).via(this.annotationFunction));
   }
 }

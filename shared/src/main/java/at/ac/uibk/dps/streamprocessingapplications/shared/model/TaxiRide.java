@@ -24,6 +24,11 @@ public class TaxiRide implements Serializable {
   private SenMLRecordDouble tollsAmount;
   private SenMLRecordDouble totalAmount;
 
+  // NOTE: These fields are to be annotated in the `etl` job
+  private SenMLRecordString taxiCompany;
+  private SenMLRecordString driverName;
+  private SenMLRecordString taxiCity;
+
   public TaxiRide() {
     this.taxiIdentifier = new SenMLRecordString(null, "taxi_identifier", "string", null, null);
     this.hackLicense = new SenMLRecordString(null, "hack_license", "string", null, null);
@@ -41,6 +46,9 @@ public class TaxiRide implements Serializable {
     this.tipAmount = new SenMLRecordDouble(null, "tip_amount", "dollar", null, null);
     this.tollsAmount = new SenMLRecordDouble(null, "tolls_amount", "dollar", null, null);
     this.totalAmount = new SenMLRecordDouble(null, "total_amount", "dollar", null, null);
+    this.taxiCompany = new SenMLRecordString(null, "taxi_company", "string", null, null);
+    this.driverName = new SenMLRecordString(null, "driver_name", "string", null, null);
+    this.taxiCity = new SenMLRecordString(null, "taxi_city", "string", null, null);
   }
 
   public TaxiRide(
@@ -60,6 +68,7 @@ public class TaxiRide implements Serializable {
       SenMLRecordDouble tipAmount,
       SenMLRecordDouble tollsAmount,
       SenMLRecordDouble totalAmount) {
+    this();
     this.taxiIdentifier = taxiIdentifier;
     this.hackLicense = hackLicense;
     this.pickupDatetime = pickupDatetime;
@@ -206,6 +215,30 @@ public class TaxiRide implements Serializable {
     this.totalAmount.setValue(totalAmount);
   }
 
+  public SenMLRecordString getTaxiCompany() {
+    return taxiCompany;
+  }
+
+  public void setTaxiCompany(String company) {
+    this.taxiCompany.setValue(company);
+  }
+
+  public SenMLRecordString getDriverName() {
+    return driverName;
+  }
+
+  public void setDriverName(String name) {
+    this.driverName.setValue(name);
+  }
+
+  public SenMLRecordString getTaxiCity() {
+    return taxiCity;
+  }
+
+  public void setTaxiCity(String city) {
+    this.taxiCity.setValue(city);
+  }
+
   @Override
   public String toString() {
     List<String> nonNullFields = new ArrayList<>();
@@ -226,6 +259,9 @@ public class TaxiRide implements Serializable {
     Optional.ofNullable(tipAmount).ifPresent(value -> nonNullFields.add(value.toString()));
     Optional.ofNullable(tollsAmount).ifPresent(value -> nonNullFields.add(value.toString()));
     Optional.ofNullable(totalAmount).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(taxiCompany).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(driverName).ifPresent(value -> nonNullFields.add(value.toString()));
+    Optional.ofNullable(taxiCity).ifPresent(value -> nonNullFields.add(value.toString()));
 
     return "[" + String.join(",", nonNullFields) + "]";
   }
@@ -250,7 +286,10 @@ public class TaxiRide implements Serializable {
         && Objects.equals(this.mtaTax, taxiRide.mtaTax)
         && Objects.equals(this.tipAmount, taxiRide.tipAmount)
         && Objects.equals(this.tollsAmount, taxiRide.tollsAmount)
-        && Objects.equals(this.totalAmount, taxiRide.totalAmount);
+        && Objects.equals(this.totalAmount, taxiRide.totalAmount)
+        && Objects.equals(this.taxiCompany, taxiRide.taxiCompany)
+        && Objects.equals(this.driverName, taxiRide.driverName)
+        && Objects.equals(this.taxiCity, taxiRide.taxiCompany);
   }
 
   @Override
@@ -271,6 +310,9 @@ public class TaxiRide implements Serializable {
         getMtaTax(),
         getTipAmount(),
         getTollsAmount(),
-        getTotalAmount());
+        getTotalAmount(),
+        getTaxiCompany(),
+        getDriverName(),
+        getTaxiCity());
   }
 }

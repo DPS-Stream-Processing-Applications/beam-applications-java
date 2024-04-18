@@ -68,6 +68,7 @@ public class TaxiRide implements Serializable {
       SenMLRecordDouble tipAmount,
       SenMLRecordDouble tollsAmount,
       SenMLRecordDouble totalAmount) {
+    this();
     this.taxiIdentifier = taxiIdentifier;
     this.hackLicense = hackLicense;
     this.pickupDatetime = pickupDatetime;

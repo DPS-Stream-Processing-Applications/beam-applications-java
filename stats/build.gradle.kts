@@ -8,7 +8,11 @@ val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.stats.FlinkJob"
 
 repositories { mavenCentral() }
 
-dependencies { implementation(project(":shared")) }
+dependencies {
+  implementation(project(":shared"))
+  implementation("org.knowm.xchart:xchart:3.8.7")
+  implementation("org.apache.commons:commons-math:2.2")
+}
 
 tasks.named<Jar>("jar") {
   archiveBaseName.set("FlinkJob")

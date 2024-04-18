@@ -5,3 +5,7 @@ rootProject.name = "beam-applications-java"
 
 include("etl")
 include("shared")
+include("pred")
+include("kafkaProducer")
+include("train")
+

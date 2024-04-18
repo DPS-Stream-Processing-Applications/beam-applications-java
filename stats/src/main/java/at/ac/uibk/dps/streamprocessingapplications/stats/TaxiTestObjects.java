@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamporcessingapplications.stats;
+package at.ac.uibk.dps.streamprocessingapplications.stats;
 
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;

@@ -25,8 +25,14 @@ public class FlinkJob {
         .apply(Create.of(TaxiTestObjects.testPacks))
         .apply(
             new STATSPipeline<>(
-                TypeDescriptor.of(TaxiRide.class), TaxiSenMLParserJSON::parseSenMLPack))
-        .apply(MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString))
+                TypeDescriptor.of(TaxiRide.class),
+                TaxiSenMLParserJSON::parseSenMLPack,
+                new AveragingFunction(),
+                new DistinctCountFunction(),
+                5,
+                new KalmanFilterFunction<>(new KalmanGetter(), new KalmanSetter()),
+                new SlidingLinearRegression<>(new KalmanGetter(), 10, 10)))
+        .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
         .apply(ParDo.of(new PrintFn()));
 
     pipeline.run();

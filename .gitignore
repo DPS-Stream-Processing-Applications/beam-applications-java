@@ -9,3 +9,6 @@ build
 
 # Ignore vscode folder
 /senMlConverter/.vscode/
+
+# Ignore pycache folder
+/senMlConverter/src/main/__pycache__/

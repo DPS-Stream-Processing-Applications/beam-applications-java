@@ -1,6 +1,14 @@
 import pandas as pd
 import csv
+
+from datetime import datetime
 from converter import Converter
+
+def date_to_unix_timestamp(date_string):
+        date_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+        unix_timestamp = date_object.timestamp()
+        return int(unix_timestamp)
+
 
 
 class TaxiConverter(Converter):
@@ -12,8 +20,7 @@ class TaxiConverter(Converter):
     def convert_to_senml_csv(self, chunk_size):
         with open(self.outputFile, "w", newline="") as csvfile:
             writer = csv.writer(csvfile, delimiter="|",quotechar="", quoting=csv.QUOTE_NONE, escapechar=" ")
-            #writer.writerow([("timestamp", "senml")])
-
+           
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 for index, row in chunk.iterrows():
                     list_senml = list()
@@ -71,8 +78,10 @@ class TaxiConverter(Converter):
                         
                     )
                     list_senml.append(senml_string)
-                    writer.writerow([int(row["timestamp"]), (list_senml[0])])
+                    writer.writerow([date_to_unix_timestamp(row[" pickup_datetime"]), (list_senml[0])])
 
+
+    
 
     def convert_to_senml_csv_dataframe(self, chunk_size):
         senml_df = pd.DataFrame(columns=["senml_entry"])

@@ -4,11 +4,11 @@ import csv
 from datetime import datetime
 from converter import Converter
 
-def date_to_unix_timestamp(date_string):
-        date_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-        unix_timestamp = date_object.timestamp()
-        return int(unix_timestamp)
 
+def date_to_unix_timestamp(date_string):
+    date_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+    unix_timestamp = date_object.timestamp()
+    return int(unix_timestamp)
 
 
 class TaxiConverter(Converter):
@@ -19,16 +19,22 @@ class TaxiConverter(Converter):
 
     def convert_to_senml_csv(self, chunk_size):
         with open(self.outputFile, "w", newline="") as csvfile:
-            writer = csv.writer(csvfile, delimiter="|",quotechar="", quoting=csv.QUOTE_NONE, escapechar=" ")
-           
+            writer = csv.writer(
+                csvfile,
+                delimiter="|",
+                quotechar="",
+                quoting=csv.QUOTE_NONE,
+                escapechar=" ",
+            )
+
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 for index, row in chunk.iterrows():
                     list_senml = list()
                     senml_string = (
-                        "["+
-                        '{"u": "string","n": "taxi_identifier","vs": "'
+                        "["
+                        + '{"u": "string","n": "taxi_identifier","vs": "'
                         + str(row["taxi_identifier"])
-                        + "}"
+                        + "},"
                         + '{"u": "string","n": "hack_license","vs": "'
                         + str(row[" hack_license"])
                         + '"},'
@@ -74,14 +80,15 @@ class TaxiConverter(Converter):
                         + '{"u": "dollar","n": "total_amount","v": "'
                         + str(row[" total_amount"])
                         + '"}'
-                        +"]"
-                        
+                        + "]"
                     )
                     list_senml.append(senml_string)
-                    writer.writerow([date_to_unix_timestamp(row[" pickup_datetime"]), (list_senml[0])])
-
-
-    
+                    writer.writerow(
+                        [
+                            date_to_unix_timestamp(row[" pickup_datetime"]),
+                            (list_senml[0]),
+                        ]
+                    )
 
     def convert_to_senml_csv_dataframe(self, chunk_size):
         senml_df = pd.DataFrame(columns=["senml_entry"])
@@ -89,11 +96,14 @@ class TaxiConverter(Converter):
         for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
             for index, row in chunk.iterrows():
                 senml_entry = (
-                    "{ \"u\": \"string\",\"n\": \"taxi_identifier\", \"sv\": " + str(row["taxi_identifier"]) + '},'
+                    '{ "u": "string","n": "taxi_identifier", "sv": '
+                    + str(row["taxi_identifier"])
+                    + "},"
                 )
-                # Append the SenML entry to the DataFrame
-                senml_df = pd.concat([senml_df, pd.DataFrame({"senml_entry": [senml_entry]})], ignore_index=True)
-
+                senml_df = pd.concat(
+                    [senml_df, pd.DataFrame({"senml_entry": [senml_entry]})],
+                    ignore_index=True,
+                )
 
         senml_df.to_csv(self.outputFile, encoding="utf-8")
 

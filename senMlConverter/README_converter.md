@@ -14,7 +14,7 @@ Place these files into the `data-folder`. When running the docker container as s
 
 
 ```bash
-docker run --rm -it -v $PWD/data:/home -e DATASET="TAXI" -e INPUT_FILE_FARE="/home/trip_fare_1.csv" -e INPUT_FILE_TRIP="home/trip_data_1.csv" -e OUTPUT_FILE="/home/output_taxi.csv" senml_converter
+docker run --rm -it -v $PWD/data:/home -e DATASET="TAXI" -e INPUT_FILE_FARE="/home/trip_fare_1.csv" -e INPUT_FILE_TRIP="/home/trip_data_1.csv" -e OUTPUT_FILE="/home/output_taxi.csv" senml_converter
 ```
 
 ## Preprocessing the fit dataset
@@ -23,4 +23,6 @@ Used for this is the mhealth+dataset.zip, which can be downloaded from this webs
 ```bash
 docker run --rm -it -v $PWD/data:/home -e DATASET="FIT" -e OUTPUT_FILE="/home/output_fit.csv"  senml_converter
 ```
+
+! Please note that the processing can take some time, because the application is not performance-optimized at all. 
 

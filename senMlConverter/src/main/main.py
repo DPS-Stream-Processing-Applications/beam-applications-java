@@ -49,20 +49,25 @@ def create_table_taxi(input_fare, input_trip):
     ordered_df.to_csv(output_file, index=False)
 
 
-def convert_taxi(input, output):
+def convert_taxi(input, output, use_riotbench_format):
     converter = TaxiConverter(input, output)
-    converter.convert_to_senml_csv(1200)
+    if use_riotbench_format:
+        converter.converter_to_senml_riotbench_csv(10000)
+    else:
+        converter.convert_to_senml_csv(10000)
 
 
-def convert_fit(input, output):
+def convert_fit(input, output,use_riotbench_format):
     converter = FitConverter(input, output)
-    converter.convert_to_senml_csv(10000)
+    if use_riotbench_format:
+        converter.converter_to_senml_riotbench_csv(10000)
+    else:
+        converter.convert_to_senml_csv(10000)
 
 
 if __name__ == "__main__":
-    # input_file = "/home/jona/Documents/Bachelor_thesis/Datasets/output_TAXI.csv"
-    # output_file = "/home/jona/Documents/Bachelor_thesis/repos/offical_repo/beam-applications-java/senMlConverter/data/test_output.csv"
     dataset = os.environ.get("DATASET")
+    use_riotbench_format = False
     if dataset == "TAXI":
         input_fare = os.environ.get("INPUT_FILE_FARE")
         input_trip = os.environ.get("INPUT_FILE_TRIP")
@@ -73,7 +78,7 @@ if __name__ == "__main__":
 
         create_table_taxi(input_fare, input_trip)
         input_file = "/home/input_joined.csv"
-        convert_taxi(input_file, output_file)
+        convert_taxi(input_file, output_file, use_riotbench_format)
 
     elif dataset == "FIT":
         output_file = os.environ.get("OUTPUT_FILE")
@@ -83,7 +88,7 @@ if __name__ == "__main__":
 
         input_file = "/home/input_joined_fit.csv"
         create_table_fit(input_file, 1417890600020)
-        convert_fit(input_file, output_file)
+        convert_fit(input_file, output_file, use_riotbench_format)
 
     else:
-        raise ValueError("No valid datasettype given via -e DATASET=")
+        raise ValueError("No valid dataset-type given via -e DATASET=")

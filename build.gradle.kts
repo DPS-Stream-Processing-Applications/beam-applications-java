@@ -14,13 +14,15 @@ subprojects {
 
         kotlinGradle {
             ktlint()
+            ktfmt()
         }
 
         java {
             removeUnusedImports()
-                importOrder()
-                googleJavaFormat().aosp().reflowLongStrings()
-                formatAnnotations()
+            importOrder()
+            googleJavaFormat().reflowLongStrings()
+            formatAnnotations()
+            toggleOffOn()
         }
     }
 }

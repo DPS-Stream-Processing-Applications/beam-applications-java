@@ -12,3 +12,7 @@ build
 
 # Ignore pycache folder
 /senMlConverter/src/main/__pycache__/
+
+# Ignore log files
+*.log
+

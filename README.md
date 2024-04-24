@@ -1,9 +1,9 @@
 <div align="center">
-<!-- NOTE: The empty line is required for center to work.-->
+<!-- INFO: The empty line is required for center to work.-->
 
 [![Nix](https://img.shields.io/badge/Nix_devShell-%235277C3?style=for-the-badge&logo=NixOS&logoColor=white)](https://nixos.wiki/wiki/Flakes)
 [![Gradle](https://img.shields.io/badge/Gradle%208.6-02303A?style=for-the-badge&logo=Gradle&logoColor=white)](https://docs.gradle.org/8.6/userguide/userguide.html)
-[![Open JDK](https://img.shields.io/badge/OpenJDK%2011.0.19-%23437291?style=for-the-badge&logo=openjdk&logoColor=white)](https://flink.apache.org/)
+[![Open JDK](https://img.shields.io/badge/OpenJDK%2011.0.19-%23437291?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/11/)
 [![Apache Beam](https://custom-icon-badges.demolab.com/badge/Apache%20Beam%202.54-orange?style=for-the-badge&logo=apache-beam&logoColor=white)](https://beam.apache.org/)
 [![Apache Flink](https://img.shields.io/badge/Apache%20Flink%201.18.1-E6526F?style=for-the-badge&logo=Apache%20Flink&logoColor=white)](https://flink.apache.org/)
 </div>
@@ -54,7 +54,7 @@ For example:
 nix develop # INFO: Not needed if already in a nix shell or using direnv.
 ./gradlew build
 start-cluster.sh
-flink run -m localhost:8081 ./etl/build/EtlJob.jar
+flink run -m localhost:8081 ./etl/build/FlinkJob.jar
 stop-cluster.sh
 ```
 Will build all applications, start a local Flink cluster and submit the `ETLJob.jar` job to the locally running cluster.
@@ -71,7 +71,7 @@ For a Flink application subproject a minimal `build.gradle.kts` file might look 
 
 ```kotlin
 plugins {
-    id("application")
+    id("java")
     // INFO: This plugin is in `buildSrc` and manages shared dependencies.
     id("flink-job-conventions")
 }
@@ -88,10 +88,6 @@ repositories {
 
 dependencies {
     // TODO: Add application specific dependencies.
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
 }
 
 tasks.named<Jar>("jar") {

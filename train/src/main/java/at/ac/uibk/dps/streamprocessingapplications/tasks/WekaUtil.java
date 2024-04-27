@@ -13,70 +13,70 @@ import weka.core.Instances;
 
 public class WekaUtil {
 
-    /***
-     *
-     * @param path
-     * @param encoding
-     * @return
-     * @throws IOException
-     */
-    public static String readFileToString(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding).intern();
+  /***
+   *
+   * @param path
+   * @param encoding
+   * @return
+   * @throws IOException
+   */
+  public static String readFileToString(String path, Charset encoding) throws IOException {
+    byte[] encoded = Files.readAllBytes(Paths.get(path));
+    return new String(encoded, encoding).intern();
+  }
+
+  /***
+   *
+   * @param instanceHeader
+   * @param testTuple
+   * @param l
+   * @return
+   */
+  public static Instance prepareInstance(Instances instanceHeader, String[] testTuple, Logger l) {
+    Instance instance = new Instance(testTuple.length);
+    instance.setDataset(instanceHeader);
+
+    for (int m = 0; m < testTuple.length; m++) {
+      instance.setValue(instanceHeader.attribute(m), Double.parseDouble(testTuple[m]));
     }
 
-    /***
-     *
-     * @param instanceHeader
-     * @param testTuple
-     * @param l
-     * @return
-     */
-    public static Instance prepareInstance(Instances instanceHeader, String[] testTuple, Logger l) {
-        Instance instance = new Instance(testTuple.length);
-        instance.setDataset(instanceHeader);
+    return instance;
+  }
 
-        for (int m = 0; m < testTuple.length; m++) {
-            instance.setValue(instanceHeader.attribute(m), Double.parseDouble(testTuple[m]));
-        }
-
-        return instance;
+  /***
+   *
+   * @param fileName
+   * @param l
+   * @return
+   */
+  public static Instances loadDatasetInstances(String fileName, Logger l) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+      return loadDatasetInstances(reader, l);
+    } catch (IOException e) {
+      l.warn("error creading reader for training instances: " + fileName, e);
+      return null;
     }
+  }
 
-    /***
-     *
-     * @param fileName
-     * @param l
-     * @return
-     */
-    public static Instances loadDatasetInstances(String fileName, Logger l) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            return loadDatasetInstances(reader, l);
-        } catch (IOException e) {
-            l.warn("error creading reader for training instances: " + fileName, e);
-            return null;
-        }
+  /***
+   *
+   * @param reader
+   * @param l
+   * @return
+   */
+
+  public static Instances loadDatasetInstances(Reader reader, Logger l) {
+
+    Instances trainingData;
+    try {
+      // Read the training data
+      trainingData = new Instances(reader);
+      // Setting class attribute to last field
+      trainingData.setClassIndex(trainingData.numAttributes() - 1);
+    } catch (IOException e) {
+      l.warn("error loading training instances", e);
+      return null;
     }
-
-    /***
-     *
-     * @param reader
-     * @param l
-     * @return
-     */
-
-    public static Instances loadDatasetInstances(Reader reader, Logger l) {
-
-        Instances trainingData;
-        try {
-            // Read the training data
-            trainingData = new Instances(reader);
-            // Setting class attribute to last field
-            trainingData.setClassIndex(trainingData.numAttributes() - 1);
-        } catch (IOException e) {
-            l.warn("error loading training instances", e);
-            return null;
-        }
-        return trainingData;
-    }
+    return trainingData;
+  }
 }

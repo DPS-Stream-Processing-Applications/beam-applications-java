@@ -14,73 +14,71 @@ import org.slf4j.LoggerFactory;
 
 public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntry> {
 
-    private static Logger l;
-    private final String dataSetType;
-    LinearRegressionPredictor linearRegressionPredictor;
-    private Properties p;
+  private static Logger l;
+  private final String dataSetType;
+  LinearRegressionPredictor linearRegressionPredictor;
+  private Properties p;
 
-    private String databaseUrl;
+  private String databaseUrl;
 
-    private String databaseName;
+  private String databaseName;
 
-    public LinearRegressionBeam1(
-            Properties p_, String dataSetType, String databaseUrl, String databaseName) {
-        p = p_;
-        this.dataSetType = dataSetType;
-        this.databaseName = databaseName;
-        this.databaseUrl = databaseUrl;
+  public LinearRegressionBeam1(
+      Properties p_, String dataSetType, String databaseUrl, String databaseName) {
+    p = p_;
+    this.dataSetType = dataSetType;
+    this.databaseName = databaseName;
+    this.databaseUrl = databaseUrl;
+  }
+
+  public static void initLogger(Logger l_) {
+    l = l_;
+  }
+
+  @Setup
+  public void setup() throws MqttException {
+    linearRegressionPredictor = new LinearRegressionPredictor(databaseUrl, databaseName);
+    initLogger(LoggerFactory.getLogger("APP"));
+    linearRegressionPredictor.setup(l, p);
+  }
+
+  @ProcessElement
+  public void processElement(@Element SenMlEntry input, OutputReceiver<LinearRegressionEntry> out)
+      throws IOException {
+
+    String sensorMeta = input.getMeta();
+    String msgtype = input.getMsgtype();
+    String analyticsType = input.getAnalyticType();
+
+    String obsVal = "";
+
+    if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
+      obsVal = "10,1955.22,27";
+    } else {
+      obsVal = "22.7,49.3,0,1955.22,27";
     }
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    String msgId = "0";
+
+    if (!msgtype.equals("modelupdate")) {
+      obsVal = input.getObsVal();
+      msgId = input.getMsgid();
+
+      if (l.isInfoEnabled()) l.info("modelupdate obsVal-" + obsVal);
     }
 
-    @Setup
-    public void setup() throws MqttException {
-        linearRegressionPredictor = new LinearRegressionPredictor(databaseUrl, databaseName);
-        initLogger(LoggerFactory.getLogger("APP"));
-        linearRegressionPredictor.setup(l, p);
+    HashMap<String, String> map = new HashMap();
+    map.put(AbstractTask.DEFAULT_KEY, obsVal);
+    Float res = linearRegressionPredictor.doTask(map);
+    if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
+
+    if (res != null) {
+      if (res != Float.MIN_VALUE)
+        out.output(new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR"));
+      else {
+        if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
+        throw new RuntimeException("Res is null or float.min");
+      }
     }
-
-    @ProcessElement
-    public void processElement(@Element SenMlEntry input, OutputReceiver<LinearRegressionEntry> out)
-            throws IOException {
-
-        String sensorMeta = input.getMeta();
-        String msgtype = input.getMsgtype();
-        String analyticsType = input.getAnalyticType();
-
-        String obsVal = "";
-
-        if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
-            obsVal = "10,1955.22,27";
-        } else {
-            obsVal = "22.7,49.3,0,1955.22,27";
-        }
-
-        String msgId = "0";
-
-        if (!msgtype.equals("modelupdate")) {
-            obsVal = input.getObsVal();
-            msgId = input.getMsgid();
-
-            if (l.isInfoEnabled()) l.info("modelupdate obsVal-" + obsVal);
-        }
-
-        HashMap<String, String> map = new HashMap();
-        map.put(AbstractTask.DEFAULT_KEY, obsVal);
-        Float res = linearRegressionPredictor.doTask(map);
-        if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
-
-        if (res != null) {
-            if (res != Float.MIN_VALUE)
-                out.output(
-                        new LinearRegressionEntry(
-                                sensorMeta, obsVal, msgId, res.toString(), "MLR"));
-            else {
-                if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
-                throw new RuntimeException("Res is null or float.min");
-            }
-        }
-    }
+  }
 }

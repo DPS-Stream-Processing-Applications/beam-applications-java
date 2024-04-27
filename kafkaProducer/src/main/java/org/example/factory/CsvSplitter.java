@@ -17,129 +17,128 @@ import org.joda.time.DateTime;
  */
 public class CsvSplitter {
 
-    public static int numThreads;
-    public static int peakRate;
+  public static int numThreads;
+  public static int peakRate;
 
-    public static List<String> extractHeadersFromCSV(String inputFileName) {
-        try {
-            CSVReader reader = new CSVReader(new FileReader(inputFileName));
-            String[] headers = reader.readNext(); // use .intern() later
-            reader.close();
-            List<String> headerList = new ArrayList<>();
-            for (String s : headers) {
-                headerList.add(s);
-            }
-            return headerList;
-        } catch (IOException | CsvValidationException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+  public static List<String> extractHeadersFromCSV(String inputFileName) {
+    try {
+      CSVReader reader = new CSVReader(new FileReader(inputFileName));
+      String[] headers = reader.readNext(); // use .intern() later
+      reader.close();
+      List<String> headerList = new ArrayList<>();
+      for (String s : headers) {
+        headerList.add(s);
+      }
+      return headerList;
+    } catch (IOException | CsvValidationException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  // Assumes sorted on timestamp csv file
+  // It also treats the first event to be at 0 relative time
+  public static List<TableClass> roundRobinSplitCsvToMemory(
+      String inputSortedCSVFileName, int numThreads, double accFactor, String datasetType)
+      throws IOException, CsvValidationException {
+
+    CSVReader reader = new CSVReader(new BufferedReader((new FileReader(inputSortedCSVFileName))));
+    String[] nextLine;
+    int ctr = 0;
+    String[] headers = reader.readNext(); // use .intern() later
+    List<String> headerList = new ArrayList<>(Arrays.asList(headers));
+
+    List<TableClass> tableList = new ArrayList<>();
+    for (int i = 0; i < numThreads; i++) {
+      TableClass tableClass = new TableClass();
+      tableClass.setHeader(headerList);
+      tableList.add(tableClass);
     }
 
-    // Assumes sorted on timestamp csv file
-    // It also treats the first event to be at 0 relative time
-    public static List<TableClass> roundRobinSplitCsvToMemory(
-            String inputSortedCSVFileName, int numThreads, double accFactor, String datasetType)
-            throws IOException, CsvValidationException {
+    TableClass tableClass;
+    boolean flag = true;
+    long startTs = 0, deltaTs = 0;
 
-        CSVReader reader =
-                new CSVReader(new BufferedReader((new FileReader(inputSortedCSVFileName))));
-        String[] nextLine;
-        int ctr = 0;
-        String[] headers = reader.readNext(); // use .intern() later
-        List<String> headerList = new ArrayList<>(Arrays.asList(headers));
+    // CODE TO ACCOMODATE PLUG DATASET SPECIAL CASE TO RUN IT FOR 10 MINS
+    int numMins = 90000; // Keeping it fixed for current set of experiments
+    Double cutOffTimeStamp = 0.0; // int msgs=0;
+    while ((nextLine = reader.readNext()) != null) {
+      // nextLine[] is an array of values from the line
+      // System.out.println(nextLine[0] + "  " + nextLine[1] + "   " +
+      // nextLine[2] + "  " + nextLine[3] + "  etc...");
 
-        List<TableClass> tableList = new ArrayList<>();
-        for (int i = 0; i < numThreads; i++) {
-            TableClass tableClass = new TableClass();
-            tableClass.setHeader(headerList);
-            tableList.add(tableClass);
-        }
+      List<String> row = new ArrayList<>();
+      Collections.addAll(row, nextLine);
 
-        TableClass tableClass;
-        boolean flag = true;
-        long startTs = 0, deltaTs = 0;
+      tableClass = tableList.get(ctr);
+      ctr = (ctr + 1) % numThreads;
 
-        // CODE TO ACCOMODATE PLUG DATASET SPECIAL CASE TO RUN IT FOR 10 MINS
-        int numMins = 90000; // Keeping it fixed for current set of experiments
-        Double cutOffTimeStamp = 0.0; // int msgs=0;
-        while ((nextLine = reader.readNext()) != null) {
-            // nextLine[] is an array of values from the line
-            // System.out.println(nextLine[0] + "  " + nextLine[1] + "   " +
-            // nextLine[2] + "  " + nextLine[3] + "  etc...");
+      int timestampColIndex;
+      DateTime date = null;
+      if (datasetType.equals("TAXI")) {
+        /*
+        timestampColIndex = 3;
+        date =
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+                        .parseDateTime(nextLine[timestampColIndex]);
 
-            List<String> row = new ArrayList<>();
-            Collections.addAll(row, nextLine);
+         */
+        timestampColIndex = 1;
+        date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
+      } else if (datasetType.equals("SYS")) {
+        /*
+        timestampColIndex = 0;
+        date =
+                ISODateTimeFormat.dateTimeParser()
+                        .parseDateTime(nextLine[timestampColIndex]);
+        // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
+        //		nextLine[timestampColIndex]);
 
-            tableClass = tableList.get(ctr);
-            ctr = (ctr + 1) % numThreads;
+         */
+        timestampColIndex = 1;
+        date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
+      } else if (datasetType.equals("PLUG")) {
+        timestampColIndex = 1;
+        date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
+        // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
+        //		nextLine[timestampColIndex]);
+      } else if (datasetType.equals("FIT")) {
+        timestampColIndex = 1;
+        long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
+        date = new DateTime(unixEpochMillis);
+      } else if (datasetType.equals("GRID")) {
+        timestampColIndex = 1;
+        long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
+        date = new DateTime(unixEpochMillis);
+      }
 
-            int timestampColIndex;
-            DateTime date = null;
-            if (datasetType.equals("TAXI")) {
-                /*
-                timestampColIndex = 3;
-                date =
-                        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
-                                .parseDateTime(nextLine[timestampColIndex]);
+      long ts = date.getMillis();
+      if (flag) {
+        startTs = ts;
+        flag = false;
+        cutOffTimeStamp =
+            startTs
+                + numMins
+                    * (1.0 / accFactor)
+                    * 60
+                    * 1000; // accFactor is actually the scaling factor or
+        // deceleration factor
+        // System.out.println("GOTSTART TS : "  + ts + " cut off " + cutOffTimeStamp);
+      }
 
-                 */
-                timestampColIndex = 1;
-                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
-            } else if (datasetType.equals("SYS")) {
-                /*
-                timestampColIndex = 0;
-                date =
-                        ISODateTimeFormat.dateTimeParser()
-                                .parseDateTime(nextLine[timestampColIndex]);
-                // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
-                //		nextLine[timestampColIndex]);
+      if (ts > cutOffTimeStamp) {
+        // System.out.println("GOT TS : "  + ts + " cut off " + cutOffTimeStamp + "  msgs "
+        // + (++msgs));
+        break; // No More data to be loaded
+      }
 
-                 */
-                timestampColIndex = 1;
-                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
-            } else if (datasetType.equals("PLUG")) {
-                timestampColIndex = 1;
-                date = new DateTime(Long.parseLong(nextLine[timestampColIndex]) * 1000);
-                // date = ISODateTimeFormat.dateTimeParser().parseDateTime(
-                //		nextLine[timestampColIndex]);
-            } else if (datasetType.equals("FIT")) {
-                timestampColIndex = 1;
-                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
-                date = new DateTime(unixEpochMillis);
-            } else if (datasetType.equals("GRID")) {
-                timestampColIndex = 1;
-                long unixEpochMillis = Long.parseLong(nextLine[timestampColIndex]);
-                date = new DateTime(unixEpochMillis);
-            }
-
-            long ts = date.getMillis();
-            if (flag) {
-                startTs = ts;
-                flag = false;
-                cutOffTimeStamp =
-                        startTs
-                                + numMins
-                                * (1.0 / accFactor)
-                                * 60
-                                * 1000; // accFactor is actually the scaling factor or
-                // deceleration factor
-                // System.out.println("GOTSTART TS : "  + ts + " cut off " + cutOffTimeStamp);
-            }
-
-            if (ts > cutOffTimeStamp) {
-                // System.out.println("GOT TS : "  + ts + " cut off " + cutOffTimeStamp + "  msgs "
-                // + (++msgs));
-                break; // No More data to be loaded
-            }
-
-            deltaTs = ts - startTs;
-            deltaTs = (long) (accFactor * deltaTs);
-            tableClass.append(deltaTs, row);
-            // System.out.println("ts " + (ts - startTs) + " deltaTs " + deltaTs);
-        }
-
-        reader.close();
-        return tableList;
+      deltaTs = ts - startTs;
+      deltaTs = (long) (accFactor * deltaTs);
+      tableClass.append(deltaTs, row);
+      // System.out.println("ts " + (ts - startTs) + " deltaTs " + deltaTs);
     }
+
+    reader.close();
+    return tableList;
+  }
 }

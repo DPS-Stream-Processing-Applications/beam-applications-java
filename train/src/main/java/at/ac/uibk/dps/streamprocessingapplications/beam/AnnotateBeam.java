@@ -13,39 +13,39 @@ import org.slf4j.LoggerFactory;
 
 public class AnnotateBeam extends DoFn<DbEntry, AnnotateEntry> {
 
-    private static Logger l;
-    AnnotateDTClass annotateDTClass;
-    private Properties p;
+  private static Logger l;
+  AnnotateDTClass annotateDTClass;
+  private Properties p;
 
-    public AnnotateBeam(Properties p_) {
-        p = p_;
-    }
+  public AnnotateBeam(Properties p_) {
+    p = p_;
+  }
 
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
+  public static void initLogger(Logger l_) {
+    l = l_;
+  }
 
-    @Setup
-    public void setup() {
-        initLogger(LoggerFactory.getLogger("APP"));
-        annotateDTClass = new AnnotateDTClass();
-        annotateDTClass.setup(l, p);
-    }
+  @Setup
+  public void setup() {
+    initLogger(LoggerFactory.getLogger("APP"));
+    annotateDTClass = new AnnotateDTClass();
+    annotateDTClass.setup(l, p);
+  }
 
-    @ProcessElement
-    public void processElement(@Element DbEntry input, OutputReceiver<AnnotateEntry> out)
-            throws IOException {
-        String msgId = input.getMgsid();
-        String data = input.getTrainData();
-        String rowkeyend = input.getRowKeyEnd();
+  @ProcessElement
+  public void processElement(@Element DbEntry input, OutputReceiver<AnnotateEntry> out)
+      throws IOException {
+    String msgId = input.getMgsid();
+    String data = input.getTrainData();
+    String rowkeyend = input.getRowKeyEnd();
 
-        HashMap<String, String> map = new HashMap();
-        map.put(AbstractTask.DEFAULT_KEY, data);
-        annotateDTClass.doTask(map);
+    HashMap<String, String> map = new HashMap();
+    map.put(AbstractTask.DEFAULT_KEY, data);
+    annotateDTClass.doTask(map);
 
-        String annotData = annotateDTClass.getLastResult();
+    String annotData = annotateDTClass.getLastResult();
 
-        AnnotateEntry entry = new AnnotateEntry(msgId, annotData, rowkeyend);
-        out.output(entry);
-    }
+    AnnotateEntry entry = new AnnotateEntry(msgId, annotData, rowkeyend);
+    out.output(entry);
+  }
 }

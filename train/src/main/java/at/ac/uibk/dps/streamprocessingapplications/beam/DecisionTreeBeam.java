@@ -14,9 +14,12 @@ import org.slf4j.LoggerFactory;
 public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
   private static Logger l;
   private final String dataSetType;
+  private static final Object SETUP_LOCK = new Object();
   DecisionTreeTrainBatched decisionTreeTrainBatched;
   String datasetName = "";
   private Properties p;
+
+  private static boolean doneSetup = false;
 
   private String connectionUrl;
 
@@ -36,17 +39,25 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
 
   @Setup
   public void setup() throws IOException {
-    initLogger(LoggerFactory.getLogger("APP"));
-    decisionTreeTrainBatched = new DecisionTreeTrainBatched(connectionUrl, dataBaseName);
-    decisionTreeTrainBatched.setup(l, p);
-    if (dataSetType.equals("SYS")) {
-      datasetName = p.getProperty("TRAIN.DATASET_NAME_SYS");
-    }
-    if (dataSetType.equals("TAXI")) {
-      datasetName = p.getProperty("TRAIN.DATASET_NAME_TAXI");
-    }
-    if (dataSetType.equals("FIT")) {
-      datasetName = p.getProperty("TRAIN.DATASET_NAME_FIT");
+    try {
+      synchronized (SETUP_LOCK) {
+        if (!doneSetup) {
+          initLogger(LoggerFactory.getLogger("APP"));
+          decisionTreeTrainBatched = new DecisionTreeTrainBatched(connectionUrl, dataBaseName);
+          decisionTreeTrainBatched.setup(l, p);
+          if (dataSetType.equals("SYS")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_SYS");
+          }
+          if (dataSetType.equals("TAXI")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_TAXI");
+          }
+          if (dataSetType.equals("FIT")) {
+            datasetName = p.getProperty("TRAIN.DATASET_NAME_FIT");
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 

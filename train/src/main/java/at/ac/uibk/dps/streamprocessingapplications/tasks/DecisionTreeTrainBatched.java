@@ -16,6 +16,8 @@ import weka.core.Instances;
 public class DecisionTreeTrainBatched extends AbstractTask {
 
   private static final Object SETUP_LOCK = new Object();
+
+  private static final Object DATABASE_LOCK = new Object();
   // static fields common to all threads
   private static boolean doneSetup = false;
 
@@ -76,7 +78,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
     return trainingData.numInstances(); // return number of instances trained on
   }
 
-  public void setup(Logger l_, Properties p_) {
+  public void setup(Logger l_, Properties p_) throws RuntimeException {
     // TODO: Later, have option of training using instances present in data file rather than
     // just from messages
     super.setup(l_, p_);
@@ -90,23 +92,28 @@ public class DecisionTreeTrainBatched extends AbstractTask {
         // StandardCharsets.UTF_8);
         instanceHeader = p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
         instanceHeader = "/resources/model/DecisionTreeClassify-SYS.arff";
-        readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
-        readFromDatabaseTask.setup(l, p_);
         doneSetup = true;
       }
+      readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
+      readFromDatabaseTask.setup(l, p_);
     }
+
     // setup for NON-static fields
     instancesCount = 0;
 
     HashMap<String, String> map = new HashMap<>();
     map.put("fileName", "DecisionTreeClassify-SYS_arff");
-    try {
-      readFromDatabaseTask.doTask(map);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    byte[] csvContent;
+
+    synchronized (DATABASE_LOCK) {
+      try {
+        readFromDatabaseTask.doTask(map);
+      } catch (IOException e) {
+        throw new RuntimeException("try: " + e);
+      }
     }
 
-    byte[] csvContent = readFromDatabaseTask.getLastResult();
+    csvContent = readFromDatabaseTask.getLastResult();
 
     StringBuffer stringBuffer;
     BufferedReader reader;

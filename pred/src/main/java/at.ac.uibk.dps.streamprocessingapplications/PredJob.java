@@ -109,7 +109,7 @@ public class PredJob {
             // .withValidation()
             .as(FlinkPipelineOptions.class);
     options.setRunner(FlinkRunner.class);
-    options.setParallelism(1);
+    options.setParallelism(4);
 
     Pipeline p = Pipeline.create(options);
 
@@ -122,7 +122,6 @@ public class PredJob {
                 new SourceBeam(
                     inputFileName, spoutLogFileName, lines, kafkaBootstrapServers, kafkaTopic)));
 
-    // inputFile.apply("Test", ParDo.of(new ReadDatabaseBeam(p_, databaseUrl, databaseName)));
     PCollection<MqttSubscribeEntry> sourceDataMqtt =
         inputFile.apply(
             "MQTT Subscribe",
@@ -188,15 +187,6 @@ public class PredJob {
             .apply("Merge PCollections", Flatten.pCollections());
 
     PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink()));
-    PCollection<Long> count = out.apply("Count", Count.globally());
-    count.apply(
-        ParDo.of(
-            new DoFn<Long, Void>() {
-              @ProcessElement
-              public void processElement(ProcessContext c) {
-                LOG.info("Length of PCollection-pred: " + c.element());
-              }
-            }));
     p.run();
   }
 }

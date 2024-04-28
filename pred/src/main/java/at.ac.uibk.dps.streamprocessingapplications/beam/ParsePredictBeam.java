@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
   private static Logger l;
+
+  private static final Object DATABASE_LOCK = new Object();
   private final String dataSetType;
   SenMlParse senMLParseTask;
   private Properties p;
@@ -73,7 +75,9 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
          */
         HashMap<String, String> map = new HashMap<>();
         map.put("fileName", "taxi-schema-without-annotation_csv");
-        readFromDatabaseTask.doTask(map);
+        synchronized (DATABASE_LOCK) {
+          readFromDatabaseTask.doTask(map);
+        }
         csvContent = readFromDatabaseTask.getLastResult();
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
       } else if (dataSetType.equals("SYS")) {
@@ -87,7 +91,9 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
          */
         HashMap<String, String> map = new HashMap<>();
         map.put("fileName", "sys-schema_without_annotationfields_txt");
-        readFromDatabaseTask.doTask(map);
+        synchronized (DATABASE_LOCK) {
+          readFromDatabaseTask.doTask(map);
+        }
         csvContent = readFromDatabaseTask.getLastResult();
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
       } else if (dataSetType.equals("FIT")) {
@@ -100,7 +106,9 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
          */
         HashMap<String, String> map = new HashMap<>();
         map.put("fileName", "mhealth_schema_csv");
-        readFromDatabaseTask.doTask(map);
+        synchronized (DATABASE_LOCK) {
+          readFromDatabaseTask.doTask(map);
+        }
         csvContent = readFromDatabaseTask.getLastResult();
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
       } else {

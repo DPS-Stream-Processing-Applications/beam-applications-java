@@ -4,11 +4,16 @@ plugins {
   id("flink-job-conventions")
 }
 
-val mainClassName = "org.example.Main"
+val mainClassName = "org.example.UndertowMain"
 
 repositories { mavenCentral() }
 
-dependencies { implementation("org.apache.flink:statefun-flink-distribution:3.1.0") }
+dependencies {
+  // https://mvnrepository.com/artifact/org.apache.flink/statefun-sdk-java
+  implementation("org.apache.flink:statefun-sdk-java:3.3.0")
+  // https://mvnrepository.com/artifact/io.undertow/undertow-core
+  implementation("io.undertow:undertow-core:2.3.13.Final")
+}
 
 tasks.named<Jar>("jar") {
   archiveBaseName.set("statefunJob")

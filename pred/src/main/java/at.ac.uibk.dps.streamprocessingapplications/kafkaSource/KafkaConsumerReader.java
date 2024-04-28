@@ -12,57 +12,55 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 public class KafkaConsumerReader extends BoundedSource.BoundedReader<String> {
-    private final KafkaConsumer<String, String> consumer;
+  private final KafkaConsumer<String, String> consumer;
 
-    private final long numberOfLines;
+  private final long numberOfLines;
 
-    private static long counter = 1;
+  private static long counter = 1;
 
-    public KafkaConsumerReader(
-            String kafkaBootstrapServers, String kafkaTopic, long numberOfLines) {
-        this.numberOfLines = numberOfLines;
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "group" + UUID.randomUUID());
+  public KafkaConsumerReader(String kafkaBootstrapServers, String kafkaTopic, long numberOfLines) {
+    this.numberOfLines = numberOfLines;
+    Properties props = new Properties();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "group" + UUID.randomUUID());
 
-        consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Collections.singletonList(kafkaTopic));
-    }
+    consumer = new KafkaConsumer<>(props);
+    consumer.subscribe(Collections.singletonList(kafkaTopic));
+  }
 
-    @Override
-    public boolean start() {
-        return true;
-    }
+  @Override
+  public boolean start() {
+    return true;
+  }
 
-    @Override
-    public boolean advance() {
-        return numberOfLines > counter;
-    }
+  @Override
+  public boolean advance() {
+    return numberOfLines > counter;
+  }
 
-    @Override
-    public String getCurrent() {
-        while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            for (ConsumerRecord<String, String> record : records) {
-                String value = record.value();
-                if (value != null) {
-                    counter++;
-                    return record.value();
-                }
-            }
+  @Override
+  public String getCurrent() {
+    while (true) {
+      ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+      for (ConsumerRecord<String, String> record : records) {
+        String value = record.value();
+        if (value != null) {
+          counter++;
+          return record.value();
         }
+      }
     }
+  }
 
-    @Override
-    public void close() {
-        consumer.close();
-    }
+  @Override
+  public void close() {
+    consumer.close();
+  }
 
-    @Override
-    public BoundedSource<String> getCurrentSource() {
-        return null;
-    }
+  @Override
+  public BoundedSource<String> getCurrentSource() {
+    return null;
+  }
 }

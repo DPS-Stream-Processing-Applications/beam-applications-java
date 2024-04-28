@@ -20,115 +20,112 @@ import org.slf4j.Logger;
  */
 public class AzureBlobDownloadTask extends AbstractTask<String, byte[]> {
 
-    // static fields common to all threads
-    private static final Object SETUP_LOCK = new Object();
-    private static boolean doneSetup = false;
-    private static int useMsgField;
+  // static fields common to all threads
+  private static final Object SETUP_LOCK = new Object();
+  private static boolean doneSetup = false;
+  private static int useMsgField;
 
-    private static String storageConnStr;
-    private static String containerName;
-    private static String[] fileNames;
+  private static String storageConnStr;
+  private static String containerName;
+  private static String[] fileNames;
 
-    /***
-     *
-     * @param azStorageConnStr
-     * @param containerName
-     * @param fileName
-     * @param l
-     * @return
-     */
-    static CloudBlob connectToAzBlob(
-            String azStorageConnStr, String containerName, String fileName, Logger l) {
-        try {
-            // Retrieve storage account from connection-string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
+  /***
+   *
+   * @param azStorageConnStr
+   * @param containerName
+   * @param fileName
+   * @param l
+   * @return
+   */
+  static CloudBlob connectToAzBlob(
+      String azStorageConnStr, String containerName, String fileName, Logger l) {
+    try {
+      // Retrieve storage account from connection-string.
+      CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
 
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+      // Create the blob client.
+      CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
 
-            // Retrieve reference to a previously created container.
-            CloudBlobContainer container = blobClient.getContainerReference(containerName);
+      // Retrieve reference to a previously created container.
+      CloudBlobContainer container = blobClient.getContainerReference(containerName);
 
-            ListBlobItem blobItem = container.getBlockBlobReference(fileName);
+      ListBlobItem blobItem = container.getBlockBlobReference(fileName);
 
-            CloudBlob blob = (CloudBlob) blobItem;
-            //			blob.download(new FileOutputStream("/home/shilpa/Desktop/" + blob.getName()));
-            //			System.out.println("File saved");
-            return blob;
-        } catch (Exception e) {
-            l.warn("Exception in connectToAzBlob: " + containerName + "/" + fileName, e);
-        }
-
-        return null;
+      CloudBlob blob = (CloudBlob) blobItem;
+      //			blob.download(new FileOutputStream("/home/shilpa/Desktop/" + blob.getName()));
+      //			System.out.println("File saved");
+      return blob;
+    } catch (Exception e) {
+      l.warn("Exception in connectToAzBlob: " + containerName + "/" + fileName, e);
     }
 
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                useMsgField =
-                        Integer.parseInt(
-                                p_.getProperty("IO.AZURE_BLOB_DOWNLOAD.USE_MSG_FIELD", "0"));
+    return null;
+  }
 
-                storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
-                containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
-                String csvFileNames =
-                        p_.getProperty(
-                                "IO.AZURE_BLOB_DOWNLOAD.FILE_NAMES"); // multiple CSV files names
-                assert csvFileNames != null;
-                fileNames = csvFileNames.split(",");
-                doneSetup = true;
-            }
-        }
+  public void setup(Logger l_, Properties p_) {
+    super.setup(l_, p_);
+    synchronized (SETUP_LOCK) {
+      if (!doneSetup) { // Do setup only once for this task
+        useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB_DOWNLOAD.USE_MSG_FIELD", "0"));
+
+        storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
+        containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
+        String csvFileNames =
+            p_.getProperty("IO.AZURE_BLOB_DOWNLOAD.FILE_NAMES"); // multiple CSV files names
+        assert csvFileNames != null;
+        fileNames = csvFileNames.split(",");
+        doneSetup = true;
+      }
+    }
+  }
+
+  @Override
+  protected Float doTaskLogic(Map<String, String> map) {
+    String m = map.get(AbstractTask.DEFAULT_KEY);
+    // get file index to be downloaded from message or at random
+    int fileindex;
+    if (useMsgField > 0) {
+      fileindex = Integer.parseInt(m.split(",")[useMsgField - 1]) % fileNames.length;
+    } else {
+      fileindex = ThreadLocalRandom.current().nextInt(fileNames.length);
     }
 
-    @Override
-    protected Float doTaskLogic(Map<String, String> map) {
-        String m = map.get(AbstractTask.DEFAULT_KEY);
-        // get file index to be downloaded from message or at random
-        int fileindex;
-        if (useMsgField > 0) {
-            fileindex = Integer.parseInt(m.split(",")[useMsgField - 1]) % fileNames.length;
-        } else {
-            fileindex = ThreadLocalRandom.current().nextInt(fileNames.length);
-        }
-
-        String fileName = fileNames[fileindex];
-        if (useMsgField == 0) {
-            fileName = m; // getting file name from mqttpublish
-        }
-
-        //		fileName = "peakRateBarplot.pdf";
-        // CloudBlob cloudBlob = connectToAzBlob(storageConnStr, containerName, fileName, l);
-        // assert cloudBlob != null;
-        // int result = getAzBlob(cloudBlob, l);
-        int result = 1;
-        return Float.valueOf(result);
+    String fileName = fileNames[fileindex];
+    if (useMsgField == 0) {
+      fileName = m; // getting file name from mqttpublish
     }
 
-    /***
-     *
-     * @param blob
-     * @param l
-     * @return
-     */
-    public int getAzBlob(CloudBlob blob, Logger l) {
-        try {
-            blob.downloadAttributes();
-            int blobSize = (int) (blob.getProperties().getLength());
+    //		fileName = "peakRateBarplot.pdf";
+    // CloudBlob cloudBlob = connectToAzBlob(storageConnStr, containerName, fileName, l);
+    // assert cloudBlob != null;
+    // int result = getAzBlob(cloudBlob, l);
+    int result = 1;
+    return Float.valueOf(result);
+  }
 
-            // preallocate memory of adequate size
-            ByteArrayOutputStream output = new ByteArrayOutputStream(blobSize);
+  /***
+   *
+   * @param blob
+   * @param l
+   * @return
+   */
+  public int getAzBlob(CloudBlob blob, Logger l) {
+    try {
+      blob.downloadAttributes();
+      int blobSize = (int) (blob.getProperties().getLength());
 
-            blob.download(output);
-            if (l.isInfoEnabled()) l.info("ByteArrayOutputStream size -" + output.size());
+      // preallocate memory of adequate size
+      ByteArrayOutputStream output = new ByteArrayOutputStream(blobSize);
 
-            super.setLastResult(output.toByteArray());
+      blob.download(output);
+      if (l.isInfoEnabled()) l.info("ByteArrayOutputStream size -" + output.size());
 
-            return output.size();
-        } catch (Exception e) {
-            l.warn("Exception in getAzBlob: " + blob, e);
-        }
-        return -1;
+      super.setLastResult(output.toByteArray());
+
+      return output.size();
+    } catch (Exception e) {
+      l.warn("Exception in getAzBlob: " + blob, e);
     }
+    return -1;
+  }
 }

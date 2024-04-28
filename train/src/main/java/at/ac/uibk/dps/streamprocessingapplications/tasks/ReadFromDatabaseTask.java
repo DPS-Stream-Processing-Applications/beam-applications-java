@@ -1,5 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import com.mongodb.MongoInterruptedException;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -9,37 +11,43 @@ import org.bson.types.Binary;
 
 public class ReadFromDatabaseTask extends AbstractTask<String, byte[]> {
 
-    private final String connectionUrl;
-    private final String databaseName;
+  private final String connectionUrl;
+  private final String databaseName;
 
-    public ReadFromDatabaseTask(String connectionUrl, String databaseName) {
-        this.connectionUrl = connectionUrl;
-        this.databaseName = databaseName;
-    }
+  private final Object databaseLock = new Object();
 
-    @Override
-    protected Float doTaskLogic(Map<String, String> map) {
-        String fileName = map.get("fileName");
+  public ReadFromDatabaseTask(String connectionUrl, String databaseName) {
+    this.connectionUrl = connectionUrl;
+    this.databaseName = databaseName;
+  }
 
-        try (var mongoClient = MongoClients.create(connectionUrl)) {
-            MongoDatabase database = mongoClient.getDatabase(databaseName);
-            MongoCollection<Document> collection = database.getCollection("pdfCollection");
+  @Override
+  protected Float doTaskLogic(Map<String, String> map) {
+    String fileName = map.get("fileName");
+    synchronized (databaseLock) {
+      try (MongoClient mongoClient = MongoClients.create(connectionUrl)) {
+        MongoDatabase database = mongoClient.getDatabase(databaseName);
+        MongoCollection<Document> collection = database.getCollection("pdfCollection");
 
-            Document query = new Document(fileName, new Document("$exists", true));
+        Document query = new Document(fileName, new Document("$exists", true));
 
-            Document projection = new Document(fileName, 1).append("_id", 0);
+        Document projection = new Document(fileName, 1).append("_id", 0);
 
-            byte[] pdfData = null;
-            for (Document document : collection.find(query).projection(projection)) {
-                Binary pdfBinary = (Binary) document.get(fileName);
-                pdfData = pdfBinary.getData();
-            }
-
-            super.setLastResult(pdfData);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        byte[] pdfData = null;
+        for (Document document : collection.find(query).projection(projection)) {
+          Binary pdfBinary = (Binary) document.get(fileName);
+          pdfData = pdfBinary.getData();
         }
-        return 1f;
+
+        super.setLastResult(pdfData);
+      } catch (MongoInterruptedException e) {
+        l.warn("Interrupt exception when trying to read from DB");
+        throw new RuntimeException(e);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
     }
+    return 1f;
+  }
 }

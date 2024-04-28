@@ -11,44 +11,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ReadDatabaseBeam extends DoFn<String, String> {
-    private static Logger l;
-    private Properties p;
-    private ReadFromDatabaseTask readFromDatabaseTask;
+  private static Logger l;
+  private Properties p;
+  private ReadFromDatabaseTask readFromDatabaseTask;
 
-    private final String connectionUrl;
-    private final String databaseName;
+  private final String connectionUrl;
+  private final String databaseName;
 
-    public ReadDatabaseBeam(Properties p, String connectionUrl, String databaseName) {
-        this.p = p;
-        this.connectionUrl = connectionUrl;
-        this.databaseName = databaseName;
-    }
+  public ReadDatabaseBeam(Properties p, String connectionUrl, String databaseName) {
+    this.p = p;
+    this.connectionUrl = connectionUrl;
+    this.databaseName = databaseName;
+  }
 
-    @Setup
-    public void prepare() {
-        readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, databaseName);
-        initLogger(LoggerFactory.getLogger("APP"));
-        readFromDatabaseTask.setup(l, p);
-    }
+  @Setup
+  public void prepare() {
+    readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, databaseName);
+    initLogger(LoggerFactory.getLogger("APP"));
+    readFromDatabaseTask.setup(l, p);
+  }
 
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
+  public static void initLogger(Logger l_) {
+    l = l_;
+  }
 
-    @ProcessElement
-    public void processElement(@Element String input, OutputReceiver<String> out)
-            throws IOException {
-        // path for both model files
+  @ProcessElement
+  public void processElement(@Element String input, OutputReceiver<String> out) throws IOException {
+    // path for both model files
 
-        //        azureBlobDownloadTask.doTask(rowString);
-        HashMap<String, String> map = new HashMap<>();
+    //        azureBlobDownloadTask.doTask(rowString);
+    HashMap<String, String> map = new HashMap<>();
 
-        map.put("fileName", "test_arff");
-        readFromDatabaseTask.doTask(map);
-        byte[] file = readFromDatabaseTask.getLastResult();
+    map.put("fileName", "test_arff");
+    readFromDatabaseTask.doTask(map);
+    byte[] file = readFromDatabaseTask.getLastResult();
 
-        l.info("Database-entry: " + new String(file, StandardCharsets.UTF_8));
+    l.info("Database-entry: " + new String(file, StandardCharsets.UTF_8));
 
-        out.output(Arrays.toString(file));
-    }
+    out.output(Arrays.toString(file));
+  }
 }

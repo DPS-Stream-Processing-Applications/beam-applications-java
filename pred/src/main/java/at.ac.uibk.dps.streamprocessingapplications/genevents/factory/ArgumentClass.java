@@ -15,6 +15,16 @@ public class ArgumentClass {
 
   String databaseUrl;
 
+  int parallelism;
+
+  public int getParallelism() {
+    return parallelism;
+  }
+
+  public void setParallelism(int parallelism) {
+    this.parallelism = parallelism;
+  }
+
   public String getDatabaseUrl() {
     return databaseUrl;
   }

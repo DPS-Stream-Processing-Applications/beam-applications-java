@@ -17,6 +17,8 @@ import weka.core.Instances;
 public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
   private static final Object SETUP_LOCK = new Object();
+
+  private static final Object DATABASE_LOCK = new Object();
   // for taxi dataset
   private static final String SAMPLE_INPUT = "420,1.95,8.00";
   public static LinearRegression lr;
@@ -74,7 +76,9 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
         readFromDatabaseTask.setup(l, p_);
         HashMap<String, String> map = new HashMap<>();
         map.put("fileName", modelFilePath);
-        readFromDatabaseTask.doTask(map);
+        synchronized (DATABASE_LOCK) {
+          readFromDatabaseTask.doTask(map);
+        }
         byte[] csvContent = readFromDatabaseTask.getLastResult();
         if (csvContent == null) {
           throw new RuntimeException("csvContent is null");

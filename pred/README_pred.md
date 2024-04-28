@@ -67,17 +67,17 @@ kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
 
 ### Example command for SYS-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
 ```
 
 ### Example command for TAXI-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap x.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
 ```
 
 ### Example command for FIT-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap x.x --topic test-1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
 ```
 
 

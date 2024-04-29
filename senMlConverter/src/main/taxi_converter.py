@@ -34,7 +34,7 @@ class TaxiConverter(Converter):
                         "["
                         + '{"u": "string","n": "taxi_identifier","vs": "'
                         + str(row["taxi_identifier"])
-                        + "},"
+                        + '"},'
                         + '{"u": "string","n": "hack_license","vs": "'
                         + str(row[" hack_license"])
                         + '"},'

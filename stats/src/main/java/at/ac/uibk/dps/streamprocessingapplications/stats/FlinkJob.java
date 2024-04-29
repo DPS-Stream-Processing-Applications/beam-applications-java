@@ -1,15 +1,21 @@
-package at.ac.uibk.dps.streamporcessingapplications.stats;
+package at.ac.uibk.dps.streamprocessingapplications.stats;
 
-import at.ac.uibk.dps.streamporcessingapplications.stats.transforms.STATSPipeline;
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.sources.ReadSenMLSource;
+import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.AveragingFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.DistinctCountFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanGetter;
+import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanSetter;
+import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.KalmanFilterFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.STATSPipeline;
+import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.SlidingLinearRegression;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class FlinkJob {
 
@@ -22,7 +28,7 @@ public class FlinkJob {
     Pipeline pipeline = Pipeline.create(options);
 
     pipeline
-        .apply(Create.of(TaxiTestObjects.testPacks))
+        .apply(new ReadSenMLSource("senml-cleaned"))
         .apply(
             new STATSPipeline<>(
                 TypeDescriptor.of(TaxiRide.class),
@@ -31,9 +37,7 @@ public class FlinkJob {
                 new DistinctCountFunction(),
                 5,
                 new KalmanFilterFunction<>(new KalmanGetter(), new KalmanSetter()),
-                new SlidingLinearRegression<>(new KalmanGetter(), 10, 10)))
-        .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
-        .apply(ParDo.of(new PrintFn()));
+                new SlidingLinearRegression<>(new KalmanGetter(), 10, 10)));
 
     pipeline.run();
   }

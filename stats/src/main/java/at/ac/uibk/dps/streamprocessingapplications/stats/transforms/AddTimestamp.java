@@ -1,4 +1,4 @@
-package at.ac.uibk.dps.streamprocessingapplications.shared.transforms;
+package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;

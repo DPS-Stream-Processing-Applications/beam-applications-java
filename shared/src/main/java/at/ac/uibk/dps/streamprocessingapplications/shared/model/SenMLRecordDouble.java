@@ -17,7 +17,8 @@ public class SenMLRecordDouble extends AbstractSenMLRecord<Double> {
     Optional.ofNullable(getBaseName()).ifPresent(val -> jsonObject.put("bn", val));
     Optional.ofNullable(getName()).ifPresent(val -> jsonObject.put("n", val));
     Optional.ofNullable(getUnit()).ifPresent(val -> jsonObject.put("u", val));
-    Optional.ofNullable(getValue()).ifPresent(val -> jsonObject.put("v", val));
+    // NOTE: Force values to be strings `{... "v":"124" ...}`
+    Optional.ofNullable(getValue()).ifPresent(val -> jsonObject.put("v", val.toString()));
     Optional.ofNullable(getTime()).ifPresent(val -> jsonObject.put("t", val));
 
     return jsonObject.toString();

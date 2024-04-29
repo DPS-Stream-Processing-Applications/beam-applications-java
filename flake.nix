@@ -15,8 +15,12 @@
       devShells.${system} = {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            flink
             jdk11
+            flink
+
+            kubectl
+            k3d
+            kubernetes-helm
           ];
 
           /* INFO:

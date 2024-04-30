@@ -14,7 +14,9 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
@@ -49,7 +51,7 @@ public class TrainJob {
     return null;
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
 
     ArgumentClass argumentClass = ArgumentParser.parserCLI(args);
     if (argumentClass == null) {

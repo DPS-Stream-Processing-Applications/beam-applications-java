@@ -6,10 +6,11 @@
 1. Start kafka server
 2. Start mongodb server
 3. Find server address of both services
-4. Start flink application
-5. Start kafkaProducer
+4. Start flink application (will run forever)
+5. Start kafkaProducer (will also run forever)
 
 
+A test dataset can be found in `shared/src/main/resources/train`.
 ## Setting up MongoDb
 
 I used this tutorial to set it up https://devopscube.com/deploy-mongodb-kubernetes/
@@ -31,31 +32,11 @@ Example address: mongodb:
 `mongodb://adminuser:password123@192.168.49.2:32000/`
 
 
-
-## Setting up Apache Kafka
-In the `kafkaProducer` directory is a deployment.yaml file
-```bash
-kubectl apply -f  deployment.yaml -n kafka 
-```
-This will deploy the Apache cluster.
-
-
-Use the following command to get the Kafka-server-bootstrap address
-```bash
-kubectl get kafka my-cluster -o=jsonpath='{.status.listeners[*].bootstrapServers}{"\n"}' -n kafka
-```
-
-This commands tears down the cluster
-
-```bash
-kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
-```
-
-
-
-
+## Commands
 
 #### Example command for the CITY dataset
+
+--p is the parallelism in the flink cluster
 ```bash
 flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
 
@@ -76,6 +57,31 @@ flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://a
 
 ```
 
+---
+
+## Deprecated:
+
+Please consider Emmanuels setup for the Kafka-cluster in the kubernetes-folder. For the event-generation please consider the README in the
+`nkafkaProducerFolder`
+
+## Setting up Apache Kafka
+In the `kafkaProducer` directory is a deployment.yaml file
+```bash
+kubectl apply -f  deployment.yaml -n kafka 
+```
+This will deploy the Apache cluster.
+
+
+Use the following command to get the Kafka-server-bootstrap address
+```bash
+kubectl get kafka my-cluster -o=jsonpath='{.status.listeners[*].bootstrapServers}{"\n"}' -n kafka
+```
+
+This commands tears down the cluster
+
+```bash
+kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
+```
 
 ## Setting up Apache Kafka Producer
 In the `kafkaProducer` directory is a Dockerfile.

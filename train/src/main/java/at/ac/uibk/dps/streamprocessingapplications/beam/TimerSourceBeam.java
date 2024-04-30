@@ -4,7 +4,6 @@ import static java.time.Duration.ofMillis;
 import static java.util.Collections.singleton;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.EventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
 import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
@@ -17,8 +16,6 @@ import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
-
-  EventGen eventGen;
   BlockingQueue<List<String>> eventQueue;
   String csvFileName;
   String outSpoutCSVLogFileName;
@@ -145,54 +142,24 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
 
       e.printStackTrace();
     }
-
-    //		msgId=r.nextInt(10000);
-    // this.eventGen = new EventGen(this, this.scalingFactor);
-    // this.eventQueue = new LinkedBlockingQueue<List<String>>();
-    // String uLogfilename = this.outSpoutCSVLogFileName + msgId;
-    // this.eventGen.launch(this.csvFileName, uLogfilename); // Launch threads
-
-    // ba = new BatchedFileLogging(uLogfilename, "test");
   }
 
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<SourceEntry> out) {
-    // allow multiple tuples to be emitted per next tuple.
-    // Discouraged? https://groups.google.com/forum/#!topic/storm-user/SGwih7vPiDE
-    // int count = 0, MAX_COUNT = 10; // FIXME?
     KafkaConsumer<Long, byte[]> kafkaConsumer;
     kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
     kafkaConsumer.subscribe(singleton(TOPIC_NAME), myKafkaConsumer);
 
     int sendMessages = 0;
     while (sendMessages < numberLines) {
-      /*
-      List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
-      if (entry == null) {
-          // System.out.println("I am exiting");
-          // return;
-          continue;
-      }
-
-       */
-      // count++;
-      /*
-      SourceEntry values = new SourceEntry();
-      StringBuilder rowStringBuf = new StringBuilder();
-      for (String s : entry) {
-          rowStringBuf.append(",").append(s);
-      }
-       */
-
       try {
-        // Poll for new records from Kafka
         ConsumerRecords<Long, byte[]> records = kafkaConsumer.poll(ofMillis(POLL_TIMEOUT_MS));
         if (!records.isEmpty()) {
           for (ConsumerRecord<Long, byte[]> record : records) {
             SourceEntry values = new SourceEntry();
             String rowString = new String(record.value());
-            String ROWKEYSTART = rowString.split(",")[2];
-            String ROWKEYEND = rowString.split(",")[3];
+            String ROWKEYSTART = rowString.split(",")[1];
+            String ROWKEYEND = rowString.split(",")[2];
             values.setRowString(rowString);
             msgId++;
             values.setMsgid(Long.toString(msgId));
@@ -208,11 +175,9 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
           pendingOffsets.clear();
         }
       } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
-        // Handle invalid offset or no offset found errors when auto.reset.policy is not set
         System.out.println("Invalid or no offset found, and auto.reset.policy unset, using latest");
         throw new RuntimeException(e);
       } catch (Exception e) {
-        // Handle other exceptions, including retriable ones
         System.err.println(e.getMessage());
         throw new RuntimeException(e);
       }

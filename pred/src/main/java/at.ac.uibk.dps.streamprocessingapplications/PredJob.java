@@ -97,17 +97,13 @@ public class PredJob {
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
     String kafkaTopic = argumentClass.getKafkaTopic();
     boolean isJson = inputFileName.contains("senml");
-    // String databaseUrl = "mongodb://adminuser:password123@192.168.49.2:32000/";
     String databaseUrl = argumentClass.getDatabaseUrl();
     String databaseName = "mydb";
 
     WriteToDatabase writeToDatabase = new WriteToDatabase(databaseUrl, databaseName);
     writeToDatabase.prepareDataBaseForApplication();
 
-    FlinkPipelineOptions options =
-        PipelineOptionsFactory.create()
-            // .withValidation()
-            .as(FlinkPipelineOptions.class);
+    FlinkPipelineOptions options = PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
     options.setRunner(FlinkRunner.class);
     options.setParallelism(argumentClass.getParallelism());
 
@@ -120,7 +116,12 @@ public class PredJob {
             "Source",
             ParDo.of(
                 new SourceBeam(
-                    inputFileName, spoutLogFileName, lines, kafkaBootstrapServers, kafkaTopic)));
+                    inputFileName,
+                    spoutLogFileName,
+                    lines,
+                    kafkaBootstrapServers,
+                    kafkaTopic,
+                    dataSetType)));
 
     PCollection<MqttSubscribeEntry> sourceDataMqtt =
         inputFile.apply(

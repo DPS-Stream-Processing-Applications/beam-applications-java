@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.WriteStringSink;
+import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
 import java.util.List;
 import java.util.Objects;
 import org.apache.beam.sdk.transforms.*;
@@ -43,7 +43,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
             .apply("Average", new Average<>(this.averagingFunction, batchSize))
             .apply("Visualise", new Visualise<>(new AveragePlot(), 10))
             .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
-            .apply(new WriteStringSink("plot-strings"));
+            .apply(new StoreStringInDBSink("plots"));
 
     PDone kalmanAndPredict =
         parsedObjects
@@ -53,7 +53,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
             .apply(Values.create())
             .apply("Visualise", new Visualise<>(new KalmanRegressionPlot(), 10))
             .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
-            .apply(new WriteStringSink("plot-strings"));
+            .apply(new StoreStringInDBSink("plots"));
 
     PDone distinctCount =
         parsedObjects
@@ -61,7 +61,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
                 "Count Distinct", new DistinctCount<>(this.distinctCountFunction, this.batchSize))
             .apply("Visualise", new Visualise<>(new DistinctCountPlot(), 10))
             .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
-            .apply(new WriteStringSink("plot-strings"));
+            .apply(new StoreStringInDBSink("plots"));
     return distinctCount;
   }
 }

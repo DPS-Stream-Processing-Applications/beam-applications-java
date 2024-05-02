@@ -2,15 +2,9 @@
 Installing the `Flink` operator and deploying a session cluster:
 
 ```bash
-flink operator version 1.8.0 was added to helm as flink-operator-repo
+helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
 helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
 kubectl apply -f flink-session-cluster-deployment.yaml
-```
-
-To make the `Flink` web ui available locally:
-
-```bash
-kubectl port-forward service/session-cluster-rest 8081:8081
 ```
 
 Installing the kafka operator as well as setting up the topics:
@@ -25,11 +19,12 @@ kubectl apply -f kafka-topic-plots-strings.yaml
 
 For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-cluster.yaml`.
 
-Port forwarding command:
-```bash
-kubectl port-forward service/kafka-cluster-kafka-external-bootstrap 9093:9093
-```
+# Portforwarding
+To forward all ports run the following bash script.
 
+```bash
+./portforwarding.sh
+```
 
 # Testing Kafka
 
@@ -57,3 +52,15 @@ kubectl run kafka-consumer -it \
 --bootstrap-server kafka-cluster-kafka-bootstrap:9092 \
 --topic plots-strings \
 ```
+
+
+# Installing MongoDB
+
+```bash
+helm repo add mongodb https://mongodb.github.io/helm-charts/
+helm install mongodb-operator-crds mongodb/community-operator-crds
+helm install mongodb-operator mongodb/community-operator
+kubectl apply -f mongodb-deployment.yaml
+```
+
+After the cluster is configured Flink jobs can be deployed normally through `flink run -m localhost:8081`.

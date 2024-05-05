@@ -82,7 +82,7 @@ public class SenMlParse extends AbstractTask<String, Map> {
 
         v =
             (jsonObject.get("v") == null)
-                ? (String) jsonObject.get("sv")
+                ? (String) jsonObject.get("vs")
                 : (String) jsonObject.get("v");
 
         t = (jsonObject.get("t") == null) ? 0 : (long) jsonObject.get("t");

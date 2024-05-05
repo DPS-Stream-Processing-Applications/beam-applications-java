@@ -134,7 +134,7 @@ public class LinearRegressionTrainBatched extends AbstractTask {
       l.warn("error training decision tree", e);
     }
 
-    return Float.valueOf(1);
+    return 1F;
     //		return Float.valueOf(Float.MIN_VALUE);
   }
 }

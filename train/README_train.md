@@ -38,23 +38,17 @@ Example address: mongodb:
 
 --p is the parallelism in the flink cluster
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
-
-
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@<IP>:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap  kafka-cluster-kafka-bootstrap.kafka.svc:9092 --topic test-1 --p 1
 ```
 
 #### Example command for the FIT dataset
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
-
-
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@<IP>:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap  kafka-cluster-kafka-bootstrap.kafka.svc:9092 --topic test-1 --p 1
 ```
 
 #### Example command for the TAXI dataset
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap x.x --topic test-1 --p 1
-
-
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@<IP>:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap  kafka-cluster-kafka-bootstrap.kafka.svc:9092 --topic test-1 --p 1
 ```
 
 ---
@@ -122,3 +116,4 @@ flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topo
 flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --input ./train/src/main/resources/datasets/inputFileForTimerSpout-FIT.csv  --inputTrainSet /home/jona/Documents/Bachelor_thesis/Datasets/output_FIT_small.csv --experiRunId FIT-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./train/src/main/resources/configs/all_tasks.properties --taskName bench
 ```
 -->
+

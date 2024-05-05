@@ -1,12 +1,10 @@
 package at.ac.uibk.dps.streamprocessingapplications.database;
 
+import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import org.bson.Document;
 
 public class WriteToDatabase implements Serializable {
@@ -34,7 +32,18 @@ public class WriteToDatabase implements Serializable {
       MongoDatabase database = mongoClient.getDatabase(dataBaseName);
       MongoCollection<Document> collection = database.getCollection("pdfCollection");
 
-      byte[] pdfData = readFileToByteArray(path);
+      // byte[] pdfData = readFileToByteArray(path);
+      byte[] pdfData;
+
+      try (InputStream inputStream = TrainJob.class.getResourceAsStream(path)) {
+        pdfData = inputStream.readAllBytes();
+      } catch (Exception e) {
+        throw new RuntimeException("Exception when trying to save files into db");
+      }
+
+      if (pdfData == null) {
+        throw new RuntimeException("Content to be saved to db is empty");
+      }
 
       Document document = new Document();
       document.append(key, pdfData);
@@ -47,8 +56,6 @@ public class WriteToDatabase implements Serializable {
   }
 
   public void prepareDataBaseForApplication() {
-    saveFileIntoDb(
-        "./train/src/main/resources/model/DecisionTreeClassify-SYS.arff",
-        "DecisionTreeClassify-SYS_arff");
+    saveFileIntoDb("/model/DecisionTreeClassify-SYS.arff", "DecisionTreeClassify-SYS_arff");
   }
 }

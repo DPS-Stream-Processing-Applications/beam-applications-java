@@ -66,10 +66,10 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
     }
 
     String filename = datasetName + "-MLR-" + rowKeyEnd + ".model";
-    if (datasetName.equals("SYS")) {
+    if (dataSetType.equals("SYS")) {
       filename = datasetName + "-MLR-" + "-1422748810000" + ".model";
     }
-    if (datasetName.equals("TAXI") | datasetName.equals("FIT")) {
+    if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
       filename = datasetName + "-MLR-" + "1358102664000.model";
     }
 

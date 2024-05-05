@@ -1,12 +1,10 @@
 package at.ac.uibk.dps.streamprocessingapplications.database;
 
+import at.ac.uibk.dps.streamprocessingapplications.PredJob;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import org.bson.Document;
 
 public class WriteToDatabase implements Serializable {
@@ -35,7 +33,18 @@ public class WriteToDatabase implements Serializable {
 
       MongoCollection<Document> collection = database.getCollection("pdfCollection");
 
-      byte[] pdfData = readFileToByteArray(path);
+      // byte[] pdfData = readFileToByteArray(path);
+      byte[] pdfData;
+
+      try (InputStream inputStream = PredJob.class.getResourceAsStream(path)) {
+        pdfData = inputStream.readAllBytes();
+      } catch (Exception e) {
+        throw new RuntimeException("Exception when trying to save files into db");
+      }
+
+      if (pdfData == null) {
+        throw new RuntimeException("Content to be saved to db is empty");
+      }
 
       Document document = new Document();
       document.append(key, pdfData);
@@ -48,36 +57,24 @@ public class WriteToDatabase implements Serializable {
   }
 
   public void prepareDataBaseForApplication() {
+    saveFileIntoDb("/datasets/DecisionTreeClassify-SYS.model", "DecisionTreeClassify-SYS_model");
     saveFileIntoDb(
-        "./pred/src/main/resources/datasets/DecisionTreeClassify-SYS.model",
-        "DecisionTreeClassify-SYS_model");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/DecisionTreeClassify-SYS-withExcellent.model",
+        "/datasets/DecisionTreeClassify-SYS-withExcellent.model",
         "DecisionTreeClassify-SYS-withExcellent_model");
     saveFileIntoDb(
-        "./pred/src/main/resources/datasets/DecisionTreeClassify-TAXI-withVeryGood.model",
+        "/datasets/DecisionTreeClassify-TAXI-withVeryGood.model",
         "DecisionTreeClassify-TAXI-withVeryGood_model");
+    saveFileIntoDb("/datasets/FIT_sample_data_senml.csv", "FIT_sample_data_senml_csv");
+    saveFileIntoDb("/datasets/LR-TAXI-Numeric.model", "LR-TAXI-Numeric_model");
+    saveFileIntoDb("/datasets/mhealth_schema.csv", "mhealth_schema_csv");
     saveFileIntoDb(
-        "./pred/src/main/resources/datasets/FIT_sample_data_senml.csv",
-        "FIT_sample_data_senml_csv");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/LR-TAXI-Numeric.model", "LR-TAXI-Numeric_model");
-    saveFileIntoDb("./pred/src/main/resources/datasets/mhealth_schema.csv", "mhealth_schema_csv");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/sys-schema_without_annotationfields.txt",
+        "/datasets/sys-schema_without_annotationfields.txt",
         "sys-schema_without_annotationfields_txt");
+    saveFileIntoDb("/datasets/SYS_sample_data_senml.csv", "SYS_sample_data_senml_csv");
+    saveFileIntoDb("/datasets/SYS_sample_data_senml_small.csv", "SYS_sample_data_senml_small_csv");
     saveFileIntoDb(
-        "./pred/src/main/resources/datasets/SYS_sample_data_senml.csv",
-        "SYS_sample_data_senml_csv");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/SYS_sample_data_senml_small.csv",
-        "SYS_sample_data_senml_small_csv");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/taxi-schema-without-annotation.csv",
-        "taxi-schema-without-annotation_csv");
-    saveFileIntoDb(
-        "./pred/src/main/resources/datasets/TAXI_sample_data_senml.csv",
-        "TAXI_sample_data_senml_csv");
-    saveFileIntoDb("./pred/src/main/resources/datasets/test.arff", "test_arff");
+        "/datasets/taxi-schema-without-annotation.csv", "taxi-schema-without-annotation_csv");
+    saveFileIntoDb("/datasets/TAXI_sample_data_senml.csv", "TAXI_sample_data_senml_csv");
+    saveFileIntoDb("/datasets/test.arff", "test_arff");
   }
 }

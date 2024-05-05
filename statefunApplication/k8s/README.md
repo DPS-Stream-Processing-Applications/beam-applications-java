@@ -1,4 +1,4 @@
-# Kubernetes Example
+# Kubernetes Setup
 
 
 ## Prerequisites

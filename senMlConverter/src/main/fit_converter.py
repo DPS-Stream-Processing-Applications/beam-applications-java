@@ -24,7 +24,7 @@ class FitConverter(Converter):
                     list_senml = list()
                     senml_string = (
                         "["
-                        + '{"u": "string","n": "subjectId","sv": "'
+                        + '{"u": "string","n": "subjectId","vs": "'
                         + str(row["subjectId"])
                         + '"'
                         + "},"
@@ -169,7 +169,7 @@ class FitConverter(Converter):
                     timestamp = str(row["timestamp"])
                     senml_string = (
                         '{"e":['
-                        + '{"u": "string","n": "subjectId","sv": "'
+                        + '{"u": "string","n": "subjectId","vs": "'
                         + str(row["subjectId"])
                         + '"'
                         + "},"

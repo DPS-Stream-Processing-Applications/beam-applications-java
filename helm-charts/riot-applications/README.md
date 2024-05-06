@@ -41,7 +41,7 @@ kubectl run kafka-producer -it \
 --topic senml-source
 ```
 
-> [!INFO]
+> [!TIP]
 > The `nKafkaProducer` module contains a producer which automatically pushes events to `localhost:9093`
 > and topic `senml-source`.
 

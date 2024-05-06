@@ -1,49 +1,56 @@
 plugins {
-    id("application")
+  id("java")
+  id("application")
 }
 
-val mainClassName = "org.example.Main"
-
-application {
-    mainClass = mainClassName
-}
-
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
-    implementation("org.apache.kafka:kafka-clients:3.5.1")
-    implementation("joda-time:joda-time:2.10.11")
-    implementation("com.opencsv:opencsv:5.5.1")
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation("org.slf4j:slf4j-api:2.0.13")
+  implementation("com.opencsv:opencsv:5.9")
+  /* INFO:
+   * For this implementation it needs to match the kafka version in `kafka-cluster.yaml`.
+   */
+  implementation("org.apache.kafka:kafka-clients:3.7.0")
+
+  testImplementation(platform("org.junit:junit-bom:5.9.1"))
+  testImplementation("org.junit.jupiter:junit-jupiter")
 }
+
+val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.eventGenerators.KafkaProducer.Main"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+    vendor = JvmVendorSpec.ADOPTOPENJDK
+  }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
+application { mainClass = mainClassName }
+
+tasks.test { useJUnitPlatform() }
 
 tasks.named<Jar>("jar") {
-    archiveBaseName.set("KafkaProducer")
-    destinationDirectory.set(file("build"))
-    manifest {
-        attributes(
-            "Main-Class" to mainClassName,
-        )
-    }
-    from("src/main/resources") {
-        into("resources")
-    }
-    exclude("META-INF/*.SF")
-    exclude("META-INF/*.DSA")
-    exclude("META-INF/*.RSA")
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    isZip64 = true
+  archiveBaseName.set("KafkaProducer")
+  destinationDirectory.set(file("build"))
+  manifest {
+    attributes(
+        "Main-Class" to mainClassName,
+    )
+  }
+  exclude("META-INF/*.SF")
+  exclude("META-INF/*.DSA")
+  exclude("META-INF/*.RSA")
+  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+  from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+  isZip64 = true
 }
+
+/*tasks.named<CreateStartScripts>("CreateStartScripts") {
+     val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.eventGenerator.KafkaProducer"
+     mainClass = mainClassName
+     applicationName = "kafkaProducer"
+     outputDir = file("build")
+     classpath = files("build/KafkaProducer.jar")
+ }*/

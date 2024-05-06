@@ -49,11 +49,11 @@ spec:
                 type: logs
 
 
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: default-password
-type: Opaque
-stringData:
-  password: passwd
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: default-password
+# type: Opaque
+# stringData:
+#   password: passwd

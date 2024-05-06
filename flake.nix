@@ -21,6 +21,8 @@
             kubectl
             k3d
             kubernetes-helm
+
+            jq
           ];
 
           /* INFO:

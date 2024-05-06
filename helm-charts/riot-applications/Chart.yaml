@@ -1,0 +1,12 @@
+apiVersion: v2
+name: riot-applications
+description: A Helm chart deploying the whole runtime environment needed for the RIoTBench applications.
+type: application
+
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: flink-operator
+    repository: https://downloads.apache.org/flink/flink-kuberntes-operator-1.8.0/
+    version: 1.8.0

@@ -1,20 +1,22 @@
 # Kubernetes setup
+Install the certificate manager first:
+```bash
+kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
+```
 Installing the `Flink` operator and deploying a session cluster:
-
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
 helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
-kubectl apply -f flink-session-cluster-deployment.yaml
+kubectl apply -f templates/flink-session-cluster-deployment.yaml
 ```
 
 Installing the kafka operator as well as setting up the topics:
 ```bash
 helm repo add strimzi https://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
-kubectl apply -f kafka-cluster.yaml 
-kubectl apply -f kafka-topic-senml-source.yaml 
-kubectl apply -f kafka-topic-senml-cleaned.yaml 
-kubectl apply -f kafka-topic-plots-strings.yaml 
+kubectl apply -f templates/kafka-cluster.yaml 
+kubectl apply -f templates/kafka-topic-senml-source.yaml 
+kubectl apply -f templates/kafka-topic-senml-cleaned.yaml 
 ```
 
 For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-cluster.yaml`.
@@ -23,7 +25,7 @@ For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-c
 To forward all ports run the following bash script.
 
 ```bash
-./portforwarding.sh
+./utils/portforwarding.sh
 ```
 
 # Testing Kafka
@@ -58,9 +60,9 @@ kubectl run kafka-consumer -it \
 
 ```bash
 helm repo add mongodb https://mongodb.github.io/helm-charts/
-helm install mongodb-operator-crds mongodb/community-operator-crds
 helm install mongodb-operator mongodb/community-operator
-kubectl apply -f mongodb-deployment.yaml
+# helm install mongodb-operator-crds mongodb/community-operator-crds
+kubectl apply -f templates/mongodb-deployment.yaml
 ```
 
 After the cluster is configured Flink jobs can be deployed normally through `flink run -m localhost:8081`.

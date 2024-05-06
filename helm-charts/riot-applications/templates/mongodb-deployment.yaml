@@ -22,10 +22,31 @@ spec:
         - name: readWrite
           db: riot-applications
       scramCredentialsSecretName: my-scram
-  podSpec:
-    persistence:
-      single:
-        storage: "5Gi"
+  statefulSet:
+      spec:
+        volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            accessModes: ["ReadWrite"]
+            storageClassName: fast
+            resources:
+              requests:
+                storage: 5Gi
+            selector:
+              matchLabels:
+                type: data
+        - metadata:
+            name: logs-volume
+          spec:
+            accessModes: ["ReadWrite"]
+            storageClassName: fast
+            resources:
+              requests:
+                storage: 5Gi
+            selector:
+              matchLabels:
+                type: logs
 
 
 ---

@@ -27,10 +27,10 @@ public class StoreStringInDBSink extends PTransform<PCollection<String>, PDone> 
             MongoDbIO.write()
                 .withUri(
                     /* INFO: This string can be acquired via the following command:
-                     * kubectl get secret riot-applications-admin-default \
+                     * kubectl get secret riot-applications-mongodb-admin-default \
                      * -o json | jq -r '.data | with_entries(.value |= @base64d)'
                      */
-                    "mongodb+srv://default:passwd@riot-applications-svc.default.svc.cluster.local/admin?replicaSet=riot-applications&ssl=false")
+                    "mongodb+srv://default:passwd@riot-applications-mongodb-svc.default.svc.cluster.local/admin?replicaSet=riot-applications-mongodb&ssl=false")
                 .withDatabase("riot-applications")
                 .withCollection(this.collection));
   }

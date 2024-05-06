@@ -22,6 +22,10 @@ spec:
         - name: readWrite
           db: riot-applications
       scramCredentialsSecretName: my-scram
+  podSpec:
+    persistence:
+      single:
+        storage: "5Gi"
 
 
 ---

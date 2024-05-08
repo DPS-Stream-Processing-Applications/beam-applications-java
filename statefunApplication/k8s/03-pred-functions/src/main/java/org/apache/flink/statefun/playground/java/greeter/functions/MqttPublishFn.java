@@ -52,7 +52,7 @@ public class MqttPublishFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.server = "kafka-cluster-kafka-bootstrap.kafka.svc:9092";
+        this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
         this.topic = "pred-topic-2";
         myKafkaProducer = new MyKafkaProducer(server, topic, p);
         myKafkaProducer.setup(l, p);

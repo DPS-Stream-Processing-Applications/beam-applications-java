@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: functions 
-          image: functions 
+          image: jungerindy/statefun_train:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

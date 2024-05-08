@@ -25,14 +25,10 @@ kubectl create -f 01-minio -n statefun
 
 ## Create the function:
 
-**NOTE:**  please make sure that you've run `eval $(minikube -p minikube docker-env)` In your current terminal session.
-
-
 ### For the train application
 
 ```
-cd 035-train-functions
-make image
+cd 03-train-functions
 make service
 cd ..
 ```
@@ -40,8 +36,7 @@ cd ..
 ### For the pred application
 
 ```
-cd 035-pred-functions
-make image
+cd 03-pred-functions
 make service
 cd ..
 ```
@@ -72,8 +67,9 @@ Now you can explore Apache Flink's WEB interface:
 
 Make sure to forward the kafka port via kubernetes
 
+For the pred application
 ```bash
-../gradlew run --args $(pwd)/test_input_SYS.csv
+../gradlew run --args $(pwd)/test.csv
 ```
 
 ## Teardown

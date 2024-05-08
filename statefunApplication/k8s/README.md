@@ -1,7 +1,7 @@
 # Kubernetes Setup
 
 
-## Prerequisites
+## Prerequisites for minikube only
 
 
 ```
@@ -10,6 +10,11 @@ minikube start
 minikube ssh 'sudo ip link set docker0 promisc on'
 eval $(minikube -p minikube docker-env)
 ```
+
+## Prerequisites
+
+Make sure that the database and the kafka cluster are running
+
 
 ## Create the `statefun` namespace.
 

@@ -13,18 +13,23 @@ public class ArgumentParser {
   public static ArgumentClass parserCLI(String[] args) {
     ParameterTool params = ParameterTool.fromArgs(args);
 
-    if (params.getNumberOfParameters() != 7) {
-      System.out.println("invalid number of arguments");
+    if (params.getNumberOfParameters() < 2) {
+      System.out.println("invalid number of arguments " + params.getNumberOfParameters());
       return null;
     } else {
       ArgumentClass argumentClass = new ArgumentClass();
-      argumentClass.setTopoName(params.get("topoName"));
-      argumentClass.setExperiRunId(params.get("experiRunId"));
-      argumentClass.setDatabaseUrl(params.get("databaseUrl"));
-      argumentClass.setTasksName(params.get("taskName"));
-      argumentClass.setBootStrapServerKafka(params.get("bootstrap"));
-      argumentClass.setKafkaTopic(params.get("topic"));
-      argumentClass.setParallelism(Integer.parseInt(params.get("p")));
+      for (String argument : args) {
+        String[] splitArgument = argument.split("=");
+        if (splitArgument[0].equals("--experiRunId")) {
+          argumentClass.setExperiRunId(splitArgument[1]);
+        } else if (splitArgument[0].equals("--databaseUrl")) {
+          argumentClass.setDatabaseUrl(splitArgument[1]);
+        }
+      }
+      argumentClass.setTopoName("IdentityTopology");
+      argumentClass.setTasksName("bench");
+      argumentClass.setBootStrapServerKafka("kafka-cluster-kafka-bootstrap:9092");
+      argumentClass.setKafkaTopic("senml-source");
       return argumentClass;
     }
   }

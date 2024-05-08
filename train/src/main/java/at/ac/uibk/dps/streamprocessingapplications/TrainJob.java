@@ -5,6 +5,7 @@ import at.ac.uibk.dps.streamprocessingapplications.database.WriteToDatabase;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.PredCustomOptions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,9 +118,11 @@ public class TrainJob {
     WriteToDatabase writeToDatabase = new WriteToDatabase(databaseUrl, databaseName);
     writeToDatabase.prepareDataBaseForApplication();
 
-    FlinkPipelineOptions options = PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
+    PipelineOptionsFactory.register(PredCustomOptions.class);
+    FlinkPipelineOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(PredCustomOptions.class);
     options.setRunner(FlinkRunner.class);
-    options.setParallelism(argumentClass.getParallelism());
+    options.setStreaming(true);
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);

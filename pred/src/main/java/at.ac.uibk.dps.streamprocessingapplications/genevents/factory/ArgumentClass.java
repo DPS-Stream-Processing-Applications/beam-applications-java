@@ -96,4 +96,37 @@ public class ArgumentClass {
   public void setTasksPropertiesFilename(String tasksPropertiesFilename) {
     this.tasksPropertiesFilename = tasksPropertiesFilename;
   }
+
+  @Override
+  public String toString() {
+    return "ArgumentClass{"
+        + "topoName='"
+        + topoName
+        + '\''
+        + ", inputDatasetPathName='"
+        + inputDatasetPathName
+        + '\''
+        + ", experiRunId='"
+        + experiRunId
+        + '\''
+        + ", outputDirName='"
+        + outputDirName
+        + '\''
+        + ", tasksPropertiesFilename='"
+        + tasksPropertiesFilename
+        + '\''
+        + ", tasksName='"
+        + tasksName
+        + '\''
+        + ", bootStrapServerKafka='"
+        + bootStrapServerKafka
+        + '\''
+        + ", kafkaTopic='"
+        + kafkaTopic
+        + '\''
+        + ", databaseUrl='"
+        + databaseUrl
+        + '\''
+        + '}';
+  }
 }

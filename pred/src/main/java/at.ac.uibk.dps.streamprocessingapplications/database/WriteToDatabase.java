@@ -1,6 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.database;
 
 import at.ac.uibk.dps.streamprocessingapplications.PredJob;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -28,7 +29,7 @@ public class WriteToDatabase implements Serializable {
   }
 
   public void saveFileIntoDb(String path, String key) {
-    try (var mongoClient = MongoClients.create(databaseUrl)) {
+    try (MongoClient mongoClient = MongoClients.create(databaseUrl)) {
       MongoDatabase database = mongoClient.getDatabase(dataBaseName);
 
       MongoCollection<Document> collection = database.getCollection("pdfCollection");

@@ -51,14 +51,12 @@ public class BlockWindowAverage extends AbstractTask<String, Float> {
     aggSum += item;
     aggCount++;
     if (aggCount < aggCountWindowSize) {
-      //			return null;    //TODO: check for null while return in bolt code
+      //			return null;
       return super.setLastResult(null);
     } else {
       avgRes = Float.valueOf(aggSum / aggCount);
       aggCount = 0;
       aggSum = 0;
-      //			l.info("CHECK: Block Average = " +avgRes);
-
       return super.setLastResult((float) avgRes);
     }
   }

@@ -5,6 +5,7 @@ import at.ac.uibk.dps.streamprocessingapplications.database.WriteToDatabase;
 import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
+import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.PredCustomOptions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,15 +15,13 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PredJob {
-
-  private static final Logger LOG = LoggerFactory.getLogger("APP");
 
   public static long countLines(String resourceFileName) {
     long lines = 0;
@@ -39,15 +38,15 @@ public class PredJob {
     return lines;
   }
 
-  public static String checkDataType(String fileName) {
-    if (fileName.contains("SYS")) {
+  public static String checkDataType(String expriRunId) {
+    if (expriRunId.contains("SYS")) {
       return "SYS";
-    } else if (fileName.contains("FIT")) {
+    } else if (expriRunId.contains("FIT")) {
       return "FIT";
-    } else if (fileName.contains("TAXI")) {
+    } else if (expriRunId.contains("TAXI")) {
       return "TAXI";
 
-    } else if (fileName.contains("GRID")) {
+    } else if (expriRunId.contains("GRID")) {
       return "GRID";
     }
     throw new RuntimeException("No valid DataSetType given");
@@ -103,9 +102,11 @@ public class PredJob {
     WriteToDatabase writeToDatabase = new WriteToDatabase(databaseUrl, databaseName);
     writeToDatabase.prepareDataBaseForApplication();
 
-    FlinkPipelineOptions options = PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
+    PipelineOptionsFactory.register(PredCustomOptions.class);
+    FlinkPipelineOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(PredCustomOptions.class);
     options.setRunner(FlinkRunner.class);
-    options.setParallelism(argumentClass.getParallelism());
+    options.setStreaming(true);
 
     Pipeline p = Pipeline.create(options);
 

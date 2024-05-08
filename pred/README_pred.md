@@ -2,14 +2,10 @@
 
 ## Commandline arguments
 
-* deploymentMode
-* topoName
-* input
+
+* URL for database
 * experiRunId (FIT/SYS/TAXI/GRID- number)
-* scalingFactor
-* outputDir: local directory, which will be filled with log-files
-* taskProp : path the .properties-file 
-* taskName 
+
 
 
 
@@ -18,10 +14,9 @@
 1. Start kafka server
 2. Start mongodb server
 3. Find server address of both services
-4. Start flink application
-5. Start kafkaProducer
+4. Start flink application (will run forever)
+5. Start kafkaProducer (will also run forever)
 
-Three test datasets can be found in `shared/src/main/resources/pred`.
 
 
 ## Setting up MongoDb
@@ -40,34 +35,34 @@ I used this command to get the ip-address and port of my db
 ````bash
 minikube service --url mongo-nodeport-svc
 ````
-
+Or on the kubernetes cluster
+```bash
+kubectl get pods -o wide
+```
+And get the IP-address of a the worker node
 Example address: mongodb:
 `mongodb://adminuser:password123@192.168.49.2:32000/`
 
 ## Commands
 
---p is the parallelism in the flink cluster
-
 ### Example command for SYS-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic senml-source --p 1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
 ```
 
 ### Example command for TAXI-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap x.x --topic senml-source --p 1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=TAXI-210
 ```
 
 ### Example command for FIT-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap x.x --topic senml-source --p 1
+flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=FIT-210
 ```
-
-
-
 
 ---
 
+<!--
 ## Deprecated:
 
 Please consider Emmanuels setup for the Kafka-cluster in the kubernetes-folder. For the event-generation please consider the README in the 
@@ -108,7 +103,6 @@ kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --re
 ```
 ---
 
-<!--
 ```bash
 flink run -m localhost:8081 ./pred/build/PredJob.jar --deploymentMode L --topoName IdentityTopology --input ./pred/src/main/resources/datasets/SYS_sample_data_senml.csv --experiRunId SYS-210 --scalingFactor 0.01 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./pred/src/main/resources/configs/all_tasks.properties --taskName bench
 ```

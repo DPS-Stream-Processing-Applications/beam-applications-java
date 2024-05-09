@@ -59,10 +59,12 @@ kubectl run kafka-consumer -it \
 # Installing MongoDB
 
 ```bash
-helm repo add mongodb https://mongodb.github.io/helm-charts/
-helm install mongodb-operator mongodb/community-operator
-# helm install mongodb-operator-crds mongodb/community-operator-crds
 kubectl apply -f templates/mongodb-deployment.yaml
+kubectl apply -f templates/mongodb-client.yaml
+kubectl apply -f templates/mongodb-nodeport.yaml
+kubectl apply -f templates/mongodb-pv.yaml
+kubectl apply -f templates/mongodb-pvc.yaml
+kubectl apply -f templates/mongodb-secret.yaml
 ```
 
-After the cluster is configured Flink jobs can be deployed normally through `flink run -m localhost:8081`.
+After the cluster is configured Flink jobs can be deployed normally through `flink run <path_to_jar>`.

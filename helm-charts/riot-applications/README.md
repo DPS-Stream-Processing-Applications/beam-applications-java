@@ -1,8 +1,9 @@
 # Kubernetes setup
+>[!WARNING]
+> Make sure the operators for `Flink` and `Kafka` are installed via `helm` before attempting to install this custom chart. 
+
 >[!NOTE]
 >This whole helm chart can also be installed using the following command: `helm install riot-applications .`
-> >[!WARNING]
-> > Make sure the operators for `Flink` and `Kafka` are installed via `helm` before attempting to install this custom chart. 
 
 Install the certificate manager first:
 ```bash

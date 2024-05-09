@@ -6,7 +6,7 @@ type: application
 version: 0.1.0
 appVersion: "0.1.0"
 
-dependencies:
-  - name: flink-operator
-    repository: https://downloads.apache.org/flink/flink-kuberntes-operator-1.8.0/
-    version: 1.8.0
+# dependencies:
+#   - name: flink-operator
+#     repository: https://downloads.apache.org/flink/flink-kuberntes-operator-1.8.0/
+#     version: 1.8.0

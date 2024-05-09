@@ -26,11 +26,7 @@ public class StoreStringInDBSink extends PTransform<PCollection<String>, PDone> 
         .apply(
             MongoDbIO.write()
                 .withUri(
-                    /* INFO: This string can be acquired via the following command:
-                     * kubectl get secret riot-applications-mongodb-admin-default \
-                     * -o json | jq -r '.data | with_entries(.value |= @base64d)'
-                     */
-                    "mongodb+srv://default:passwd@riot-applications-mongodb-svc.default.svc.cluster.local/admin?replicaSet=riot-applications-mongodb&ssl=false")
+                    "mongodb://adminuser:password123@mongodb-nodeport.default.svc.cluster.local/admin")
                 .withDatabase("riot-applications")
                 .withCollection(this.collection));
   }

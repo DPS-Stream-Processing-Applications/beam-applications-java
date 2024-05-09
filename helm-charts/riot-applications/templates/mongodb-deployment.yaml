@@ -1,59 +1,61 @@
-apiVersion: mongodbcommunity.mongodb.com/v1
-kind: MongoDBCommunity
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: riot-applications-mongodb
+  labels:
+    app: mongodb
+  name: mongodb
 spec:
-  members: 3
-  type: ReplicaSet
-  version: "6.0.5"
-  security:
-    authentication:
-      modes: ["SCRAM"]
-  users:
-    - name: default
-      db: admin
-      passwordSecretRef:
-        name: default-password
-      roles:
-        - name: clusterAdmin
-          db: admin
-        - name: userAdminAnyDatabase
-          db: admin
-        - name: readWrite
-          db: riot-applications
-      scramCredentialsSecretName: my-scram
-  statefulSet:
-      spec:
-        volumeClaimTemplates:
-        - metadata:
-            name: data-volume
-          spec:
-            accessModes: ["ReadWrite"]
-            storageClassName: fast
-            resources:
-              requests:
-                storage: 5Gi
-            selector:
-              matchLabels:
-                type: data
-        - metadata:
-            name: logs-volume
-          spec:
-            accessModes: ["ReadWrite"]
-            storageClassName: fast
-            resources:
-              requests:
-                storage: 5Gi
-            selector:
-              matchLabels:
-                type: logs
-
-
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: default-password
-# type: Opaque
-# stringData:
-#   password: passwd
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - image: mongo
+        name: mongodb
+        args: ["--dbpath","/data/db"]
+        livenessProbe:
+          exec:
+            command:
+              - mongosh
+              - --eval
+              - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+              - mongosh
+              - --eval
+              - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 6
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        volumeMounts:
+        - name: "mongodb-data-dir"
+          mountPath: "/data/db"
+      volumes:
+      - name: "mongodb-data-dir"
+        persistentVolumeClaim:
+          claimName: "mongodb-data"

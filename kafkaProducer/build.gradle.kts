@@ -46,11 +46,3 @@ tasks.named<Jar>("jar") {
   from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
   isZip64 = true
 }
-
-/*tasks.named<CreateStartScripts>("CreateStartScripts") {
-     val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.eventGenerator.KafkaProducer"
-     mainClass = mainClassName
-     applicationName = "kafkaProducer"
-     outputDir = file("build")
-     classpath = files("build/KafkaProducer.jar")
- }*/

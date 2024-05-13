@@ -39,9 +39,13 @@ You might also want to install [nix-direnv](https://github.com/nix-community/nix
 This project makes use of the Gradle wrapper to provide every developer with the same version of Gradle. No global Gradle installation is needed.
 Use the `gradlew` binary for every Gradle command.
 
-# Running a Job with Flink
-The nix development environment provides a Flink binary installation to be used for deploying flink jobs.
-Each subproject has a `jar` build task that builds the `.jar` file of the job that can then be submitted to a Flink cluster.
+# Dev Environment
+
+## Local Flink Cluster
+If you want to deploy a standalone Flink job with no dependencies on external sources or sinks,
+you can do this via the available scripts `start-cluster.sh` and `stop-cluster.sh`.
+These scripts are available from your `PATH` once you are in the nix development shell. 
+
 >[!IMPORTANT]
 >Running the `start-cluster.sh` command for the first time might lead to the following error:
 >```bash
@@ -49,63 +53,35 @@ Each subproject has a `jar` build task that builds the `.jar` file of the job th
 >```
 > Invoking `flink --version` once appears to solve this issue.
 
-For example:
+## Kubernetes
+For all the applications in this repository external resources are required.
+These resources are all managed within a Kubernetes cluster.
+
+### Local K8S Cluster
+> [!IMPORTANT]
+> Make sure you have `[docker](https://www.docker.com/)` installed on your system before reading further.
+
+The nix dev shell provides `k3d` as means to spin up a local Kubernetes cluster.
+Follow the [quick start guide](https://k3d.io/v5.6.3/#quick-start) to set up an empty cluster.
+
+### Helm Deployment
+All the applications of this repository depend on external resources like an Apache `Kafka` cluster as well as a `mongoDB` database.
+All dependencies for the applications are managed and deployed via a custom `helm chart` in the `helm-charts` directory.
+Refer to the [README](./helm-charts/riot-applications/README.md) for an installation walkthrough.
+
+## Running a Job with Flink
+The nix development environment provides a Flink binary installation to be used for deploying Flink jobs.
+Each subproject has a `jar` build task that builds the `.jar` file of the job that can then be submitted to a Flink cluster.
+The following commands will enter the development envrionment, build all applications, start a local Flink cluster
+and submit the `ETLJob.jar` job to the Flink cluster.
+
+>[!WARN]
+> Make sure you have either the [Local Flink Cluster](#local-flink-cluster) or the [Kubernetes deployment](#kubernetes)
+> set up before attempting to run a Flink job.
+
 ```bash
 nix develop # INFO: Not needed if already in a nix shell or using direnv.
 ./gradlew build
-start-cluster.sh
-flink run -m localhost:8081 ./etl/build/FlinkJob.jar
-stop-cluster.sh
-```
-Will build all applications, start a local Flink cluster and submit the `ETLJob.jar` job to the locally running cluster.
-
-# Developing an Application
-This project is structured in the following way:
-Each application is its own Gradle [subproject](https://docs.gradle.org/current/userguide/multi_project_builds.html).
-For Flink applications there exists a [Gradle conventions plugin](https://docs.gradle.org/current/samples/sample_convention_plugins.html) called `flink-job-conventions`. This plugin manages basic dependencies like the Beam core library and the Flink runner as well as testing dependencies.
-
-The root `build.gradle.kts` file contains the config for the [Spotless](https://github.com/diffplug/spotless) formatter.
-
-Each subproject has its own `build.gradle.kts` file and needs to be added to the `settings.gradle.kts` file.
-For a Flink application subproject a minimal `build.gradle.kts` file might look like this:
-
-```kotlin
-plugins {
-    id("java")
-    // INFO: This plugin is in `buildSrc` and manages shared dependencies.
-    id("flink-job-conventions")
-}
-
-val mainClassName = // TODO: Add the java main class name string.
-
-application {
-    mainClass = mainClassName
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    // TODO: Add application specific dependencies.
-}
-
-tasks.named<Jar>("jar") {
-    archiveBaseName.set(/* TODO: Specify the archive name. */)
-    destinationDirectory.set(file("build"))
-    manifest {
-        attributes(
-            "Main-Class" to mainClassName,
-        )
-    }
-    exclude("META-INF/*.SF")
-    exclude("META-INF/*.DSA")
-    exclude("META-INF/*.RSA")
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    isZip64 = true
-}
+flink run ./etl/build/FlinkJob.jar
 ```
 
-After that Gradle will automatically detect the new subproject and build it when calling `./gradlew build` from the project root.
-`Spotless` formatting will also be enforced.

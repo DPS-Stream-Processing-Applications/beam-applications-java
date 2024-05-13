@@ -1,9 +1,7 @@
 # Kubernetes setup
 >[!WARNING]
 > Make sure the operators for `Flink` and `Kafka` are installed via `helm` before attempting to install this custom chart. 
-
->[!NOTE]
->This whole helm chart can also be installed using the following command: `helm install riot-applications .`
+> Then, this chart can be installed using the following command: `helm install riot-applications .`
 
 Install the certificate manager first:
 ```bash
@@ -13,6 +11,7 @@ Installing the `Flink` operator and deploying a session cluster:
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
 helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
+
 kubectl apply -f templates/flink-session-cluster-deployment.yaml
 ```
 
@@ -20,6 +19,7 @@ Installing the kafka operator as well as setting up the topics:
 ```bash
 helm repo add strimzi https://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
+
 kubectl apply -f templates/kafka-cluster.yaml 
 kubectl apply -f templates/kafka-topic-senml-source.yaml 
 kubectl apply -f templates/kafka-topic-senml-cleaned.yaml 

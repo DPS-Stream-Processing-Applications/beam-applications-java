@@ -6,11 +6,15 @@ import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.RangeFilterFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.ETLPipeline;
 import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
+import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.WriteStringSink;
+import at.ac.uibk.dps.streamprocessingapplications.shared.sources.ReadSenMLSource;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
@@ -23,28 +27,25 @@ public class FlinkJob {
     // options.setParallelism(4);
 
     Pipeline pipeline = Pipeline.create(options);
-
-    pipeline
-        .apply(Create.of(TaxiTestObjects.testPacks))
-        .apply(
-            new ETLPipeline<>(
-                TypeDescriptor.of(TaxiRide.class),
-                TaxiSenMLParserJSON::parseSenMLPack,
-                new RangeFilterFunction(),
-                TaxiTestObjects.buildTestBloomFilter(),
-                new InterpolationFunction(),
-                5,
-                new AnnotationFunction()))
-        .apply(MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString))
-        .apply(ParDo.of(new FlinkJob.PrintFn()));
+    PCollection<String> etl_strings =
+        pipeline
+            .apply(new ReadSenMLSource("senml-source"))
+            .apply(
+                new ETLPipeline<>(
+                    TypeDescriptor.of(TaxiRide.class),
+                    TaxiSenMLParserJSON::parseSenMLPack,
+                    new RangeFilterFunction(),
+                    // TaxiTestObjects.buildTestBloomFilter(),
+                    null,
+                    new InterpolationFunction(),
+                    5,
+                    new AnnotationFunction()))
+            .apply(
+                "Serialize SenML to String",
+                MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString));
+    etl_strings.apply(new WriteStringSink("senml-cleaned"));
+    etl_strings.apply(new StoreStringInDBSink("senml-cleaned"));
 
     pipeline.run();
-  }
-
-  static class PrintFn extends DoFn<String, Void> {
-    @ProcessElement
-    public void processElement(@Element String element) {
-      System.out.println(element);
-    }
   }
 }

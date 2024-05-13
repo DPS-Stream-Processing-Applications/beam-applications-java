@@ -1,12 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
+import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
 import java.util.List;
+import java.util.Objects;
 import org.apache.beam.sdk.transforms.*;
-import org.apache.beam.sdk.values.KV;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.TypeDescriptor;
+import org.apache.beam.sdk.values.*;
 
-public class STATSPipeline<T> extends PTransform<PCollection<String>, PCollection<byte[]>> {
+public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
   private final TypeDescriptor<T> typeDescriptor;
   private final SerializableFunction<String, T> parser;
   private final DoFn<Iterable<T>, Double> averagingFunction;
@@ -33,29 +33,35 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PCollectio
   }
 
   @Override
-  public PCollection<byte[]> expand(PCollection<String> input) {
+  public PDone expand(PCollection<String> input) {
 
     PCollection<T> parsedObjects =
         input.apply("Parse", MapElements.into(this.typeDescriptor).via(this.parser));
 
-    PCollection<byte[]> average =
+    PDone average =
         parsedObjects
             .apply("Average", new Average<>(this.averagingFunction, batchSize))
-            .apply("Visualise", new Visualise<>(new AveragePlot(), 10));
+            .apply("Visualise", new Visualise<>(new AveragePlot(), 10))
+            .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
+            .apply(new StoreStringInDBSink("plots"));
 
-    PCollection<byte[]> kalmanAndPredict =
+    PDone kalmanAndPredict =
         parsedObjects
             .apply(WithKeys.of(""))
             .apply("KalmanFilter", ParDo.of(this.kalmanFilterFunction))
             .apply("SlidingLinearReg", ParDo.of(this.slidingLinearRegressionFunction))
             .apply(Values.create())
-            .apply("Visualise", new Visualise<>(new KalmanRegressionPlot(), 10));
+            .apply("Visualise", new Visualise<>(new KalmanRegressionPlot(), 10))
+            .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
+            .apply(new StoreStringInDBSink("plots"));
 
-    PCollection<byte[]> distinctCount =
+    PDone distinctCount =
         parsedObjects
             .apply(
                 "Count Distinct", new DistinctCount<>(this.distinctCountFunction, this.batchSize))
-            .apply("Visualise", new Visualise<>(new DistinctCountPlot(), 10));
-    return kalmanAndPredict;
+            .apply("Visualise", new Visualise<>(new DistinctCountPlot(), 10))
+            .apply(MapElements.into(TypeDescriptors.strings()).via(Objects::toString))
+            .apply(new StoreStringInDBSink("plots"));
+    return distinctCount;
   }
 }

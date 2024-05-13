@@ -9,14 +9,27 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://packages.confluent.io/maven")
+    }
 }
 
 dependencies {
     implementation("org.apache.beam:beam-sdks-java-core:2.54.0")
     implementation("org.apache.beam:beam-runners-direct-java:2.54.0")
     implementation("org.apache.beam:beam-runners-flink-1.16:2.54.0")
+    implementation("org.apache.beam:beam-sdks-java-io-kafka:2.54.0")
+    implementation("org.apache.beam:beam-sdks-java-io-mongodb:2.54.0")
     implementation("org.slf4j:slf4j-jdk14:1.7.32")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
+    /* INFO:
+     * The beam `KafkaIO` does not specify the kafka client which is needed to interact with the kafka topics.
+     * Instead, one needs to add the `kafka-clients` dependency
+     * with the version of the kafka cluster to be interfaced with.
+     *
+     * For this implementation it needs to match the kafka version in `kafka-cluster.yaml`.
+     */
+    implementation("org.apache.kafka:kafka-clients:3.7.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -31,8 +44,9 @@ java {
         vendor = JvmVendorSpec.ADOPTOPENJDK
     }
 
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-}

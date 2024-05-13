@@ -1,0 +1,7 @@
+To make the `Flink` Jobmanager and the `Kafka` bootstrap available,
+run the port forwardig script from the root of this project `./utils/portforwarding.sh`
+This will forward ports 8081 and 9093
+
+The `Flink` dashboard is available under `localhost:8081`
+The kafkaProducer will acces 9093.
+

@@ -7,5 +7,12 @@
 # Ignore Gradle build output directory
 build
 
-#Ignore log files
+# Ignore vscode folder
+/senMlConverter/.vscode/
+
+# Ignore pycache folder
+/senMlConverter/src/main/__pycache__/
+
+# Ignore log files
 *.log
+

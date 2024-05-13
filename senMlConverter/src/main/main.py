@@ -2,6 +2,7 @@ import sys
 import os
 import pandas as pd
 from taxi_converter import TaxiConverter
+from train_converter import TrainConverter
 from fit_converter import FitConverter
 from taxi_modifier import (
     filter_date,
@@ -64,6 +65,11 @@ def convert_fit(input, output,use_riotbench_format):
     else:
         converter.convert_to_senml_csv(10000)
 
+def convert_train(output_file, interval, time_bench):
+    converter = TrainConverter(output_file, interval, time_bench)
+    converter.convert_to_senml_csv(10000)
+
+
 
 if __name__ == "__main__":
     dataset = os.environ.get("DATASET")
@@ -90,6 +96,14 @@ if __name__ == "__main__":
         input_file = "/home/input_joined_fit.csv"
         create_table_fit(input_file, 1417890600020)
         convert_fit(input_file, output_file, use_riotbench_format)
+
+    elif dataset=="TRAIN":
+        output_file = os.environ.get("OUTPUT_FILE")
+
+        if not output_file:
+            raise ValueError("Missing required environment variables for FIT dataset")
+        convert_train(output_file, interval=30, time_bench=60)
+
 
     else:
         raise ValueError("No valid dataset-type given via -e DATASET=")

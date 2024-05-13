@@ -107,6 +107,7 @@ public class PredJob {
         PipelineOptionsFactory.fromArgs(args).withValidation().as(PredCustomOptions.class);
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
+    options.setLatencyTrackingInterval(5L);
 
     Pipeline p = Pipeline.create(options);
 

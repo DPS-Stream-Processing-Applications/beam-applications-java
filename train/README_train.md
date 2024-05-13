@@ -1,13 +1,19 @@
 # README for  the train-application
 
+## Commandline arguments
+
+
+* URL for database
+* experiRunId (FIT/SYS/TAXI/GRID- number)
+
 
 ## General process
 
 1. Start kafka server
 2. Start mongodb server
 3. Find server address of both services
-4. Start flink application
-5. Start kafkaProducer
+4. Start flink application (will run forever)
+5. Start kafkaProducer (will also run forever)
 
 
 ## Setting up MongoDb
@@ -27,11 +33,44 @@ I used this command to get the ip-address and port of my db
 minikube service --url mongo-nodeport-svc
 ````
 
+Or on the kubernetes cluster
+```bash
+kubectl get pods -o wide
+```
+And get the IP-address of a the worker node
+Example address: mongodb:
+
 Example address: mongodb:
 `mongodb://adminuser:password123@192.168.49.2:32000/`
 
 
+## Commands
 
+#### Example command for the CITY dataset
+
+```bash
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+```
+
+#### Example command for the FIT dataset
+```bash
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+```
+
+
+#### Example command for the TAXI dataset
+```bash
+flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+```
+
+---
+
+## Setup kafkaProducer:
+
+Please consider Emmanuels setup for the Kafka-cluster in the kubernetes-folder. For the event-generation please consider the README in the
+`kafkaProducerFolder`
+
+<!--
 ## Setting up Apache Kafka
 In the `kafkaProducer` directory is a deployment.yaml file
 ```bash
@@ -51,32 +90,6 @@ This commands tears down the cluster
 kubectl -n kafka delete $(kubectl get strimzi -o name -n kafka)
 ```
 
-
-
-
-
-#### Example command for the CITY dataset
-```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId SYS-210  --taskName bench  --bootstrap x.x --topic test-1
-
-
-```
-
-#### Example command for the FIT dataset
-```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId FIT-210  --taskName bench  --bootstrap x.x --topic test-1
-
-
-```
-
-#### Example command for the TAXI dataset
-```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl mongodb://adminuser:password123@x:32000/ --topoName IdentityTopology --experiRunId TAXI-210  --taskName bench  --bootstrap x.x --topic test-1
-
-
-```
-
-
 ## Setting up Apache Kafka Producer
 In the `kafkaProducer` directory is a Dockerfile.
 
@@ -92,7 +105,6 @@ Please make sure that the bootstrapserver, the application and the expected data
 kubectl run kafka-producer --image=kafka-producer --image-pull-policy=Never --restart=Never --env="BOOTSTRAP_SERVER=192.168.49.2:31316" --env="APPLICATION=train" --env="DATASET=SYS" --env="SCALING=0.001" --env="TOPIC=test-1" 
 ```
 
-<!--
 ### Example command for the CITY dataset
 ```bash
 flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --input ./train/src/main/resources/datasets/inputFileForTimerSpout-CITY.csv --inputTrainSet ./train/src/main/resources/datasets/SYS_sample_data_senml.csv --experiRunId SYS-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./train/src/main/resources/configs/all_tasks.properties --taskName bench
@@ -116,3 +128,4 @@ flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topo
 flink run -m localhost:8081 ./train/build/TrainJob.jar --deploymentMode L --topoName IdentityTopology --input ./train/src/main/resources/datasets/inputFileForTimerSpout-FIT.csv  --inputTrainSet /home/jona/Documents/Bachelor_thesis/Datasets/output_FIT_small.csv --experiRunId FIT-210 --scalingFactor 0.001 --outputDir /home/jona/Documents/Bachelor_thesis/logs --taskProp ./train/src/main/resources/configs/all_tasks.properties --taskName bench
 ```
 -->
+

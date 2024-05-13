@@ -2,113 +2,123 @@ package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
 /** Created by tarun on 28/5/15. */
 public class ArgumentClass {
-    String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
-    String topoName;
-    String inputDatasetPathName; // Full path along with File Name
-    String inputTrainDataset;
-    String experiRunId;
-    double scalingFactor; // Deceleration factor with respect to seconds.
-    String outputDirName; // Path where the output log file from spout and sink has to be kept
-    String tasksPropertiesFilename;
-    String tasksName;
-    String bootStrapServerKafka;
-    String kafkaTopic;
+  String deploymentMode; // Local ('L') or Distributed-cluster ('C') Mode
+  String topoName;
+  String inputDatasetPathName; // Full path along with File Name
+  String inputTrainDataset;
+  String experiRunId;
+  double scalingFactor; // Deceleration factor with respect to seconds.
+  String outputDirName; // Path where the output log file from spout and sink has to be kept
+  String tasksPropertiesFilename;
+  String tasksName;
+  String bootStrapServerKafka;
+  String kafkaTopic;
 
-    String databaseUrl;
+  String databaseUrl;
 
-    public String getDatabaseUrl() {
-        return databaseUrl;
-    }
+  int parallelism;
 
-    public void setDatabaseUrl(String databaseUrl) {
-        this.databaseUrl = databaseUrl;
-    }
+  public int getParallelism() {
+    return parallelism;
+  }
 
-    public String getBootStrapServerKafka() {
-        return bootStrapServerKafka;
-    }
+  public void setParallelism(int parallelism) {
+    this.parallelism = parallelism;
+  }
 
-    public void setBootStrapServerKafka(String bootStrapServerKafka) {
-        this.bootStrapServerKafka = bootStrapServerKafka;
-    }
+  public String getDatabaseUrl() {
+    return databaseUrl;
+  }
 
-    public String getKafkaTopic() {
-        return kafkaTopic;
-    }
+  public void setDatabaseUrl(String databaseUrl) {
+    this.databaseUrl = databaseUrl;
+  }
 
-    public void setKafkaTopic(String kafkaTopic) {
-        this.kafkaTopic = kafkaTopic;
-    }
+  public String getBootStrapServerKafka() {
+    return bootStrapServerKafka;
+  }
 
-    public String getTasksName() {
-        return tasksName;
-    }
+  public void setBootStrapServerKafka(String bootStrapServerKafka) {
+    this.bootStrapServerKafka = bootStrapServerKafka;
+  }
 
-    public void setTasksName(String tasksName) {
-        this.tasksName = tasksName;
-    }
+  public String getKafkaTopic() {
+    return kafkaTopic;
+  }
 
-    public String getOutputDirName() {
-        return outputDirName;
-    }
+  public void setKafkaTopic(String kafkaTopic) {
+    this.kafkaTopic = kafkaTopic;
+  }
 
-    public void setOutputDirName(String outputDirName) {
-        this.outputDirName = outputDirName;
-    }
+  public String getTasksName() {
+    return tasksName;
+  }
 
-    public String getDeploymentMode() {
-        return deploymentMode;
-    }
+  public void setTasksName(String tasksName) {
+    this.tasksName = tasksName;
+  }
 
-    public void setDeploymentMode(String deploymentMode) {
-        this.deploymentMode = deploymentMode;
-    }
+  public String getOutputDirName() {
+    return outputDirName;
+  }
 
-    public String getTopoName() {
-        return topoName;
-    }
+  public void setOutputDirName(String outputDirName) {
+    this.outputDirName = outputDirName;
+  }
 
-    public void setTopoName(String topoName) {
-        this.topoName = topoName;
-    }
+  public String getDeploymentMode() {
+    return deploymentMode;
+  }
 
-    public String getInputDatasetPathName() {
-        return inputDatasetPathName;
-    }
+  public void setDeploymentMode(String deploymentMode) {
+    this.deploymentMode = deploymentMode;
+  }
 
-    public void setInputDatasetPathName(String inputDatasetPathName) {
-        this.inputDatasetPathName = inputDatasetPathName;
-    }
+  public String getTopoName() {
+    return topoName;
+  }
 
-    public String getExperiRunId() {
-        return experiRunId;
-    }
+  public void setTopoName(String topoName) {
+    this.topoName = topoName;
+  }
 
-    public void setExperiRunId(String experiRunId) {
-        this.experiRunId = experiRunId;
-    }
+  public String getInputDatasetPathName() {
+    return inputDatasetPathName;
+  }
 
-    public double getScalingFactor() {
-        return scalingFactor;
-    }
+  public void setInputDatasetPathName(String inputDatasetPathName) {
+    this.inputDatasetPathName = inputDatasetPathName;
+  }
 
-    public void setScalingFactor(double scalingFactor) {
-        this.scalingFactor = scalingFactor;
-    }
+  public String getExperiRunId() {
+    return experiRunId;
+  }
 
-    public String getTasksPropertiesFilename() {
-        return tasksPropertiesFilename;
-    }
+  public void setExperiRunId(String experiRunId) {
+    this.experiRunId = experiRunId;
+  }
 
-    public void setTasksPropertiesFilename(String tasksPropertiesFilename) {
-        this.tasksPropertiesFilename = tasksPropertiesFilename;
-    }
+  public double getScalingFactor() {
+    return scalingFactor;
+  }
 
-    public String getInputTrainDataset() {
-        return inputTrainDataset;
-    }
+  public void setScalingFactor(double scalingFactor) {
+    this.scalingFactor = scalingFactor;
+  }
 
-    public void setInputTrainDataset(String inputTrainDataset) {
-        this.inputTrainDataset = inputTrainDataset;
-    }
+  public String getTasksPropertiesFilename() {
+    return tasksPropertiesFilename;
+  }
+
+  public void setTasksPropertiesFilename(String tasksPropertiesFilename) {
+    this.tasksPropertiesFilename = tasksPropertiesFilename;
+  }
+
+  public String getInputTrainDataset() {
+    return inputTrainDataset;
+  }
+
+  public void setInputTrainDataset(String inputTrainDataset) {
+    this.inputTrainDataset = inputTrainDataset;
+  }
 }

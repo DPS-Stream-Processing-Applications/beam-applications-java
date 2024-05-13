@@ -9,3 +9,15 @@
 ../gradlew run --args $(pwd)/test.csv
 # ../gradlew run --args "/home/eprader/beam-applications-java/nkafkaProducer/test.csv"
 ```
+
+## Test the train application
+
+```bash
+../gradlew run --args $(pwd)/test_input_TRAIN_SYS.csv
+```
+
+## Test the pred application
+
+```bash
+../gradlew run --args $(pwd)/test_input_PRED_TAXI.csv
+```

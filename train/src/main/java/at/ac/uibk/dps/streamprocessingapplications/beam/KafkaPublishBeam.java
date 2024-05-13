@@ -13,41 +13,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KafkaPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
-    private static Logger l;
-    MyKafkaProducer myKafkaProducer;
-    String server;
-    String topic;
-    private Properties p;
+  private static Logger l;
+  MyKafkaProducer myKafkaProducer;
+  String server;
+  String topic;
+  private Properties p;
 
-    public KafkaPublishBeam(Properties p_, String server, String topic) {
-        p = p_;
-        this.server = server;
-        this.topic = topic;
-    }
+  public KafkaPublishBeam(Properties p_, String server, String topic) {
+    p = p_;
+    this.server = server;
+    this.topic = topic;
+  }
 
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
+  public static void initLogger(Logger l_) {
+    l = l_;
+  }
 
-    @Setup
-    public void setup() throws MqttException {
-        initLogger(LoggerFactory.getLogger("APP"));
-        myKafkaProducer = new MyKafkaProducer(server, topic, p);
-        myKafkaProducer.setup(l, p);
-    }
+  @Setup
+  public void setup() throws MqttException {
+    initLogger(LoggerFactory.getLogger("APP"));
+    myKafkaProducer = new MyKafkaProducer(server, topic, p);
+    myKafkaProducer.setup(l, p);
+  }
 
-    @ProcessElement
-    public void processElement(
-            @Element BlobUploadEntry input, DoFn.OutputReceiver<MqttPublishEntry> out)
-            throws IOException {
-        String msgId = input.getMsgid();
-        String filename = input.getFileName();
+  @ProcessElement
+  public void processElement(
+      @Element BlobUploadEntry input, DoFn.OutputReceiver<MqttPublishEntry> out)
+      throws IOException {
+    String msgId = input.getMsgid();
+    String filename = input.getFileName();
 
-        HashMap<String, String> map = new HashMap();
-        map.put(AbstractTask.DEFAULT_KEY, filename);
-        Float res = 93f;
-        if (l.isInfoEnabled()) l.info("MQTT result:{}", res);
-        myKafkaProducer.doTask(map);
-        out.output(new MqttPublishEntry(msgId));
-    }
+    HashMap<String, String> map = new HashMap();
+    map.put(AbstractTask.DEFAULT_KEY, filename);
+    Float res = 93f;
+    if (l.isInfoEnabled()) l.info("MQTT result:{}", res);
+    myKafkaProducer.doTask(map);
+    out.output(new MqttPublishEntry(msgId));
+  }
 }

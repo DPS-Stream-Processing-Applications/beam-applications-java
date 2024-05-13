@@ -21,111 +21,109 @@ import org.slf4j.Logger;
  */
 public class AzureBlobUploadTask extends AbstractTask<String, Float> {
 
-    private static final Object SETUP_LOCK = new Object();
-    // static fields common to all threads
-    private static boolean doneSetup = false;
-    private static int useMsgField;
+  private static final Object SETUP_LOCK = new Object();
+  // static fields common to all threads
+  private static boolean doneSetup = false;
+  private static int useMsgField;
 
-    private static String storageConnStr;
-    private static String containerName;
-    private String[] localFilePaths;
+  private static String storageConnStr;
+  private static String containerName;
+  private String[] localFilePaths;
 
-    /***
-     *
-     * @param azStorageConnStr
-     * @param containerName
-     * @param l
-     * @return
-     */
-    public static CloudBlobContainer connectToAzContainer(
-            String azStorageConnStr, String containerName, Logger l) {
-        try {
-            // Retrieve storage account from connection-string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
+  /***
+   *
+   * @param azStorageConnStr
+   * @param containerName
+   * @param l
+   * @return
+   */
+  public static CloudBlobContainer connectToAzContainer(
+      String azStorageConnStr, String containerName, Logger l) {
+    try {
+      // Retrieve storage account from connection-string.
+      CloudStorageAccount storageAccount = CloudStorageAccount.parse(azStorageConnStr);
 
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+      // Create the blob client.
+      CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
 
-            // Retrieve reference to a previously created container.
-            CloudBlobContainer container = blobClient.getContainerReference(containerName);
+      // Retrieve reference to a previously created container.
+      CloudBlobContainer container = blobClient.getContainerReference(containerName);
 
-            return container;
-        } catch (Exception e) {
-            l.warn("Exception in connectToAzContainer: " + containerName + "\n" + e);
-        }
-
-        return null;
+      return container;
+    } catch (Exception e) {
+      l.warn("Exception in connectToAzContainer: " + containerName + "\n" + e);
     }
 
-    /***
-     * @param container
-     * @param localPath
-     * @param l  @return
-     */
+    return null;
+  }
 
-    public static int putAzBlob(CloudBlobContainer container, String localPath, Logger l) {
-        try {
-            String fileName = Paths.get(localPath).getFileName().toString();
+  /***
+   * @param container
+   * @param localPath
+   * @param l  @return
+   */
 
-            if (l.isInfoEnabled())
-                l.info(
-                        "Uploding File .... File name is {} from local file path : {} ",
-                        fileName,
-                        localPath);
+  public static int putAzBlob(CloudBlobContainer container, String localPath, Logger l) {
+    try {
+      String fileName = Paths.get(localPath).getFileName().toString();
 
-            CloudBlockBlob blob = container.getBlockBlobReference(fileName);
-            File source = new File(localPath);
-            blob.upload(new FileInputStream(source), source.length());
+      if (l.isInfoEnabled())
+        l.info(
+            "Uploding File .... File name is {} from local file path : {} ", fileName, localPath);
 
-            if (l.isInfoEnabled()) l.info("Uploding File successful");
+      CloudBlockBlob blob = container.getBlockBlobReference(fileName);
+      File source = new File(localPath);
+      blob.upload(new FileInputStream(source), source.length());
 
-            return 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            l.warn("Exception in getAzBlob: " + container);
-            return -1;
-        }
+      if (l.isInfoEnabled()) l.info("Uploding File successful");
+
+      return 1;
+    } catch (Exception e) {
+      e.printStackTrace();
+      l.warn("Exception in getAzBlob: " + container);
+      return -1;
+    }
+  }
+
+  public void setup(Logger l_, Properties p_) {
+    super.setup(l_, p_);
+    synchronized (SETUP_LOCK) {
+      if (!doneSetup) { // Do setup only once for this task
+        // If positive, use it for index over file names else read randomly
+        useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB.USE_MSG_FIELD"));
+        storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
+        containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
+        doneSetup = true;
+      }
+
+      String csvLocalPaths = p_.getProperty("IO.AZURE_BLOB_UPLOAD.FILE_SOURCE_PATH");
+      assert csvLocalPaths != null;
+      localFilePaths = csvLocalPaths.split(",");
+    }
+  }
+
+  @Override
+  protected Float doTaskLogic(Map<String, String> map) {
+    String m = map.get(AbstractTask.DEFAULT_KEY);
+    // pass file index to be downloaded in message or at random
+
+    int localFileSourcePathIndex;
+    String localFileSourcePath;
+    if (useMsgField > 0) {
+      // localFileSourcePathIndex = Integer.parseInt(m.split(",")[useMsgField - 1]) %
+      // localFilePaths.length;
+      // localFileSourcePath = localFilePaths[localFileSourcePathIndex];
+    } else if (useMsgField == 0) {
+      localFileSourcePath = m;
+    } else {
+      localFileSourcePathIndex = ThreadLocalRandom.current().nextInt(localFilePaths.length);
+      localFileSourcePath = localFilePaths[localFileSourcePathIndex];
     }
 
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                // If positive, use it for index over file names else read randomly
-                useMsgField = Integer.parseInt(p_.getProperty("IO.AZURE_BLOB.USE_MSG_FIELD"));
-                storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
-                containerName = p_.getProperty("IO.AZURE_BLOB.CONTAINER_NAME");
-                doneSetup = true;
-            }
+    // CloudBlobContainer container = connectToAzContainer(storageConnStr, containerName,  l);
+    // int result = putAzBlob(container,localFileSourcePath,l);
 
-            String csvLocalPaths = p_.getProperty("IO.AZURE_BLOB_UPLOAD.FILE_SOURCE_PATH");
-            assert csvLocalPaths != null;
-            localFilePaths = csvLocalPaths.split(",");
-        }
-    }
-
-    @Override
-    protected Float doTaskLogic(Map<String, String> map) {
-        String m = map.get(AbstractTask.DEFAULT_KEY);
-        // pass file index to be downloaded in message or at random
-
-        int localFileSourcePathIndex;
-        String localFileSourcePath;
-        if (useMsgField > 0) {
-            // localFileSourcePathIndex = Integer.parseInt(m.split(",")[useMsgField - 1]) %
-            // localFilePaths.length;
-            // localFileSourcePath = localFilePaths[localFileSourcePathIndex];
-        } else if (useMsgField == 0) {
-            localFileSourcePath = m;
-        } else {
-            localFileSourcePathIndex = ThreadLocalRandom.current().nextInt(localFilePaths.length);
-            localFileSourcePath = localFilePaths[localFileSourcePathIndex];
-        }
-
-        // CloudBlobContainer container = connectToAzContainer(storageConnStr, containerName,  l);
-        // int result = putAzBlob(container,localFileSourcePath,l);
-
-        int result = 1;
-        return Float.valueOf(result);
-    }
+    int result = 1;
+    return Float.valueOf(result);
+  }
 }

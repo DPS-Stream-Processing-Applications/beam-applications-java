@@ -5,29 +5,29 @@ import com.microsoft.azure.storage.table.TableServiceEntity;
 import java.util.List;
 
 public class Measurement extends TableServiceEntity {
-    private String ts;
+  private String ts;
 
-    @SerializedName("e")
-    private List<SensorData> sensorDataList;
+  @SerializedName("e")
+  private List<SensorData> sensorDataList;
 
-    public String getTs() {
-        return ts;
-    }
+  public String getTs() {
+    return ts;
+  }
 
-    public void setTs(String ts) {
-        this.ts = ts;
-    }
+  public void setTs(String ts) {
+    this.ts = ts;
+  }
 
-    public List<SensorData> getSensorDataList() {
-        return sensorDataList;
-    }
+  public List<SensorData> getSensorDataList() {
+    return sensorDataList;
+  }
 
-    public void setSensorDataList(List<SensorData> sensorDataList) {
-        this.sensorDataList = sensorDataList;
-    }
+  public void setSensorDataList(List<SensorData> sensorDataList) {
+    this.sensorDataList = sensorDataList;
+  }
 
-    @Override
-    public String toString() {
-        return "Measurement{" + "ts='" + ts + '\'' + ", sensorDataList=" + sensorDataList + '}';
-    }
+  @Override
+  public String toString() {
+    return "Measurement{" + "ts='" + ts + '\'' + ", sensorDataList=" + sensorDataList + '}';
+  }
 }

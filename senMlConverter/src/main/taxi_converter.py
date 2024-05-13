@@ -12,10 +12,11 @@ def date_to_unix_timestamp(date_string):
 
 
 class TaxiConverter(Converter):
-    def __init__(self, inputFile, outputFile):
+    def __init__(self, inputFile, outputFile, scaling_factor):
         self.inputFile = inputFile
         self.outputFile = outputFile
         self.total_entries = 0
+        self.scaling_factor = float(scaling_factor)
 
     def convert_to_senml_csv(self, chunk_size):
         with open(self.outputFile, "w", newline="") as csvfile:
@@ -26,7 +27,8 @@ class TaxiConverter(Converter):
                 quoting=csv.QUOTE_NONE,
                 escapechar=" ",
             )
-
+            set_first_timestamp = True
+            first_timestamp = 0
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 for index, row in chunk.iterrows():
                     list_senml = list()
@@ -83,9 +85,26 @@ class TaxiConverter(Converter):
                         + "]"
                     )
                     list_senml.append(senml_string)
+                    delay_stamp = 0
+                    if set_first_timestamp:
+                        first_timestamp = date_to_unix_timestamp(
+                            row[" pickup_datetime"]
+                        )
+                        delay_stamp = 5 * 1000
+                        set_first_timestamp = False
+                    else:
+                        delay_stamp = (
+                            date_to_unix_timestamp(row[" pickup_datetime"])
+                            - first_timestamp
+                        )
+                        if delay_stamp == 0:
+                            delay_stamp = 5
+                        delay_stamp = delay_stamp * 1000
+                        if delay_stamp != 5000:
+                            delay_stamp = int(delay_stamp / self.scaling_factor)
                     writer.writerow(
                         [
-                            date_to_unix_timestamp(row[" pickup_datetime"]),
+                            delay_stamp,
                             (list_senml[0]),
                         ]
                     )
@@ -187,7 +206,7 @@ class TaxiConverter(Converter):
         pass
 
     def print_first_line(self):
-        chunk_size = 100
+        chunk_size = 10000
         for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
             for index, row in chunk.iterrows():
                 print(row)

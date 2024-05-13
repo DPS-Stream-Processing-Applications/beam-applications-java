@@ -1,6 +1,12 @@
 # Table to SenMl-Converter for the Event-Generator
 
 
+## Enter correct directory
+
+```bash
+cd senMlConverter/
+```
+
 ## Build the docker image
 
 ```bash
@@ -10,11 +16,10 @@ docker build -t senml_converter .
 
 ## Preprocessing the taxi dataset
 Used for this is the FOIL2013.zip, which can be downloaded from here: [Download taxi data](https://databank.illinois.edu/datasets/IDB-9610843). From this zip file the files `trip_data_1.csv` and `trip_fare_1.csv` are needed. 
-Place these files into the `data-folder`. When running the docker container as shown below two files will be created in the `data-folder`. `input_joined.csv` contains the joined table of these two datasets, while the second file contains the senml-output format. For this creating entries from the 2013-01-14 to the 2013-01-21 will be included, as described in the paper. 
-
+Place these files into the `data` folder in the current directory. When running the docker container as shown below two files will be created in the `data-folder`. `input_joined.csv` contains the joined table of these two datasets, while the `output_taxi.csv` file contains the senml-output format used for the kafkaProducer. For this creating entries from the 2013-01-14 to the 2013-01-21 will be included, as described in the RIOTBench paper. Because these seven days would be too long for the benchmark the milliseconds are divided by a scaling factor which can be specified by 
 
 ```bash
-docker run --rm -it -v $PWD/data:/home -e DATASET="TAXI" -e INPUT_FILE_FARE="/home/trip_fare_1.csv" -e INPUT_FILE_TRIP="/home/trip_data_1.csv" -e OUTPUT_FILE="/home/output_taxi.csv" senml_converter
+docker run --rm -it -v $PWD/data:/home -e DATASET="TAXI" -e INPUT_FILE_FARE="/home/trip_fare_1.csv" -e INPUT_FILE_TRIP="/home/trip_data_1.csv" -e OUTPUT_FILE="/home/output_taxi.csv" -e SCALING="260" senml_converter
 ```
 
 ## Preprocessing the fit dataset

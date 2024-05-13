@@ -49,8 +49,8 @@ def create_table_taxi(input_fare, input_trip):
     ordered_df.to_csv(output_file, index=False)
 
 
-def convert_taxi(input, output, use_riotbench_format):
-    converter = TaxiConverter(input, output)
+def convert_taxi(input, output, use_riotbench_format,scaling_factor):
+    converter = TaxiConverter(input, output,scaling_factor)
     if use_riotbench_format:
         converter.converter_to_senml_riotbench_csv(10000)
     else:
@@ -67,6 +67,7 @@ def convert_fit(input, output,use_riotbench_format):
 
 if __name__ == "__main__":
     dataset = os.environ.get("DATASET")
+    scaling_factor = os.environ.get("SCALING")
     use_riotbench_format = False
     if dataset == "TAXI":
         input_fare = os.environ.get("INPUT_FILE_FARE")
@@ -78,7 +79,7 @@ if __name__ == "__main__":
 
         create_table_taxi(input_fare, input_trip)
         input_file = "/home/input_joined.csv"
-        convert_taxi(input_file, output_file, use_riotbench_format)
+        convert_taxi(input_file, output_file, use_riotbench_format, scaling_factor)
 
     elif dataset == "FIT":
         output_file = os.environ.get("OUTPUT_FILE")

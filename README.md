@@ -75,7 +75,7 @@ Each subproject has a `jar` build task that builds the `.jar` file of the job th
 The following commands will enter the development envrionment, build all applications, start a local Flink cluster
 and submit the `ETLJob.jar` job to the Flink cluster.
 
->[!WARN]
+>[!WARNING]
 > Make sure you have either the [Local Flink Cluster](#local-flink-cluster) or the [Kubernetes deployment](#kubernetes)
 > set up before attempting to run a Flink job.
 

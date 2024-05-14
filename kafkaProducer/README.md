@@ -6,7 +6,7 @@
 > Make sure the kubernetes port is forwarded before you try running this program!
 
 ```bash
-../gradlew run --args $(pwd)/test.csv
+../gradlew run --args $(pwd)/test_TAXI.csv
 # ../gradlew run --args "/home/eprader/beam-applications-java/nkafkaProducer/test.csv"
 ```
 

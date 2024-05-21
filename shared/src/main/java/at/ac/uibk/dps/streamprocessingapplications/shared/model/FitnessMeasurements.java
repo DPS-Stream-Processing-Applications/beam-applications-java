@@ -335,6 +335,7 @@ public class FitnessMeasurements implements Serializable {
   public void setName(String name) {
     this.name.setValue(name);
   }
+
   @Override
   public String toString() {
     List<String> nonNullFields = new ArrayList<>();

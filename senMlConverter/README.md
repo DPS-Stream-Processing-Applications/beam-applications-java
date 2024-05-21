@@ -9,6 +9,7 @@ docker build -t senml_converter .
 > Please note that the processing can take some time,
 > because the application is not performance-optimized at all. 
 
+>[!NOTE]
 > The docker container should be run with the `./data` folder as the host directory.
 > This is achieved via `$PWD/../data:/home`.
 

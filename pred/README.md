@@ -7,8 +7,6 @@
 * experiRunId (FIT/SYS/TAXI/GRID- number)
 
 
-
-
 ## General process
 
 1. Start kafka server
@@ -33,31 +31,54 @@ kubectl apply -f .
 
 I used this command to get the ip-address and port of my db
 ````bash
-minikube service --url mongo-nodeport-svc
+minikube service --url mongodb-nodeport
 ````
-Or on the kubernetes cluster
+Or on the kubernetes cluster:
 ```bash
-kubectl get pods -o wide
+kubectl get nodes -o \
+    jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
 ```
-And get the IP-address of a the worker node
-Example address: mongodb:
-`mongodb://adminuser:password123@192.168.49.2:32000/`
+This will read the first nodes `InternalIP` to use in the `databaseUrl` argument.
+The following commands are automatically inlining this IP adress.
+
+<!-- And get the IP-address of a the worker node -->
+<!-- Example address: mongodb: -->
+<!-- `mongodb://adminuser:password123@192.168.49.2:32000/` -->
 
 ## Commands
 
 ### Example command for SYS-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=SYS-210
 ```
+$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 ### Example command for TAXI-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=TAXI-210
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=TAXI-210
 ```
 
 ### Example command for FIT-Data
 ```bash
-flink run -m localhost:8081 ./pred/build/PredJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=FIT-210
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=FIT-210
 ```
 
 ---

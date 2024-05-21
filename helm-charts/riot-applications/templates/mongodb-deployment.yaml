@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: mongodb
-  name: mongodb
+    app: mongo
+  name: mongo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongodb
+      app: mongo
   strategy: {}
   template:
     metadata:
       labels:
-        app: mongodb
+        app: mongo
     spec:
       containers:
       - image: mongo
-        name: mongodb
+        name: mongo
         args: ["--dbpath","/data/db"]
         livenessProbe:
           exec:
@@ -45,17 +45,17 @@ spec:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
             secretKeyRef:
-              name: mongodb-secret
+              name: mongo-creds
               key: username
         - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mongodb-secret
+              name: mongo-creds
               key: password
         volumeMounts:
-        - name: "mongodb-data-dir"
+        - name: "mongo-data-dir"
           mountPath: "/data/db"
       volumes:
-      - name: "mongodb-data-dir"
+      - name: "mongo-data-dir"
         persistentVolumeClaim:
-          claimName: "mongodb-data"
+          claimName: "mongo-data"

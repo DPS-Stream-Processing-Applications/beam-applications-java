@@ -7,9 +7,9 @@ import org.apache.beam.sdk.transforms.DoFn;
 public class DistinctCountFunction extends DoFn<Iterable<FitnessMeasurements>, Long> {
   @ProcessElement
   public void processElement(
-      @Element Iterable<FitnessMeasurements> taxiRides, OutputReceiver<Long> out) {
+      @Element Iterable<FitnessMeasurements> measurements, OutputReceiver<Long> out) {
     out.output(
-        StreamSupport.stream(taxiRides.spliterator(), false)
+        StreamSupport.stream(measurements.spliterator(), false)
             .map(FitnessMeasurements::getSubjectId)
             .distinct()
             .count());

@@ -1,5 +1,4 @@
 The default build command will build this Job for the `TAXI` dataset.
-
 ```bash
 ../gradlew build
 flink run ./build/FlinkJob.jar
@@ -13,3 +12,8 @@ Example for the `FIT` implementation:
 flink run ./build/FlinkJob.jar
 ```
 
+Example for the `GRID` implementation:
+```bash
+../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobGRID
+flink run ./build/FlinkJob.jar
+```

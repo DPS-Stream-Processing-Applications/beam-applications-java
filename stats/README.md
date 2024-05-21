@@ -12,4 +12,3 @@ Example for the `FIT` implementation:
 ../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobFIT
 flink run ./build/FlinkJob.jar
 ```
-

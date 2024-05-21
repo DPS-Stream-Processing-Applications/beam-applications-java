@@ -128,7 +128,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
     kafkaConsumer.subscribe(singleton(myKafkaConsumer.getTopic()), myKafkaConsumer);
 
-    while (count < numberLines) {
+    while (true) {
       /*
       List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
       if (entry == null) {

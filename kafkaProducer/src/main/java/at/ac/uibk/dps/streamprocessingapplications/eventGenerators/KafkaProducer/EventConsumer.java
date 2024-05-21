@@ -26,7 +26,7 @@ public class EventConsumer implements Runnable {
         try (Producer<Long, String> producer = new KafkaProducer<>(this.kafkaProperties)) {
           producer.send(
               new ProducerRecord<>(topic, Instant.now().getEpochSecond(), event.getEventString()));
-          System.out.println("sent");
+          // System.out.println("sent");
         }
       } catch (InterruptedException e) {
         throw new RuntimeException(e);

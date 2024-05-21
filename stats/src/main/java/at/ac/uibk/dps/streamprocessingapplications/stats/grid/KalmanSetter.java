@@ -1,11 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.grid;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.FitnessMeasurements;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.GridMeasurement;
-import org.apache.beam.sdk.transforms.SerializableBiFunction;
-
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apache.beam.sdk.transforms.SerializableBiFunction;
 
 public class KalmanSetter
     implements SerializableBiFunction<GridMeasurement, Double, GridMeasurement> {

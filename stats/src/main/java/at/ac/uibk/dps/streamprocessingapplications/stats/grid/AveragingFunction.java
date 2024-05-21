@@ -1,10 +1,8 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.grid;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.FitnessMeasurements;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.GridMeasurement;
-import org.apache.beam.sdk.transforms.DoFn;
-
 import java.util.stream.StreamSupport;
+import org.apache.beam.sdk.transforms.DoFn;
 
 public class AveragingFunction extends DoFn<Iterable<GridMeasurement>, Double> {
   @ProcessElement

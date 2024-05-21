@@ -1,8 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.FitSenMLParserJSON;
 import at.ac.uibk.dps.streamprocessingapplications.shared.GridSenMLParserJSON;
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.FitnessMeasurements;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.GridMeasurement;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sources.ReadSenMLSource;
 import at.ac.uibk.dps.streamprocessingapplications.stats.grid.AveragingFunction;

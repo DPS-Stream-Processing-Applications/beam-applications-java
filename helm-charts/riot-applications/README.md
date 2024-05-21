@@ -58,7 +58,7 @@ kubectl run kafka-consumer -it \
 --rm=true --restart=Never \
 -- bin/kafka-console-consumer.sh \
 --bootstrap-server kafka-cluster-kafka-bootstrap:9092 \
---topic plots-strings \
+--topic senml-cleaned
 ```
 
 

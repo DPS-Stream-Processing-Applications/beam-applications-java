@@ -14,7 +14,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 public class Main {
   public static void main(String[] args) {
     if (args.length == 0 || args[0].trim().isEmpty()) {
-      System.out.println("You need to specify a path!");
+      // System.out.println("You need to specify a path!");
       return;
     }
 
@@ -38,7 +38,7 @@ public class Main {
               .build();
       producer.submit(new EventProducer(eventQueue, reader));
     } catch (FileNotFoundException e) {
-      System.out.println("file_not_found");
+      // System.out.println("file_not_found");
     }
     // HACK for initial startup...
     while (eventQueue.isEmpty()) {}

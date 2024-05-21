@@ -4,22 +4,25 @@ plugins {
   id("flink-job-conventions")
 }
 
-val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.stats.FlinkJob"
-
 repositories { mavenCentral() }
 
 dependencies {
+  implementation("org.json:json:20240205")
   implementation(project(":shared"))
-  implementation("org.knowm.xchart:xchart:3.8.7")
-  implementation("org.apache.commons:commons-math:2.2")
 }
 
 tasks.named<Jar>("jar") {
   archiveBaseName.set("FlinkJob")
   destinationDirectory.set(file("build"))
   manifest {
+    /* NOTE:
+     * Allows the mainClass can be overridden using `-PmainClass=<custom_main_class>`
+     */
+    val mainClass =
+        project.findProperty("mainClass")?.toString()
+            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI"
     attributes(
-        "Main-Class" to mainClassName,
+        "Main-Class" to mainClass,
     )
   }
   exclude("META-INF/*.SF")

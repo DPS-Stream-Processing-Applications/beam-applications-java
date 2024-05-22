@@ -60,8 +60,8 @@ def convert_taxi(input, output, use_riotbench_format, scaling_factor):
         converter.convert_to_senml_csv(10000)
 
 
-def convert_fit(input, output, use_riotbench_format):
-    converter = FitConverter(input, output)
+def convert_fit(input, output, use_riotbench_format, scaling):
+    converter = FitConverter(input, output,scaling)
     if use_riotbench_format:
         converter.converter_to_senml_riotbench_csv(10000)
     else:
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     if not dataset:
         raise ValueError("Missing required environment variable DATASET")
-    elif not scaling_factor:
+    elif not scaling_factor and not dataset=="TRAIN":
         raise ValueError("Missing required environment variable SCALING")
     elif not output_file:
         raise ValueError("Missing required environment variable OUTPUT_FILE")
@@ -110,12 +110,21 @@ if __name__ == "__main__":
 
         input_file = "/home/input_joined_fit.csv"
         create_table_fit(input_file, 1417890600020)
-        convert_fit(input_file, output_file, use_riotbench_format)
+        convert_fit(input_file, output_file, use_riotbench_format,float(scaling_factor) or 1)
 
     elif dataset == "TRAIN":
         if not output_file:
-            raise ValueError("Missing required environment variables for FIT dataset")
-        convert_train(output_file, interval=30, time_bench=60)
+            raise ValueError("Missing required environment variables for TRAIN dataset")
+        interval = float(os.environ.get("INTERVAL")) or 30
+        time_bench = float(os.environ.get("DURATION")) or 60
+        scaling_factor = os.environ.get("SCALING")
+        convert_train(output_file, interval, time_bench)
+
+    elif dataset == "SYS":
+        if not output_file:
+            raise ValueError("Missing required environment variables for SYS dataset")
+        
+
 
     elif dataset == "GRID":
         # NOTE: `data` directory should be mounted as `/home`

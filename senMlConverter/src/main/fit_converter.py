@@ -4,9 +4,10 @@ from converter import Converter
 
 
 class FitConverter(Converter):
-    def __init__(self, inputFile, outputFile):
+    def __init__(self, inputFile, outputFile, scaling):
         self.inputFile = inputFile
         self.outputFile = outputFile
+        self.scaling = scaling
         self.total_entries = 0
 
     def convert_to_senml_csv(self, chunk_size):
@@ -18,7 +19,8 @@ class FitConverter(Converter):
                 quoting=csv.QUOTE_NONE,
                 escapechar=" ",
             )
-
+            set_first_timestamp = True
+            first_timestamp = 0
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 for index, row in chunk.iterrows():
                     list_senml = list()
@@ -151,7 +153,19 @@ class FitConverter(Converter):
                         + "]"
                     )
                     list_senml.append(senml_string)
-                    writer.writerow([row["timestamp"], (list_senml[0])])
+                    delay_stamp = 0
+                    if set_first_timestamp:
+                        first_timestamp = row["timestamp"]
+                        delay_stamp = 5 * 1000
+                        set_first_timestamp = False
+                    else:
+                        delay_stamp = row["timestamp"] - first_timestamp
+                        if delay_stamp == 0:
+                            delay_stamp = 5
+                        delay_stamp = delay_stamp * 1000
+                        if delay_stamp != 5000:
+                            delay_stamp = int(delay_stamp / self.scaling)
+                    writer.writerow([delay_stamp, (list_senml[0])])
 
     def converter_to_senml_riotbench_csv(self, chunk_size):
         with open(self.outputFile, "w", newline="") as csvfile:
@@ -166,7 +180,7 @@ class FitConverter(Converter):
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 for index, row in chunk.iterrows():
                     list_senml = list()
-                    timestamp = str(row["timestamp"])
+                    timestamp = int(row["timestamp"])
                     senml_string = (
                         '{"e":['
                         + '{"u": "string","n": "subjectId","vs": "'

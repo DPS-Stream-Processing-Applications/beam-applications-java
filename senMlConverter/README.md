@@ -12,6 +12,23 @@ docker build -t senml_converter .
 > The docker container should be run with the `./data` folder of this project.
 > This is achieved via `$PWD/../data:/home`.
 
+## TRAIN Dataset
+
+No file needs to be placed inside the `data` folder. Duration is the total time of the benchmark
+in minutes, interval is how often the model should train inside the benchmark time. 
+
+```bash
+docker run --rm -it -v \
+    $PWD/data:/home \
+    -e DATASET="TRAIN" \
+    -e OUTPUT_FILE="/home/output_train.csv" \
+    -e INTERVAL="30"
+    -e DURATION="60"
+    senml_converter
+```
+
+
+
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).
 From this zip file the files `trip_data_1.csv` and `trip_fare_1.csv` are required. 
@@ -24,7 +41,7 @@ Because these seven days would be too long for the benchmark the milliseconds ar
 
 ```bash
 docker run --rm -it -v \
-    $PWD/../data:/home \
+    $PWD/data:/home \
     -e DATASET="TAXI" \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
@@ -34,14 +51,14 @@ docker run --rm -it -v \
 ```
 
 ## FIT Dataset
-Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the file into the `data` folder
+Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the folder into the `data` folder. The `mHEALTHDATASET` folder should be the only folder in the `data` folder.
 
 ```bash
 docker run --rm -it -v \
-    $PWD/../data:/home \
+    $PWD/data:/home \
     -e DATASET="FIT" \
     -e OUTPUT_FILE="/home/output_fit.csv" \
-    -e SCALING="260" \
+    -e SCALING="660" \
     senml_converter
 ```
 

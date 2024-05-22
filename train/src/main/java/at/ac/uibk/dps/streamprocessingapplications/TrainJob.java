@@ -49,7 +49,7 @@ public class TrainJob {
     } else if (fileName.contains("GRID")) {
       return "GRID";
     }
-    return null;
+    throw new IllegalArgumentException("No valid datatype given");
   }
 
   public static void main(String[] args) {
@@ -80,6 +80,7 @@ public class TrainJob {
         trainDataSet = "/resources/datasets/TAXI_sample_data_senml.csv";
         inputFileName = "/resources/datasets/inputFileForTimerSpout-TAXI.csv";
         break;
+      case "GRID":
       case "SYS":
         trainDataSet = "/resources/datasets/SYS_sample_data_senml.csv";
         inputFileName = "/resources/datasets/inputFileForTimerSpout-CITY.csv";

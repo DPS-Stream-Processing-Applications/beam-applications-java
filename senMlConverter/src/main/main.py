@@ -123,7 +123,7 @@ if __name__ == "__main__":
         scaling_factor = os.environ.get("SCALING")
         convert_train(output_file, interval, time_bench)
 
-    #Note This is a workaround, because the original sys data is not available 
+    # Note This is a workaround, because the original sys data is not available
     elif dataset == "SYS":
         if not output_file:
             raise ValueError("Missing required environment variables for SYS dataset")

@@ -6,6 +6,7 @@ metadata:
   name: flink-config
   labels:
     app: statefun
+    release: prometheus
 data:
   flink-conf.yaml: |+
     jobmanager.rpc.address: statefun-master
@@ -25,6 +26,10 @@ data:
     s3.path-style-access: true
     jobmanager.memory.process.size: 1g
     taskmanager.memory.process.size: 1g
+    #Added
+    metrics.reporters: prom
+    metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+    metrics.reporter.prom.port: 9999
 
   log4j-console.properties: |+
           monitorInterval=30
@@ -51,12 +56,17 @@ kind: Service
 metadata:
   name: statefun-master-rest
   namespace: statefun
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9999"
 spec:
   type: NodePort
   ports:
     - name: rest
       port: 8081
       targetPort: 8081
+    - name: metrics
+      port: 9999
   selector:
     app: statefun
     component: master
@@ -66,6 +76,9 @@ kind: Service
 metadata:
   name: statefun-master
   namespace: statefun
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9999"
 spec:
   type: ClusterIP
   ports:
@@ -75,6 +88,8 @@ spec:
       port: 6124
     - name: ui
       port: 8081
+    - name: metrics
+      port: 9999
   selector:
     app: statefun
     component: master
@@ -84,6 +99,9 @@ kind: Deployment
 metadata:
   name: statefun-master
   namespace: statefun
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9999"
 spec:
   replicas: 1
   selector:
@@ -112,6 +130,9 @@ spec:
               name: blob
             - containerPort: 8081
               name: ui
+            - containerPort: 9999
+              name: metrics
+              protocol: TCP
           livenessProbe:
             tcpSocket:
               port: 6123
@@ -143,6 +164,9 @@ kind: Deployment
 metadata:
   name: statefun-worker
   namespace: statefun
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9999"
 spec:
   replicas: 1
   selector:
@@ -174,6 +198,9 @@ spec:
               name: blob
             - containerPort: 8081
               name: ui
+            - containerPort: 9999
+              name: metrics
+              protocol: TCP
           livenessProbe:
             tcpSocket:
               port: 6122

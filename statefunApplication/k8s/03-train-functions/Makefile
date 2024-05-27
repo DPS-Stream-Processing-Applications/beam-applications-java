@@ -2,7 +2,7 @@
 
 image:
 	export $(shell minikube docker-env)
-	docker build . -t functions
+	docker build . -t train-functions
 
 service: 
 	kubectl create -n statefun -f functions-service.yaml

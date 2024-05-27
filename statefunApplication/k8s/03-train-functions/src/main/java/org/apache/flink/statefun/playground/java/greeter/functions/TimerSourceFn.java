@@ -26,6 +26,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -54,33 +55,6 @@ public final class TimerSourceFn implements StatefulFunction {
 
     public static void initLogger(Logger l_) {
         l = l_;
-    }
-
-
-    protected static String checkDataSetType(String input) {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject;
-        JSONArray jsonArr;
-        try {
-            jsonObject = (JSONObject) jsonParser.parse(input);
-            jsonArr = (JSONArray) jsonObject.get("e");
-        } catch (org.json.simple.parser.ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        String n;
-        for (int j = 0; j < jsonArr.size(); j++) {
-            jsonObject = (JSONObject) jsonArr.get(j);
-
-            n = (jsonObject.get("n") == null) ? "empty" : (String) jsonObject.get("n");
-
-            if (n.equals("taxi_identifier")) {
-                return "TAXI";
-            }
-
-
-        }
-        return null;
     }
 
 

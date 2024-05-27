@@ -11,7 +11,7 @@ minikube ssh 'sudo ip link set docker0 promisc on'
 eval $(minikube -p minikube docker-env)
 ```
 
-## Prerequisites
+## General prerequisites
 
 Make sure that the database and the kafka cluster are running
 

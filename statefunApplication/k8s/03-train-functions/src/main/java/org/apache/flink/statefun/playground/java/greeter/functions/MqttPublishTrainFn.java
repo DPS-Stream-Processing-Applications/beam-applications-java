@@ -51,7 +51,7 @@ public class MqttPublishTrainFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.server = "kafka-cluster-kafka-bootstrap.kafka.svc:9092";
+        this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
         this.topic = "train-topic-2";
         initLogger(LoggerFactory.getLogger("APP"));
         myKafkaProducer = new MyKafkaProducer(server, topic, p);
@@ -69,7 +69,6 @@ public class MqttPublishTrainFn implements StatefulFunction {
         HashMap<String, String> map = new HashMap();
         map.put(AbstractTask.DEFAULT_KEY, filename);
         Float res = 93f;
-        if (l.isInfoEnabled()) l.info("MQTT result:{}", res);
         myKafkaProducer.doTask(map);
         MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId);
         context.send(

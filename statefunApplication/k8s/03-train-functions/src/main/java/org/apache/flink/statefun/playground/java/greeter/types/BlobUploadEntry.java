@@ -46,4 +46,13 @@ public class BlobUploadEntry implements Serializable {
   public void setFileName(String fileName) {
     this.fileName = fileName;
   }
+
+  @java.lang.Override
+  public java.lang.String toString() {
+    return "BlobUploadEntry{" +
+            "msgid='" + msgid + '\'' +
+            ", fileName='" + fileName + '\'' +
+            ", dataSetType='" + dataSetType + '\'' +
+            '}';
+  }
 }

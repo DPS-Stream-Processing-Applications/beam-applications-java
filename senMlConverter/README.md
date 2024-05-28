@@ -22,8 +22,8 @@ docker run --rm -it -v \
     $PWD/data:/home \
     -e DATASET="TRAIN" \
     -e OUTPUT_FILE="/home/output_train.csv" \
-    -e INTERVAL="30"
-    -e DURATION="60"
+    -e INTERVAL="30" \
+    -e DURATION="60" \
     senml_converter
 ```
 

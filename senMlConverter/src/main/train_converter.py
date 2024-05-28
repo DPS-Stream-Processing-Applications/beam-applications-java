@@ -24,7 +24,8 @@ class TrainConverter(Converter):
 
             number_events = int(self.time_benchmark / self.interval)
             # convert min to ms
-            timestamp = int(self.interval) * 60 * 1000
+            interval = int(self.interval) * 60 * 1000
+            timestamp = interval
             for i in range(number_events):
                 list_senml = list()
                 rowStart = random.randint(100, 1422748800000)
@@ -34,7 +35,7 @@ class TrainConverter(Converter):
                 )
                 list_senml.append(senml_string)
                 writer.writerow([timestamp, (list_senml[0])])
-                timestamp = timestamp * 2
+                timestamp = timestamp + interval
                 timestamp_date = timestamp_date + random.randint(1000, 100000)
 
     def converter_to_senml_riotbench_csv(self, chunk_size):

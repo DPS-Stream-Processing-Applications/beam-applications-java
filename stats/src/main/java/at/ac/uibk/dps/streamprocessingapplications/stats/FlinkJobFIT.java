@@ -1,12 +1,12 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.FitSenMLParserJSON;
+import at.ac.uibk.dps.streamprocessingapplications.shared.model.FitnessMeasurements;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sources.ReadSenMLSource;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.AveragingFunction;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.DistinctCountFunction;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanGetter;
-import at.ac.uibk.dps.streamprocessingapplications.stats.taxi.KalmanSetter;
+import at.ac.uibk.dps.streamprocessingapplications.stats.fit.AveragingFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.fit.DistinctCountFunction;
+import at.ac.uibk.dps.streamprocessingapplications.stats.fit.KalmanGetter;
+import at.ac.uibk.dps.streamprocessingapplications.stats.fit.KalmanSetter;
 import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.KalmanFilterFunction;
 import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.STATSPipeline;
 import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.SlidingLinearRegression;
@@ -14,10 +14,9 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.TypeDescriptor;
 
-public class FlinkJob {
+public class FlinkJobFIT {
 
   public static void main(String[] args) {
     FlinkPipelineOptions options =
@@ -31,8 +30,8 @@ public class FlinkJob {
         .apply(new ReadSenMLSource("senml-cleaned"))
         .apply(
             new STATSPipeline<>(
-                TypeDescriptor.of(TaxiRide.class),
-                TaxiSenMLParserJSON::parseSenMLPack,
+                TypeDescriptor.of(FitnessMeasurements.class),
+                FitSenMLParserJSON::parseSenMLPack,
                 new AveragingFunction(),
                 new DistinctCountFunction(),
                 5,
@@ -40,12 +39,5 @@ public class FlinkJob {
                 new SlidingLinearRegression<>(new KalmanGetter(), 10, 10)));
 
     pipeline.run();
-  }
-
-  static class PrintFn extends DoFn<String, Void> {
-    @ProcessElement
-    public void processElement(@Element String element) {
-      System.out.println(element);
-    }
   }
 }

@@ -6,7 +6,7 @@
 > via [../senMlConverter/](../senMlConverter/README.md)
 
 # Run
-> [!WARN]
+> [!WARNING]
 > Make sure the kubernetes port is forwarded before you try running this program!
 
 ```bash

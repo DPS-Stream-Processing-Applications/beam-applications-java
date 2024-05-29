@@ -28,7 +28,7 @@ public class AveragePlot extends DoFn<Iterable<TimestampedValue<Double>>, byte[]
             .height(600)
             .title(getClass().getSimpleName())
             .xAxisTitle("Time")
-            .yAxisTitle("Distinct Count")
+            .yAxisTitle("Average")
             .build();
 
     List<Double> sortedaverages =

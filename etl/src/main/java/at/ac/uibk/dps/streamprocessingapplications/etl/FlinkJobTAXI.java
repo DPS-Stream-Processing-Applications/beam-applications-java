@@ -18,7 +18,7 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
-public class FlinkJob {
+public class FlinkJobTAXI {
 
   public static void main(String[] args) {
     FlinkPipelineOptions options =

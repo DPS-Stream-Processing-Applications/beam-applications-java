@@ -20,6 +20,7 @@ spec:
         type: internal
         tls: true
     config:
+      num.partitions: 64
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2

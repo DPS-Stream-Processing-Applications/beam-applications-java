@@ -1,5 +1,4 @@
 # Build the Docker Image
-
 ```bash
 docker build -t senml_converter .
 ```
@@ -10,7 +9,7 @@ docker build -t senml_converter .
 > because the application is not performance-optimized at all. 
 
 >[!NOTE]
-> The docker container should be run with the `./data` folder as the host directory.
+> The docker container should be run with the `./data` folder of this project.
 > This is achieved via `$PWD/../data:/home`.
 
 ## TAXI Dataset
@@ -88,3 +87,4 @@ docker run --rm -it -v \
     -e SCALING="260" \
     senml_converter
 ```
+

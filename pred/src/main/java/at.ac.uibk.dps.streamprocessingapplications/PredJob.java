@@ -81,13 +81,14 @@ public class PredJob {
         inputFileName = "/resources/datasets/TAXI_sample_data_senml.csv";
         break;
       case "SYS":
-        inputFileName = "/resources/datasets/SYS_sample_data_senml.csv";
 
+      case "GRID":
+        inputFileName = "/resources/datasets/SYS_sample_data_senml.csv";
         break;
       case "FIT":
         inputFileName = "/resources/datasets/FIT_sample_data_senml.csv";
-
         break;
+
       default:
         throw new RuntimeException("Type not recognized");
     }

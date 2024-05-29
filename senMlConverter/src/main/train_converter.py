@@ -24,7 +24,7 @@ class TrainConverter(Converter):
 
             number_events = int(self.time_benchmark / self.interval)
             # convert min to ms
-            timestamp = self.interval * 60 * 1000
+            timestamp = int(self.interval) * 60 * 1000
             for i in range(number_events):
                 list_senml = list()
                 rowStart = random.randint(100, 1422748800000)

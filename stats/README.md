@@ -1,7 +1,14 @@
-# Build
-`../gradlew build` or in the project root: `./gradlew stats:build`
+The default build command will build this Job for the `TAXI` dataset.
 
-# Run
+```bash
+../gradlew build
+flink run ./build/FlinkJob.jar
+```
 
-With local cluster (`start-cluster.sh`) or make sure you have port 8081 forwarded from the Kubernetes cluster: `flink run -m localhost:8081 ./build/FlinkJob.jar` or `flink run -m localhost:8081 ./stats/build/FlinkJob.jar`
+If you want to compile using a different main class you can do so by overriding `mainClass` with the `-P` flag.
 
+Example for the `FIT` implementation:
+```bash
+../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobFIT
+flink run ./build/FlinkJob.jar
+```

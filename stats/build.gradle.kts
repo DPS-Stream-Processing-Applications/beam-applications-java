@@ -13,7 +13,7 @@ dependencies {
 }
 
 tasks.named<Jar>("jar") {
-  archiveBaseName.set("FlinkJob")
+  archiveBaseName.set("FlinkJobFIT")
   destinationDirectory.set(file("build"))
   manifest {
     /* NOTE:

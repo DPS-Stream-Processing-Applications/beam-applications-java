@@ -1,18 +1,21 @@
-import sys
 import os
+import sys
+
 import pandas as pd
-from taxi_converter import TaxiConverter
-from train_converter import TrainConverter
 from fit_converter import FitConverter
+from fit_modifier import create_table_fit
+from grid_converter import GridConverter
+from sys_converter import SysConverter
+from taxi_converter import TaxiConverter
 from taxi_modifier import (
-    filter_date,
-    rename_cols,
+    change_header_order_df,
     drop_cols_fare,
     drop_cols_trip,
+    filter_date,
     merge_dfs,
-    change_header_order_df,
+    rename_cols,
 )
-from fit_modifier import create_table_fit
+from train_converter import TrainConverter
 
 
 def create_table_taxi(input_fare, input_trip):
@@ -50,35 +53,43 @@ def create_table_taxi(input_fare, input_trip):
     ordered_df.to_csv(output_file, index=False)
 
 
-def convert_taxi(input, output, use_riotbench_format,scaling_factor):
-    converter = TaxiConverter(input, output,scaling_factor)
+def convert_taxi(input, output, use_riotbench_format, scaling_factor):
+    converter = TaxiConverter(input, output, scaling_factor)
     if use_riotbench_format:
         converter.converter_to_senml_riotbench_csv(10000)
     else:
         converter.convert_to_senml_csv(10000)
 
 
-def convert_fit(input, output,use_riotbench_format):
-    converter = FitConverter(input, output)
+def convert_fit(input, output, use_riotbench_format, scaling):
+    converter = FitConverter(input, output, scaling)
     if use_riotbench_format:
         converter.converter_to_senml_riotbench_csv(10000)
     else:
         converter.convert_to_senml_csv(10000)
+
 
 def convert_train(output_file, interval, time_bench):
     converter = TrainConverter(output_file, interval, time_bench)
     converter.convert_to_senml_csv(10000)
 
 
-
 if __name__ == "__main__":
     dataset = os.environ.get("DATASET")
     scaling_factor = os.environ.get("SCALING")
     use_riotbench_format = False
+    output_file = os.environ.get("OUTPUT_FILE")
+
+    if not dataset:
+        raise ValueError("Missing required environment variable DATASET")
+    elif not scaling_factor and not dataset == "TRAIN":
+        raise ValueError("Missing required environment variable SCALING")
+    elif not output_file:
+        raise ValueError("Missing required environment variable OUTPUT_FILE")
+
     if dataset == "TAXI":
         input_fare = os.environ.get("INPUT_FILE_FARE")
         input_trip = os.environ.get("INPUT_FILE_TRIP")
-        output_file = os.environ.get("OUTPUT_FILE")
 
         if not (input_fare and input_trip and output_file):
             raise ValueError("Missing required environment variables for TAXI dataset")
@@ -95,15 +106,58 @@ if __name__ == "__main__":
 
         input_file = "/home/input_joined_fit.csv"
         create_table_fit(input_file, 1417890600020)
-        convert_fit(input_file, output_file, use_riotbench_format)
+        convert_fit(
+            input_file, output_file, use_riotbench_format, float(scaling_factor) or 1
+        )
 
-    elif dataset=="TRAIN":
-        output_file = os.environ.get("OUTPUT_FILE")
-
+    elif dataset == "TRAIN":
         if not output_file:
-            raise ValueError("Missing required environment variables for FIT dataset")
-        convert_train(output_file, interval=30, time_bench=60)
+            raise ValueError("Missing required environment variables for TRAIN dataset")
+        interval = float(os.environ.get("INTERVAL")) or 30
+        time_bench = float(os.environ.get("DURATION")) or 60
+        scaling_factor = os.environ.get("SCALING")
+        convert_train(output_file, interval, time_bench)
 
+    # Note This is a workaround, because the original sys data is not available
+    elif dataset == "SYS":
+        if not output_file:
+            raise ValueError("Missing required environment variables for SYS dataset")
+        data_dir_path: str = "/home"
+        file_paths = [
+            f"{data_dir_path}/File{i}.txt"
+            for i in range(1, 7)
+            if os.path.exists(f"{data_dir_path}/File{i}.txt")
+        ]
+
+        start_date = 0
+        first_file = True
+        for file in file_paths:
+            converter = SysConverter(
+                file,
+                output_file or "/home/out.csv",
+                float(scaling_factor) or 1,
+                start_date,
+            )
+            if start_date == 0 and first_file:
+                start_date = converter.get_first_date()
+            elif start_date == 0 and not first_file:
+                raise Exception
+            converter.convert_to_senml_csv(1000)
+
+    elif dataset == "GRID":
+        # NOTE: `data` directory should be mounted as `/home`
+        data_dir_path: str = "/home"
+        file_paths = [
+            f"{data_dir_path}/File{i}.txt"
+            for i in range(1, 7)
+            if os.path.exists(f"{data_dir_path}/File{i}.txt")
+        ]
+
+        for file in file_paths:
+            converter = GridConverter(
+                file, output_file or "/home/out.csv", float(scaling_factor) or 1
+            )
+            converter.convert_to_senml_csv(1000)
 
     else:
         raise ValueError("No valid dataset-type given via -e DATASET=")

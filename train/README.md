@@ -31,42 +31,54 @@ I used this command to get the ip-address and port of my db
 minikube service --url mongo-nodeport-svc
 ````
 
-Or on the kubernetes cluster
+Or on the kubernetes cluster:
 ```bash
-kubectl get pods -o wide
+kubectl get nodes -o \
+    jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
 ```
-And get the IP-address of a the worker node
-Example address: mongodb:
+This will read the first nodes `InternalIP` to use in the `databaseUrl` argument.
+The following commands are automatically inlining this IP adress.
 
-Example address: mongodb:
-`mongodb://adminuser:password123@192.168.49.2:32000/`
-
+<!-- And get the IP-address of a the worker node -->
+<!-- Example address: mongodb: -->
+<!-- `mongodb://adminuser:password123@192.168.49.2:32000/` -->
 
 ## Commands
 
-#### Example command for the CITY dataset
-
+### Example command for SYS-Data
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=SYS-210
+```
+$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+
+### Example command for TAXI-Data
+```bash
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=TAXI-210
 ```
 
-#### Example command for the FIT dataset
+### Example command for FIT-Data
 ```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
+flink run -m localhost:8081 \
+    ./pred/build/PredJob.jar \
+    --databaseUrl=mongodb://adminuser:password123@$(
+        kubectl get nodes -o \
+            jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
+    ):32000/ \
+    --experiRunId=FIT-210
 ```
-
-
-#### Example command for the TAXI dataset
-```bash
-flink run -m localhost:8081 ./train/build/TrainJob.jar --databaseUrl=mongodb://adminuser:password123@X:32000/ --experiRunId=SYS-210
-```
-
 ---
-
-## Setup kafkaProducer:
-
-Please consider Emmanuels setup for the Kafka-cluster in the kubernetes-folder. For the event-generation please consider the README in the
-`kafkaProducerFolder`
 
 <!--
 ## Setting up Apache Kafka

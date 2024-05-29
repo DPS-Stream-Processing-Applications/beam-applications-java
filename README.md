@@ -59,7 +59,7 @@ These resources are all managed within a Kubernetes cluster.
 
 ### Local K8S Cluster
 > [!IMPORTANT]
-> Make sure you have `[docker](https://www.docker.com/)` installed on your system before reading further.
+> Make sure you have [docker](https://www.docker.com/) installed on your system before reading further.
 
 The nix dev shell provides `k3d` as means to spin up a local Kubernetes cluster.
 Follow the [quick start guide](https://k3d.io/v5.6.3/#quick-start) to set up an empty cluster.

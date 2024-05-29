@@ -28,6 +28,6 @@ public class EventProducer implements Runnable {
     } catch (IOException e) {
       System.out.println("io_exc");
     }
-    System.out.println("done");
+    // System.out.println("done");
   }
 }

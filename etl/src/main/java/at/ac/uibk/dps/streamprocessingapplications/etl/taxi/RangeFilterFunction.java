@@ -26,7 +26,6 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
  */
 public class RangeFilterFunction implements SerializableFunction<TaxiRide, TaxiRide> {
 
-  // @Override
   public TaxiRide apply(TaxiRide taxiRide) {
     setNullIf(
         taxiRide::getTripTimeInSecs,

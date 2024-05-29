@@ -54,21 +54,23 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     HashMap<String, String> map = new HashMap();
     map.put(AbstractTask.DEFAULT_KEY, "dummy");
     // mqttSubscribeTask.doTask(map);
-    myKafkaConsumer.doTask(map);
-    String arg1 = myKafkaConsumer.getLastResult();
-    // arg1 = "test-12";
+    while (true) {
+      myKafkaConsumer.doTask(map);
+      String arg1 = myKafkaConsumer.getLastResult();
+      // arg1 = "test-12";
 
-    if (arg1 != null) {
-      try {
-        msgid++;
-        // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("Exception in processElement of MqttBeam " + e);
+      if (arg1 != null) {
+        try {
+          msgid++;
+          // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException("Exception in processElement of MqttBeam " + e);
+        }
+        if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
+        // System.out.println("arg " + arg1);
+        out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
       }
-      if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
-      // System.out.println("arg " + arg1);
-      out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
     }
   }
 

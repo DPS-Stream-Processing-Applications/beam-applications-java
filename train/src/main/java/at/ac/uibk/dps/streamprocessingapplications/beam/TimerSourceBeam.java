@@ -151,7 +151,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
     kafkaConsumer.subscribe(singleton(TOPIC_NAME), myKafkaConsumer);
 
     int sendMessages = 0;
-    while (sendMessages < numberLines) {
+    while (true) {
       try {
         ConsumerRecords<Long, byte[]> records = kafkaConsumer.poll(ofMillis(POLL_TIMEOUT_MS));
         if (!records.isEmpty()) {

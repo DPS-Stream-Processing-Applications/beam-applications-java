@@ -5,8 +5,8 @@ import pandas as pd
 from fit_converter import FitConverter
 from fit_modifier import create_table_fit
 from grid_converter import GridConverter
-from taxi_converter import TaxiConverter
 from sys_converter import SysConverter
+from taxi_converter import TaxiConverter
 from taxi_modifier import (
     change_header_order_df,
     drop_cols_fare,
@@ -72,11 +72,6 @@ def convert_fit(input, output, use_riotbench_format, scaling):
 def convert_train(output_file, interval, time_bench):
     converter = TrainConverter(output_file, interval, time_bench)
     converter.convert_to_senml_csv(10000)
-
-
-# if __name__ == "__main__":
-#     grid_converter = GridConverter("../../data/File1.txt", "./out.csv", 20)
-#     grid_converter.convert_to_senml_csv(10)
 
 
 if __name__ == "__main__":

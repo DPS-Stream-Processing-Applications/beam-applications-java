@@ -4,8 +4,6 @@ plugins {
   id("flink-job-conventions")
 }
 
-val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.stats.FlinkJobFIT"
-
 repositories { mavenCentral() }
 
 dependencies {

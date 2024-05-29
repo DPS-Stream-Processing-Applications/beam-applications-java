@@ -24,8 +24,8 @@ data:
     state.checkpoints.dir: s3://checkpoints/subscriptions
     s3.endpoint: http://minio.statefun.svc.cluster.local:9000
     s3.path-style-access: true
-    jobmanager.memory.process.size: 1g
-    taskmanager.memory.process.size: 1g
+    jobmanager.memory.process.size: 2048m
+    taskmanager.memory.process.size: 2048m
     #Added
     metrics.reporters: prom
     metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
@@ -190,7 +190,8 @@ spec:
               value: statefun-master
           resources:
             requests:
-              memory: "0.5Gi"
+              #Changed from 0.5Gi to 1Gi to 2048m
+              memory: "2048M"
           ports:
             - containerPort: 6122
               name: rpc

@@ -10,7 +10,7 @@ metadata:
 data:
   flink-conf.yaml: |+
     jobmanager.rpc.address: statefun-master
-    taskmanager.numberOfTaskSlots: 1
+    taskmanager.numberOfTaskSlots: 2
     blob.server.port: 6124
     jobmanager.rpc.port: 6123
     taskmanager.rpc.port: 6122
@@ -192,6 +192,7 @@ spec:
             requests:
               #Changed from 0.5Gi to 1Gi to 2048m
               memory: "2048M"
+              cpu: "1"
           ports:
             - containerPort: 6122
               name: rpc

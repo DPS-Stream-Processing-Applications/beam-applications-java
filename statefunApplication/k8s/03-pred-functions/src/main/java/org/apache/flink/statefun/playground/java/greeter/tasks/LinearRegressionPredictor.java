@@ -150,6 +150,14 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
       testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
 
+      if (instanceHeader == null) {
+        throw new RuntimeException("instanceHeader is null");
+      }
+
+      if (lr == null) {
+        throw new RuntimeException("lr is null");
+
+      }
       int prediction = (int) lr.classifyInstance(testInstance);
       // int prediction = 1;
       if (l.isInfoEnabled()) {

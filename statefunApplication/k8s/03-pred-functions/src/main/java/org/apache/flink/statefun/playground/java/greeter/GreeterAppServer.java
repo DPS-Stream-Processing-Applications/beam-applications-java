@@ -19,6 +19,7 @@
 package org.apache.flink.statefun.playground.java.greeter;
 
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import org.apache.flink.statefun.playground.java.greeter.functions.*;
 import org.apache.flink.statefun.playground.java.greeter.tasks.WriteToDatabase;
 import org.apache.flink.statefun.playground.java.greeter.undertow.UndertowHttpHandler;
@@ -26,10 +27,6 @@ import org.apache.flink.statefun.sdk.java.StatefulFunctions;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
 
 /**
  * Entry point to start an {@link Undertow} web server that exposes the functions that build up our
@@ -56,6 +53,7 @@ public final class GreeterAppServer {
         functions.withStatefulFunction(SinkFn.SPEC);
         functions.withStatefulFunction(MqttPublishFn.SPEC);
 
+        System.out.println("New version 4");
         WriteToDatabase writeToDatabase = new WriteToDatabase("mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
         writeToDatabase.prepareDataBaseForApplication();
 
@@ -65,7 +63,16 @@ public final class GreeterAppServer {
                 Undertow.builder()
                         .addHttpListener(8000, "0.0.0.0")
                         .setHandler(new UndertowHttpHandler(requestReplyHandler))
+                        .setWorkerThreads(1000)
+                        .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 100 * 1000)   // 60 seconds no request timeout
+                        .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                         .build();
-        httpServer.start();
+        try {
+            httpServer.start();
+        }
+        catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("Server start: "+e);
+        }
     }
 }

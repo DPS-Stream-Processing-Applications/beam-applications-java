@@ -20,15 +20,16 @@ data:
           valueType: example/MyMessage
           targets:
             - pred/source
+    
     ---
-    kind: io.statefun.kafka.v1/ingress
-    spec:
-      id: pred/in-2
-      address: kafka-cluster-kafka-bootstrap.default.svc:9092
-      consumerGroupId: my-group-id-2
-      topics:
-        - topic: pred-sub-task
-          valueType: example/MyMessage
-          targets:
-            - pred/mqttSubscribe
+    #kind: io.statefun.kafka.v1/ingress
+    #spec:
+      #id: pred/in-2
+      #address: kafka-cluster-kafka-bootstrap.default.svc:9092
+      #consumerGroupId: my-group-id-2
+      #topics:
+        #- topic: pred-sub-task
+          #valueType: example/MyMessage
+          #targets:
+            #- pred/mqttSubscribe
 

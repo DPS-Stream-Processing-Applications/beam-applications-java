@@ -21,7 +21,7 @@ COPY pom.xml /usr/src/app
 RUN mvn -f /usr/src/app/pom.xml clean package
 
 # ... and run the web server!
-FROM openjdk:8
+FROM openjdk:11
 WORKDIR /
 COPY resources resources/
 COPY --from=builder /usr/src/app/target/pred-statefun*jar-with-dependencies.jar  pred-statefun.jar

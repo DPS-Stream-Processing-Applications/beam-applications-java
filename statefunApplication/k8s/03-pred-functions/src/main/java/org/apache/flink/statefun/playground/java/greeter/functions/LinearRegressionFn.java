@@ -40,7 +40,7 @@ public class LinearRegressionFn implements StatefulFunction {
 
     private static Logger l;
     private String dataSetType;
-    LinearRegressionPredictor linearRegressionPredictor;
+    LinearRegressionPredictor linearRegressionPredictor = null;
 
 
     public static void initLogger(Logger l_) {
@@ -55,31 +55,36 @@ public class LinearRegressionFn implements StatefulFunction {
             throw new RuntimeException(e);
         }
         this.dataSetType = datasetType;
-        linearRegressionPredictor = new LinearRegressionPredictor("mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
-        initLogger(LoggerFactory.getLogger("APP"));
-        linearRegressionPredictor.setup(l, p);
+        if (linearRegressionPredictor == null) {
+            linearRegressionPredictor = new LinearRegressionPredictor("mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
+            initLogger(LoggerFactory.getLogger("APP"));
+            linearRegressionPredictor.setup(l, p);
+        }
     }
 
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
-
+        initLogger(LoggerFactory.getLogger("APP"));
         try {
             if (message.is(SENML_ENTRY_JSON_TYPE)) {
                 SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
                 setup(senMlEntry.getDataSetType());
+                this.dataSetType = senMlEntry.getDataSetType();
                 String sensorMeta = senMlEntry.getMeta();
                 String msgtype = senMlEntry.getMsgtype();
-
-                String obsVal;
-
+                String obsVal = senMlEntry.getObsVal();
+                /*
                 if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
                     obsVal = "10,1955.22,27";
                 } else {
                     obsVal = "22.7,49.3,0,1955.22,27";
                 }
 
-                String msgId = "0";
+                 */
+
+                //String msgId = "0";
+                String msgId = senMlEntry.getMsgid();
 
                 if (!msgtype.equals("modelupdate")) {
                     obsVal = senMlEntry.getObsVal();
@@ -91,11 +96,12 @@ public class LinearRegressionFn implements StatefulFunction {
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, obsVal);
                 Float res = linearRegressionPredictor.doTask(map);
+                //Float res = 2.0f;
                 if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR",senMlEntry.getDataSetType());
+                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", senMlEntry.getDataSetType());
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
                                         .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
@@ -111,12 +117,14 @@ public class LinearRegressionFn implements StatefulFunction {
 
                 BlobReadEntry blobReadEntry = message.as(BLOB_READ_ENTRY_JSON_TYPE);
                 setup(blobReadEntry.getDataSetType());
+                this.dataSetType = blobReadEntry.getDataSetType();
                 String sensorMeta = blobReadEntry.getMeta();
                 String msgtype = blobReadEntry.getMsgType();
                 String analyticsType = blobReadEntry.getAnalyticType();
 
                 String obsVal = "";
-                String msgId = "0";
+                //String msgId = "0";
+                String msgId = blobReadEntry.getMsgid();
 
                 if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
                     obsVal = "10,1955.22,27";

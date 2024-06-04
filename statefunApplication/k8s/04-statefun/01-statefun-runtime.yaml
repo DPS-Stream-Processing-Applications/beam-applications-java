@@ -33,7 +33,7 @@ data:
 
   log4j-console.properties: |+
           monitorInterval=30
-          rootLogger.level = INFO
+          rootLogger.level = DEBUG
           rootLogger.appenderRef.console.ref = ConsoleAppender
           logger.akka.name = akka
           logger.akka.level = INFO
@@ -48,7 +48,8 @@ data:
           appender.console.layout.type = PatternLayout
           appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
           logger.netty.name = org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline
-          logger.netty.level = OFF
+          #Change from OFF to ON
+          logger.netty.level = ON
 
 ---
 apiVersion: v1
@@ -123,6 +124,11 @@ spec:
               value: master
             - name: MASTER_HOST
               value: statefun-master
+          resources:
+              requests:
+                #Changed from 0.5Gi to 1Gi to 2048m
+                memory: "7Gi"
+                cpu: "2"
           ports:
             - containerPort: 6123
               name: rpc
@@ -191,7 +197,7 @@ spec:
           resources:
             requests:
               #Changed from 0.5Gi to 1Gi to 2048m
-              memory: "2048M"
+              memory: "7Gi"
               cpu: "1"
           ports:
             - containerPort: 6122

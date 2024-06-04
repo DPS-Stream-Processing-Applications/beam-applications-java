@@ -36,9 +36,15 @@ public class ReadFromDatabaseTask extends AbstractTask<String, byte[]> {
         pdfData = pdfBinary.getData();
       }
 
+      if (pdfData == null){
+        System.out.println("null when reading from db");
+        throw new RuntimeException("null content in db");
+      }
+
       super.setLastResult(pdfData);
     } catch (Exception e) {
       e.printStackTrace();
+      System.out.println("Error in read from db");
       throw new RuntimeException(e);
     }
     return 1f;

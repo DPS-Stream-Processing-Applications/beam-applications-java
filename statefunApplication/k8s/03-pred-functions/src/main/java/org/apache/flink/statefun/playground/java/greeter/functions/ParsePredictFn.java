@@ -14,7 +14,7 @@ import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,27 +70,36 @@ public class ParsePredictFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        String line = "";
+
         try {
             initLogger(LoggerFactory.getLogger("APP"));
             senMLParseTask = new SenMlParse(dataSetType, true);
             senMLParseTask.setup(l, p);
             observableFields = new ArrayList<>();
+            /*
             readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
             synchronized (DATABASE_LOCK) {
                 readFromDatabaseTask.setup(l, p);
             }
+
+             */
             ArrayList<String> metaList = new ArrayList<>();
 
             String meta;
             byte[] csvContent;
             if (dataSetType.equals("TAXI")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
+                /*
                 HashMap<String, String> map = new HashMap<>();
                 map.put("fileName", "taxi-schema-without-annotation_csv");
                 synchronized (DATABASE_LOCK) {
                     readFromDatabaseTask.doTask(map);
                 }
                 csvContent = readFromDatabaseTask.getLastResult();
+                */
+
+                line = "taxi_identifier,hack_license,pickup_datetime,timestamp,trip_time_in_secs,trip_distance,pickup_longitude,pickup_latitude,dropoff_longitude,dropoff_latitude,payment_type,fare_amount,surcharge,mta_tax,tip_amount,tolls_amount,total_amount";
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
 
             } else if (dataSetType.equals("SYS")) {
@@ -115,15 +124,19 @@ public class ParsePredictFn implements StatefulFunction {
                 throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
             }
 
+            /*
             ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+             */
 
             metaFields = meta.split(",");
             for (String metaField : metaFields) {
                 metaList.add(metaField);
             }
 
-            String line = br.readLine();
+            //String line = br.readLine();
+
             String[] obsType = line.split(",");
             for (String field : obsType) {
                 if (!metaList.contains(field)) {
@@ -131,8 +144,8 @@ public class ParsePredictFn implements StatefulFunction {
                 }
             }
 
-            br.close();
-        } catch (IOException e) {
+            //br.close();
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error when setting up ParsePredictBeam: " + e);
         }
@@ -147,8 +160,9 @@ public class ParsePredictFn implements StatefulFunction {
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
 
-            HashMap<String, String> map = new HashMap();
+            HashMap<String, String> map = new HashMap<>();
             map.put(AbstractTask.DEFAULT_KEY, msg);
+
             senMLParseTask.doTask(map);
             HashMap<String, String> resultMap = (HashMap) senMLParseTask.getLastResult();
 
@@ -163,6 +177,14 @@ public class ParsePredictFn implements StatefulFunction {
                 obsVal.append(",");
             }
             obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
+
+             /*
+            StringBuilder obsVal = new StringBuilder();
+            StringBuilder meta = new StringBuilder();
+            obsVal.append("2013003495,2013003088,320,2.0,5.5,0.5,0.5,1.95,0.0,8.45");
+            meta.append("2013-01-14  00:00:16,1358121616,-73.970146,40.756584,-73.951225,40.782761,CRD");
+
+              */
             SenMlEntry senMlEntry =
                     new SenMlEntry(
                             msgId,

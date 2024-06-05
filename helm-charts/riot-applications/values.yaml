@@ -105,3 +105,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# INFO:
+# Reason to set this:
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusioscrape
+
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false

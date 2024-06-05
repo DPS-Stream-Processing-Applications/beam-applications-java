@@ -62,21 +62,6 @@ kubectl run kafka-consumer -it \
 --bootstrap-server kafka-cluster-kafka-bootstrap:9092 \
 --topic senml-cleaned
 ```
-# Prometheus Stack
-Install the prometheus stack before installing this projects custom helm-chart.
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/kube-prometheus-stack
-```
-
-## Login
-The login credentials for `Grafana` can be acquired as follows:
-
-```bash
-kubectl get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
-kubectl get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-```
 
 # Installing MongoDB
 
@@ -89,3 +74,19 @@ kubectl apply -f templates/mongodb-pvc.yaml
 kubectl apply -f templates/mongodb-secret.yaml
 ```
 After the cluster is configured Flink jobs can be deployed normally through `flink run <path_to_jar>`.
+
+# Prometheus Stack
+Install the Prometheus stack before installing this projects custom helm-chart.
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack
+```
+
+## Login
+The login credentials for `Grafana` can be acquired as follows:
+
+```bash
+kubectl get secret riot-applications-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+kubectl get secret riot-applications-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```

@@ -62,7 +62,10 @@ These resources are all managed within a Kubernetes cluster.
 > Make sure you have [docker](https://www.docker.com/) installed on your system before reading further.
 
 The nix dev shell provides `k3d` as means to spin up a local Kubernetes cluster.
+Use the `k3d-cluster-config.yaml` file of this project to set up a preconfigured `riot-test-cluster`.
+See the following [guide on how to use a config file](https://k3d.io/v5.0.0/usage/configfile/#usage).
 Follow the [quick start guide](https://k3d.io/v5.6.3/#quick-start) to set up an empty cluster.
+
 
 ### Helm Deployment
 All the applications of this repository depend on external resources like an Apache `Kafka` cluster as well as a `mongoDB` database.

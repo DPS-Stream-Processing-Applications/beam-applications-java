@@ -17,7 +17,7 @@ public class EventProducer implements Runnable {
   private static final char SEPARATION_CHARACTER = '|';
   private final int STRIDE;
   private CSVReader reader;
-  private Producer<Long, String> kafkaProducer;
+  private final Properties kafkaProperties;
   private final String kafkaTopic;
 
   public EventProducer(
@@ -31,8 +31,8 @@ public class EventProducer implements Runnable {
     this.running = running;
     this.unixStartTime = unixStartTime;
     this.STRIDE = stride;
+    this.kafkaProperties = kafkaProperties;
     this.kafkaTopic = kafkaTopic;
-    this.kafkaProducer = new KafkaProducer<>(kafkaProperties);
     try {
       this.reader =
           new CSVReaderBuilder(new FileReader(filePath))
@@ -48,7 +48,7 @@ public class EventProducer implements Runnable {
 
   @Override
   public void run() {
-    try {
+    try (Producer<Long, String> kafkaProducer = new KafkaProducer<>(this.kafkaProperties)) {
       String[] csvLine = reader.readNext();
       while (running.get() && csvLine != null) {
         long requiredElapsedTime = Long.parseLong(csvLine[0]);
@@ -61,15 +61,15 @@ public class EventProducer implements Runnable {
           break;
         }
 
-        this.kafkaProducer.send(
+        kafkaProducer.send(
             new ProducerRecord<>(this.kafkaTopic, System.currentTimeMillis(), csvLine[1]));
         reader.skip(this.STRIDE);
         csvLine = reader.readNext();
       }
       // Cleanup
       reader.close();
-      kafkaProducer.close();
-    } catch (Exception ignore) {
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

@@ -43,8 +43,8 @@ public class Main {
     // HACK for initial startup...
     while (eventQueue.isEmpty()) {}
 
-    ExecutorService consumers = Executors.newFixedThreadPool(4);
-    for (int i = 0; i < 4; i++) {
+    ExecutorService consumers = Executors.newFixedThreadPool(64);
+    for (int i = 0; i < 64; i++) {
       consumers.submit(new EventConsumer(eventQueue, props, topic));
     }
 

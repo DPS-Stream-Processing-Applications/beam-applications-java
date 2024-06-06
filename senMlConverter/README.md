@@ -84,7 +84,7 @@ docker run --rm -it -v \
     $PWD/../data:/home \
     -e DATASET="GRID" \
     -e OUTPUT_FILE="/home/output_grid.csv" \
-    -e SCALING="260" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 

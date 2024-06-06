@@ -31,12 +31,14 @@ class GridConverter(Converter):
                     # NOTE::
                     # Item format:
                     # (UNIX_timestamp, id, value)
-                    relative_timestamp = start_timestamp + (
-                        row["UNIX_timestamp"] / self.scaling_factor
-                    )
+                    if j == 1:
+                        start_timestamp = int(row["UNIX_timestamp"])
+                    relative_elapsed_time = (
+                        int(row["UNIX_timestamp"]) - start_timestamp
+                    ) * self.scaling_factor
                     writer.writerow(
                         [
-                            int(relative_timestamp),
+                            int(relative_elapsed_time),
                             (
                                 "["
                                 f'{{"n": "id", "u": "double", "v": {row["id"]}}},'

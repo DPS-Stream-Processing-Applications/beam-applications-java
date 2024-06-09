@@ -24,8 +24,9 @@ The following are used independently of the dataset that is being processed:
   It should be an absolute path relative to the docker containers `/home` directory.
   An example path could look like this: `/home/grid_events.csv`
 - `SCALING`: All datasets provide timestamps of the time they were collected. These are `UNIX` format timestamps.
-  From these timestamps, the elapsed time relative to the first timestamp `start_time` is calculated. This `relative_elapsed_time` can be scaled through a scaling factor.
-   $(timestamp - start_time) * scaling factor$
+  From these timestamps, the elapsed time relative to the first timestamp `start_time` is calculated.
+  This `relative_elapsed_time` can be scaled through a scaling factor.
+   $$(timestamp - start_time) * scaling factor$$
 
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).

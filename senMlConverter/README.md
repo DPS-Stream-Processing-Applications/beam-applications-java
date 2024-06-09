@@ -26,11 +26,10 @@ The following are used independently of the dataset that is being processed:
 - `SCALING`: All datasets provide timestamps of the time they were collected. These are `UNIX` format timestamps.
   From these timestamps, the elapsed time relative to the first timestamp `start_time` is calculated.
   This `relative_elapsed_time` can be scaled through a scaling factor.
-   $$(timestamp - start\_time) * scaling\_factor$$
+  ```math
+  (timestamp - start\_time) * scaling\_factor
+  ```
   With this implementation the original time distribution is preserved and only the frequency of events is impacted.
-
-  >[!NOTE]
-  > The first event will have a time delta of 0.
 
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).

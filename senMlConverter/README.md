@@ -1,14 +1,15 @@
 # Build the Docker Image
+Before you are able to run this application make sure to build the docker image.
+
 ```bash
 docker build -t senml_converter .
 ```
 
-# Preprocessing
+# Processing Datasets
+
 >[!CAUTION]
 > This application makes use of pandas data frames and is not performance optimized.
 > Expect a significant runtime for these datasets.
-
-# Building Datasets
 
 >[!IMPORTANT]
 > The docker container needs access to the local file system to read the input files and write the output file.

@@ -4,9 +4,9 @@ docker build -t senml_converter .
 ```
 
 # Preprocessing
->[!NOTE]
-> Please note that the processing can take some time,
-> because the application is not performance-optimized at all. 
+>[!CAUTION]
+> This application makes use of pandas data frames and is not performance optimized.
+> Expect a significant runtime for these datasets.
 
 # Building Datasets
 

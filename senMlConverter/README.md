@@ -18,6 +18,20 @@ docker build -t senml_converter .
 ## Environment Variables
 This application uses environment variables as input for runtime parameters.
 The following are used independently of the dataset that is being processed:
+| Environment Variable | Description                                                |
+|----------------------|------------------------------------------------------------|
+| `DATASET`            | Represents the dataset to be processed. Possible values:   |
+|                      | `TAXI`, `FIT`, `GRID`.                                     |
+| `OUTPUT_FILE`        | Path of the output file. It should be an absolute path     |
+|                      | relative to the Docker container's `/home` directory.      |
+|                      | Example: `/home/grid_events.csv`.                          |
+| `SCALING`            | Scaling factor for the elapsed time calculation.           |
+|                      | Timestamps are in UNIX format. Elapsed time is calculated  |
+|                      | relative to the first timestamp (`start_time`). Formula:   |
+|                      | \[(timestamp - start_time) * scaling_factor\]. This        |
+|                      | preserves the original time distribution, impacting only   |
+|                      | the frequency of events.                                   |
+
 - `DATASET`: This variable represents the dataset to be processed.
   Possible values are: `TAXI`, `FIT` and `GRID`.
 - `OUTPUT_FILE`: This variable represents the path of the output file.

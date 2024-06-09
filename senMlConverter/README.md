@@ -28,8 +28,9 @@ The following are used independently of the dataset that is being processed:
   This `relative_elapsed_time` can be scaled through a scaling factor.
    $$(timestamp - start\_time) * scaling\_factor$$
   With this implementation the original time distribution is preserved and only the frequency of events is impacted.
+
   >[!NOTE]
-  >The first event will have a time delta of 0.
+  > The first event will have a time delta of 0.
 
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).

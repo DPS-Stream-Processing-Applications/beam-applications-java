@@ -8,9 +8,24 @@ docker build -t senml_converter .
 > Please note that the processing can take some time,
 > because the application is not performance-optimized at all. 
 
->[!NOTE]
-> The docker container should be run with the `./data` folder of this project.
-> This is achieved via `$PWD/../data:/home`.
+# Building Datasets
+
+>[!IMPORTANT]
+> The docker container needs access to the local file system to read the input files and write the output file.
+> This is achieved by mounting the target directory as a [volume])(https://docs.docker.com/storage/volumes/).
+> Moving forward, the `data` directory of the project root is the target volume.
+
+## Environment Variables
+This application uses environment variables as input for runtime parameters.
+The following are used independently of the dataset that is being processed:
+- `DATASET`: This variable represents the dataset to be processed.
+  Possible values are: `TAXI`, `FIT` and `GRID`.
+- `OUTPUT_FILE`: This variable represents the path of the output file.
+  It should be an absolute path relative to the docker containers `/home` directory.
+  An example path could look like this: `/home/grid_events.csv`
+- `SCALING`: All datasets provide timestamps of the time they were collected. These are `UNIX` format timestamps.
+  From these timestamps, the elapsed time relative to the first timestamp `start_time` is calculated. This `relative_elapsed_time` can be scaled through a scaling factor.
+   $(timestamp - start_time) * scaling factor$
 
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).
@@ -23,8 +38,8 @@ For this creating entries from the 2013-01-14 to the 2013-01-21 will be included
 Because these seven days would be too long for the benchmark the milliseconds are divided by a scaling factor which can be specified.
 
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="TAXI" \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \

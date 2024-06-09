@@ -1,7 +1,7 @@
-import pandas as pd
 import csv
-
 from datetime import datetime
+
+import pandas as pd
 from converter import Converter
 
 
@@ -30,7 +30,8 @@ class TaxiConverter(Converter):
             set_first_timestamp = True
             first_timestamp = 0
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
-                for index, row in chunk.iterrows():
+                start_timestamp: int = 0
+                for j, row in chunk.iterrows():
                     list_senml = list()
                     senml_string = (
                         "["
@@ -85,26 +86,17 @@ class TaxiConverter(Converter):
                         + "]"
                     )
                     list_senml.append(senml_string)
-                    delay_stamp = 0
-                    if set_first_timestamp:
-                        first_timestamp = date_to_unix_timestamp(
-                            row[" pickup_datetime"]
-                        )
-                        delay_stamp = 5 * 1000
-                        set_first_timestamp = False
-                    else:
-                        delay_stamp = (
-                            date_to_unix_timestamp(row[" pickup_datetime"])
-                            - first_timestamp
-                        )
-                        if delay_stamp == 0:
-                            delay_stamp = 5
-                        delay_stamp = delay_stamp * 1000
-                        if delay_stamp != 5000:
-                            delay_stamp = int(delay_stamp / self.scaling_factor)
+
+                    if j == 1:
+                        start_timestamp = int(row["UNIX_timestamp"])
+
+                    relative_elapsed_time = (
+                        int(row["UNIX_timestamp"]) - start_timestamp
+                    ) * self.scaling_factor
+
                     writer.writerow(
                         [
-                            delay_stamp,
+                            relative_elapsed_time,
                             (list_senml[0]),
                         ]
                     )

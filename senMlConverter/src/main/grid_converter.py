@@ -33,9 +33,11 @@ class GridConverter(Converter):
                     # (UNIX_timestamp, id, value)
                     if j == 1:
                         start_timestamp = int(row["UNIX_timestamp"])
+
                     relative_elapsed_time = (
                         int(row["UNIX_timestamp"]) - start_timestamp
                     ) * self.scaling_factor
+
                     writer.writerow(
                         [
                             int(relative_elapsed_time),

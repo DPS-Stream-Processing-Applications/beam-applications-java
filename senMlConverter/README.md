@@ -24,28 +24,21 @@ The following are used independently of the dataset that is being processed:
 | `OUTPUT_FILE`        | Path of the output file. It should be an absolute path relative to the Docker container's `/home` directory. Example: `/home/grid_events.csv`. |
 | `SCALING`            | The Scaling factor for the elapsed time between events. The original timestamps of the datasets are in UNIX format. The elapsed time is calculated relative to the first timestamp (`startTime`). $$(timestamp - startTime) * scalingFactor$$ This preserves the original time distribution, impacting only the frequency of events. |
 
-- `DATASET`: This variable represents the dataset to be processed.
-  Possible values are: `TAXI`, `FIT` and `GRID`.
-- `OUTPUT_FILE`: This variable represents the path of the output file.
-  It should be an absolute path relative to the docker containers `/home` directory.
-  An example path could look like this: `/home/grid_events.csv`
-- `SCALING`: All datasets provide timestamps of the time they were collected. These are `UNIX` format timestamps.
-  From these timestamps, the elapsed time relative to the first timestamp `start_time` is calculated.
-  This `relative_elapsed_time` can be scaled through a scaling factor.
-  ```math
-  (timestamp - start\_time) * scaling\_factor
-  ```
-  With this implementation the original time distribution is preserved and only the frequency of events is impacted.
-
 ## TAXI Dataset
-Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).
-From this zip file the files `trip_data_1.csv` and `trip_fare_1.csv` are required. 
+Used for this is the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
+From this zip file the files `trip_data_*.csv` and `trip_fare_*.csv` are required. 
 
 Place these files into the `data` folder of this project.
-When running the docker container as shown below, two files will be created in the `data` folder.
-`input_joined.csv` contains the joined table of these two datasets, while the `output_taxi.csv` file contains the senml-output format used for the kafkaProducer.
-For this creating entries from the 2013-01-14 to the 2013-01-21 will be included, as described in the RIOTBench paper.
-Because these seven days would be too long for the benchmark the milliseconds are divided by a scaling factor which can be specified.
+When running the docker container as shown below, two files will be created:
+- `input_joined.csv` contains the joined table of these two datasets
+-  `OUTPUT_FILE` file contains the SenML output format used for the `kafkaProducer`.
+   Using the files `trip_fare_1.csv` and `trip_data_1.csv` will result in the same dataset used in the original RIOTBench paper.
+   This will contain data from `2013-01-14` to `2013-01-21`.
+
+| Environment Variable | Description |
+|----------------------|-------------|
+| `INPUT_FILE_FARE` | Path of the `fare` input file. It should be an absolute path relative to the Docker container's `/home` directory. Example: `/home/trip_fare_1.csv`|
+| `INPUT_FILE_TRIP` | Path of the regular `trip` input file named `data`. It should be an absolute path relative to the Docker container's `/home` directory. Example: `/home/trip_data_1.csv` |
 
 ```bash
 docker run --rm -it \
@@ -54,7 +47,7 @@ docker run --rm -it \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
     -e OUTPUT_FILE="/home/output_taxi.csv" \
-    -e SCALING="260" \
+    -e SCALING="1.8" \
     senml_converter
 ```
 
@@ -62,11 +55,11 @@ docker run --rm -it \
 Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the file into the `data` folder
 
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="FIT" \
     -e OUTPUT_FILE="/home/output_fit.csv" \
-    -e SCALING="260" \
+    -e SCALING="1.8" \
     senml_converter
 ```
 
@@ -90,7 +83,8 @@ After unzipping, you should get the following folder structure:
 The Folders starting with `File` are regular `zip` archives containing `txt` files with the same name.
 These are the files you want to move into the `data` in this directory.
 
->[!NOTE] You can also choose a subset of the files if you are after a smaller sample size.
+>[!NOTE]
+> You can also choose a subset of the files if you are after a smaller sample size.
 
     📁 data
     ├── 📄 File1.txt
@@ -105,8 +99,8 @@ These are the files you want to move into the `data` in this directory.
 > In this example this projects `data` directory is mounted as `home`.
 
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="GRID" \
     -e OUTPUT_FILE="/home/output_grid.csv" \
     -e SCALING="0.5" \

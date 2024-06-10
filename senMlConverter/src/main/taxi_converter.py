@@ -25,14 +25,13 @@ class TaxiConverter(Converter):
                 delimiter="|",
                 quotechar="",
                 quoting=csv.QUOTE_NONE,
-                escapechar=" ",
+                escapechar="\\",
             )
-            set_first_timestamp = True
-            first_timestamp = 0
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
                 start_timestamp: int = 0
                 for j, row in chunk.iterrows():
                     list_senml = list()
+                    timestamp = int(date_to_unix_timestamp(row[" pickup_datetime"]))
                     senml_string = (
                         "["
                         + '{"u": "string","n": "taxi_identifier","vs": "'
@@ -88,10 +87,10 @@ class TaxiConverter(Converter):
                     list_senml.append(senml_string)
 
                     if j == 1:
-                        start_timestamp = int(row["UNIX_timestamp"])
+                        start_timestamp = int(timestamp)
 
                     relative_elapsed_time = (
-                        int(row["UNIX_timestamp"]) - start_timestamp
+                        int(timestamp) - start_timestamp
                     ) * self.scaling_factor
 
                     writer.writerow(
@@ -112,9 +111,10 @@ class TaxiConverter(Converter):
             )
 
             for chunk in pd.read_csv(self.inputFile, chunksize=chunk_size):
-                for index, row in chunk.iterrows():
+                start_timestamp = 0
+                for j, row in chunk.iterrows():
                     list_senml = list()
-                    timestamp = str(date_to_unix_timestamp(row[" pickup_datetime"]))
+                    timestamp = int(date_to_unix_timestamp(row[" pickup_datetime"]))
                     senml_string = (
                         '{"e":['
                         + '{"u": "string","n": "taxi_identifier","sv": "'
@@ -170,9 +170,16 @@ class TaxiConverter(Converter):
                         + "}"
                     )
                     list_senml.append(senml_string)
+
+                    if j == 1:
+                        start_timestamp = int(timestamp)
+
+                    relative_elapsed_time = (
+                        int(timestamp - start_timestamp)
+                    ) * self.scaling_factor
                     writer.writerow(
                         [
-                            timestamp,
+                            relative_elapsed_time,
                             (list_senml[0]),
                         ]
                     )

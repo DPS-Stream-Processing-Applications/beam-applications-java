@@ -48,7 +48,9 @@ def create_table_taxi(input_fare, input_trip):
     cleaned_trip = drop_cols_trip(renamed_trip)
     cleaned_fare = drop_cols_fare(renamed_fare)
 
+    print("merging trip and fare")
     merged_df = merge_dfs(cleaned_trip, cleaned_fare)
+    print(f"size merged: {len(merged_df)}")
     ordered_df = change_header_order_df(merged_df, order)
     ordered_df.to_csv(output_file, index=False)
 
@@ -94,8 +96,10 @@ if __name__ == "__main__":
         if not (input_fare and input_trip and output_file):
             raise ValueError("Missing required environment variables for TAXI dataset")
 
+        print("reading data")
         create_table_taxi(input_fare, input_trip)
         input_file = "/home/input_joined.csv"
+        print("building new dataset")
         convert_taxi(input_file, output_file, use_riotbench_format, scaling_factor)
 
     elif dataset == "FIT":

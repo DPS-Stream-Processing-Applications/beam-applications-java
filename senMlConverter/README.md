@@ -48,7 +48,7 @@ docker run --rm -it \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
     -e OUTPUT_FILE="/home/output_taxi.csv" \
-    -e SCALING="1.8" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 
@@ -60,7 +60,7 @@ docker run --rm -it \
     -v $PWD/../data:/home \
     -e DATASET="FIT" \
     -e OUTPUT_FILE="/home/output_fit.csv" \
-    -e SCALING="1.8" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 

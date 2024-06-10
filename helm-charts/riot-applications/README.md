@@ -1,14 +1,22 @@
 # Kubernetes setup
->[!WARNING]
-> Make sure the operators for `Flink` and `Kafka` as well as the `Prometheus Stack` are installed via `helm` before attempting to install this custom chart. 
-> Then, this chart can be installed using the following command: `helm install riot-applications .`
 
-# Flink
+>[!WARNING]
+> Make sure the `Certificate Manager` is installed as well as the `Flink` operator helm chart, before attempting to install this custom chart.
+> All other dependencies are handled via this helm chart.
+```bash
+helm install riot-applications .
+```
+
+# Certificate Manager
 
 Install the certificate manager first:
+
 ```bash
 kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 ```
+
+# Flink
+
 Installing the `Flink` operator and deploying a session cluster:
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/

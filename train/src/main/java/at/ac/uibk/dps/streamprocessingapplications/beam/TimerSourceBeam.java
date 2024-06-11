@@ -1,37 +1,21 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import static java.time.Duration.ofMillis;
-import static java.util.Collections.singleton;
-
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
-import at.ac.uibk.dps.streamprocessingapplications.genevents.ISyntheticEventGen;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
-import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.TopicPartition;
 
-public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
+public class TimerSourceBeam extends DoFn<String, SourceEntry> {
   BlockingQueue<List<String>> eventQueue;
   String csvFileName;
   String outSpoutCSVLogFileName;
   String experiRunId;
   double scalingFactor;
   long msgId;
-
-  long numberLines;
-
-  private final long POLL_TIMEOUT_MS = 1000;
-
-  private final String TOPIC_NAME;
-
-  private MyKafkaConsumer myKafkaConsumer;
-
-  private Map<TopicPartition, OffsetAndMetadata> pendingOffsets = new HashMap<>();
 
   public TimerSourceBeam(
       String csvFileName,
@@ -45,11 +29,6 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
     this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
     this.scalingFactor = scalingFactor;
     this.experiRunId = experiRunId;
-    this.numberLines = lines;
-
-    this.myKafkaConsumer =
-        new MyKafkaConsumer(bootstrapserver, "group-" + UUID.randomUUID(), 1000, topic, lines);
-    this.TOPIC_NAME = topic;
   }
 
   public TimerSourceBeam(
@@ -146,51 +125,20 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> implements ISynth
 
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<SourceEntry> out) {
-    KafkaConsumer<Long, byte[]> kafkaConsumer;
-    kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
-    kafkaConsumer.subscribe(singleton(TOPIC_NAME), myKafkaConsumer);
-
-    int sendMessages = 0;
-    while (true) {
-      try {
-        ConsumerRecords<Long, byte[]> records = kafkaConsumer.poll(ofMillis(POLL_TIMEOUT_MS));
-        if (!records.isEmpty()) {
-          for (ConsumerRecord<Long, byte[]> record : records) {
-            SourceEntry values = new SourceEntry();
-            String rowString = new String(record.value());
-            String ROWKEYSTART = rowString.split(",")[1];
-            String ROWKEYEND = rowString.split(",")[2];
-            values.setRowString(rowString);
-            msgId++;
-            values.setMsgid(Long.toString(msgId));
-            values.setRowKeyStart(ROWKEYSTART);
-            values.setRowKeyEnd(ROWKEYEND);
-            out.output(values);
-            sendMessages++;
-            pendingOffsets.put(
-                new TopicPartition(record.topic(), record.partition()),
-                new OffsetAndMetadata(record.offset() + 1, null));
-          }
-          kafkaConsumer.commitAsync(pendingOffsets, myKafkaConsumer);
-          pendingOffsets.clear();
-        }
-      } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
-        System.out.println("Invalid or no offset found, and auto.reset.policy unset, using latest");
-        throw new RuntimeException(e);
-      } catch (Exception e) {
-        System.err.println(e.getMessage());
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  @Override
-  public void receive(List<String> event) {
     try {
-      this.eventQueue.put(event);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-      throw new RuntimeException("Exception in receive Event" + e);
+      SourceEntry values = new SourceEntry();
+      String rowString = input;
+      String ROWKEYSTART = rowString.split(",")[1];
+      String ROWKEYEND = rowString.split(",")[2];
+      values.setRowString(rowString);
+      msgId++;
+      values.setMsgid(Long.toString(msgId));
+      values.setRowKeyStart(ROWKEYSTART);
+      values.setRowKeyEnd(ROWKEYEND);
+      out.output(values);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 }

@@ -15,7 +15,6 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
@@ -131,7 +130,7 @@ public class TrainJob {
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
     String kafkaTopic = argumentClass.getKafkaTopic();
 
-    PCollection<String> inputFile = p.apply(Create.of("test"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
 
     PCollection<SourceEntry> timerSource =
         inputFile.apply(

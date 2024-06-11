@@ -1,10 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import static java.time.Duration.ofMillis;
-import static java.util.Collections.singleton;
-
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
-import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.kafka.clients.consumer.*;
@@ -30,14 +25,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
   String outSpoutCSVLogFileName;
   String experiRunId;
   long msgId;
-
-  long numberLines;
-
-  private final long POLL_TIMEOUT_MS = 1000;
-
   private final String datasetType;
-
-  private MyKafkaConsumer myKafkaConsumer;
 
   public static void initLogger(Logger l_) {
     l = l_;
@@ -54,9 +42,6 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
     this.csvFileName = csvFileName;
     this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
     this.experiRunId = experiRunId;
-    this.myKafkaConsumer =
-        new MyKafkaConsumer(bootstrap, "group-" + UUID.randomUUID(), 10000, topic);
-    this.numberLines = lines;
     this.datasetType = datasetType;
   }
 
@@ -123,51 +108,26 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<SourceEntry> out)
       throws IOException {
-    long count = 1, MAX_COUNT = 100; // FIXME?
-    KafkaConsumer<Long, byte[]> kafkaConsumer;
-    kafkaConsumer = myKafkaConsumer.createKafkaConsumer();
-    kafkaConsumer.subscribe(singleton(myKafkaConsumer.getTopic()), myKafkaConsumer);
+    try {
+      SourceEntry values = new SourceEntry();
+      String rowString = input;
+      String newRow;
+      if (datasetType.equals("TAXI")) {
+        newRow = "{\"e\":" + rowString + ",\"bt\":" + extractTimeStamp(rowString) + "}";
+      } else if (datasetType.equals("FIT")) {
+        newRow = "{\"e\":" + rowString + ",\"bt\": \"1358101800000\"}";
 
-    while (true) {
-      /*
-      List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
-      if (entry == null) {
-          // return;
-          continue;
+      } else {
+        newRow = "{\"e\":" + rowString + ",\"bt\":1358101800000}";
       }
-       */
-
-      try {
-        ConsumerRecords<Long, byte[]> records = kafkaConsumer.poll(ofMillis(POLL_TIMEOUT_MS));
-        if (!records.isEmpty()) {
-          for (ConsumerRecord<Long, byte[]> record : records) {
-            SourceEntry values = new SourceEntry();
-            String rowString = new String(record.value());
-            String newRow;
-            if (datasetType.equals("TAXI")) {
-              newRow = "{\"e\":" + rowString + ",\"bt\":" + extractTimeStamp(rowString) + "}";
-            } else if (datasetType.equals("FIT")) {
-              newRow = "{\"e\":" + rowString + ",\"bt\": \"1358101800000\"}";
-
-            } else {
-              newRow = "{\"e\":" + rowString + ",\"bt\":1358101800000}";
-            }
-            l.info(newRow);
-            values.setMsgid(Long.toString(msgId));
-            values.setPayLoad(newRow);
-            out.output(values);
-            msgId++;
-            count++;
-          }
-        }
-      } catch (OffsetOutOfRangeException | NoOffsetForPartitionException e) {
-        // Handle invalid offset or no offset found errors when auto.reset.policy is not set
-        System.out.println("Invalid or no offset found, and auto.reset.policy unset, using latest");
-        throw new RuntimeException(e);
-      } catch (Exception e) {
-        System.err.println(e.getMessage());
-        throw new RuntimeException(e);
-      }
+      l.info(newRow);
+      values.setMsgid(Long.toString(msgId));
+      values.setPayLoad(newRow);
+      out.output(values);
+      msgId++;
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 

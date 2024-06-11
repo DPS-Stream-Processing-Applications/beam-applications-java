@@ -15,7 +15,6 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
@@ -112,7 +111,9 @@ public class PredJob {
 
     Pipeline p = Pipeline.create(options);
 
-    PCollection<String> inputFile = p.apply(Create.of("test"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+
+    PCollection<String> inputFile2 = p.apply(new ReadSenMLSource("cleaned"));
 
     PCollection<SourceEntry> sourceData =
         inputFile.apply(
@@ -127,7 +128,7 @@ public class PredJob {
                     dataSetType)));
 
     PCollection<MqttSubscribeEntry> sourceDataMqtt =
-        inputFile.apply(
+        inputFile2.apply(
             "MQTT Subscribe",
             ParDo.of(new KafkaSubscribeBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
     PCollection<BlobReadEntry> blobRead =

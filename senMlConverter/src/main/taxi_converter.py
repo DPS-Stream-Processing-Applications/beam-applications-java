@@ -34,9 +34,7 @@ class TaxiConverter(Converter):
                     timestamp = int(date_to_unix_timestamp(row[" pickup_datetime"]))
                     senml_string = (
                         "["
-                        + '{"u": "string","n": "taxi_identifier","vs": "'
-                        + str(row["taxi_identifier"])
-                        + '"},'
+                        f'{{"u": "string","n": "taxi_identifier","vs": {str(row["taxi_identifier"])}"}},'
                         + '{"u": "string","n": "hack_license","vs": "'
                         + str(row[" hack_license"])
                         + '"},'

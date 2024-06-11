@@ -47,7 +47,7 @@ docker run --rm -it \
     -e DATASET="TAXI" \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
-    -e OUTPUT_FILE="/home/output_taxi.csv" \
+    -e OUTPUT_FILE="/home/riot_events_TAXI.csv" \
     -e SCALING="0.5" \
     senml_converter
 ```
@@ -59,7 +59,7 @@ Used for this is the mhealth+dataset.zip, which can be downloaded from this webs
 docker run --rm -it \
     -v $PWD/../data:/home \
     -e DATASET="FIT" \
-    -e OUTPUT_FILE="/home/output_fit.csv" \
+    -e OUTPUT_FILE="/home/riot_events_FIT.csv" \
     -e SCALING="0.5" \
     senml_converter
 ```
@@ -103,7 +103,7 @@ These are the files you want to move into the `data` in this directory.
 docker run --rm -it \
     -v $PWD/../data:/home \
     -e DATASET="GRID" \
-    -e OUTPUT_FILE="/home/output_grid.csv" \
+    -e OUTPUT_FILE="/home/riot_events_GRID.csv" \
     -e SCALING="0.5" \
     senml_converter
 ```

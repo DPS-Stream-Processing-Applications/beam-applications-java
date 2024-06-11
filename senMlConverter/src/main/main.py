@@ -50,9 +50,9 @@ def create_table_taxi(input_fare, input_trip):
 
     print("merging trip and fare")
     merged_df = merge_dfs(cleaned_trip, cleaned_fare)
-    print(f"size merged: {len(merged_df)}")
     ordered_df = change_header_order_df(merged_df, order)
     ordered_df.to_csv(output_file, index=False)
+    print("stored intermediate joined file")
 
 
 def convert_taxi(input, output, use_riotbench_format, scaling_factor):
@@ -90,17 +90,17 @@ if __name__ == "__main__":
         raise ValueError("Missing required environment variable OUTPUT_FILE")
 
     if dataset == "TAXI":
-        input_fare = os.environ.get("INPUT_FILE_FARE")
-        input_trip = os.environ.get("INPUT_FILE_TRIP")
+        fare_path = os.environ.get("INPUT_FILE_FARE")
+        trip_path = os.environ.get("INPUT_FILE_TRIP")
 
-        if not (input_fare and input_trip and output_file):
+        if not (fare_path and trip_path and output_file):
             raise ValueError("Missing required environment variables for TAXI dataset")
 
         print("reading data")
-        create_table_taxi(input_fare, input_trip)
+        create_table_taxi(fare_path, trip_path)
         input_file = "/home/input_joined.csv"
         print("building new dataset")
-        convert_taxi(input_file, output_file, use_riotbench_format, scaling_factor)
+        convert_taxi(fare_path, output_file, use_riotbench_format, scaling_factor)
 
     elif dataset == "FIT":
         output_file = os.environ.get("OUTPUT_FILE")

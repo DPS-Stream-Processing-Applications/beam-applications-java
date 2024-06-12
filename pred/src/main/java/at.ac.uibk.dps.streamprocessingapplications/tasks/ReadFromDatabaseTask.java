@@ -35,6 +35,9 @@ public class ReadFromDatabaseTask extends AbstractTask<String, byte[]> {
         pdfData = pdfBinary.getData();
       }
 
+      if (pdfData == null) {
+        throw new RuntimeException("MongoDB returned no element from db");
+      }
       super.setLastResult(pdfData);
     } catch (Exception e) {
       e.printStackTrace();

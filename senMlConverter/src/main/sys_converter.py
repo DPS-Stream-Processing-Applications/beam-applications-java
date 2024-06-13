@@ -1,11 +1,10 @@
 import csv
-import pandas as pd
 import random
-from converter import Converter
-from grid_decoder import decode_datetime_to_unix
+
+import pandas as pd
 
 
-class SysConverter(Converter):
+class SysConverter:
     def __init__(self, inputFile, outputFile, scaling, start_date):
         self.inputFile = inputFile
         self.outputFile = outputFile

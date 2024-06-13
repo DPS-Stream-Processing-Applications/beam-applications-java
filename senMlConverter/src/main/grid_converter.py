@@ -1,59 +1,61 @@
 import csv
 
+import numpy as np
 import pandas as pd
-from converter import Converter
+from pandas.core.generic import DtypeArg
 
 
-class GridConverter(Converter):
+class GridConverter:
     def __init__(self, inputFile: str, outputFile: str, scaling_factor: float):
         self.inputFile: str = inputFile
         self.outputFile: str = outputFile
         self.scaling_factor: float = scaling_factor
 
-    def convert_to_senml_csv(self, chunk_size):
-        with open(self.outputFile, "w", newline="") as csvfile:
+    def convert_to_senml_csv(self, chunk_size: int):
+        with open(self.outputFile, "w") as csvfile:
             writer = csv.writer(
                 csvfile,
                 delimiter="|",
-                quotechar="",
-                quoting=csv.QUOTE_NONE,
-                escapechar=" ",
+                quoting=csv.QUOTE_MINIMAL,
+                escapechar=None,
+                quotechar=" ",
             )
+            start_timestamp: int | None = None
+            dtypes: DtypeArg = {
+                "UNIX_timestamp": np.int64,
+                "id": np.float64,
+                "value": np.float64,
+            }
 
             for chunk in pd.read_csv(
                 self.inputFile,
                 chunksize=chunk_size,
                 sep=" ",
                 names=["UNIX_timestamp", "id", "value"],
+                dtype=dtypes,
+                # engine='pyarrow'
             ):
-                start_timestamp: int = 0
-                for j, row in chunk.iterrows():
-                    # NOTE::
-                    # Item format:
-                    # (UNIX_timestamp, id, value)
-                    if j == 1:
-                        start_timestamp = int(row["UNIX_timestamp"])
+                for _, row in chunk.iterrows():
+                    # NOTE:
+                    # The event stream should start immediately with the first event.
+                    # To calculate the relative elapsed time between the initial event and the following,
+                    # The original start time needs to be saved. This is the timestamp of the very first row.
+                    if start_timestamp == None:
+                        start_timestamp = row["UNIX_timestamp"]
 
-                    relative_elapsed_time = (
-                        int(row["UNIX_timestamp"]) - start_timestamp
-                    ) * self.scaling_factor
+                    relative_elapsed_time: int = int(
+                        (row["UNIX_timestamp"] - start_timestamp) * self.scaling_factor
+                    )
 
                     writer.writerow(
                         [
-                            int(relative_elapsed_time),
+                            relative_elapsed_time,
                             (
-                                "["
-                                f'{{"n": "id", "u": "double", "v": {row["id"]}}},'
-                                f'{{"n": "grid_measurement", "u": "double", "v": {row["value"]}}},'
-                                f'{{"n": "timestamp", "u": "s", "v": {row["UNIX_timestamp"]}}}'
-                                "]"
+                                r"["
+                                f'{{"n":"id","u":"double","v":"{row["id"]}"}},'
+                                f'{{"n":"grid_measurement","u":"double","v":"{row["value"]}"}},'
+                                f'{{"n":"timestamp","u":"s","v":"{int(row["UNIX_timestamp"])}"}}'
+                                r"]"
                             ),
                         ]
                     )
-
-    def converter_to_senml_riotbench_csv(self):
-        # INFO:
-        # This dataset is not going to be used for the `TRAIN` and `PRED` workflows,
-        # because there is only a single field for each datapoint.
-        # Therefore, the original riotbench format for csv can be skiped.
-        pass

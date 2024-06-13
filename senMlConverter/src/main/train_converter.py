@@ -1,11 +1,10 @@
-from converter import Converter
 import csv
-import pandas as pd
 import random
 
+import pandas as pd
 
-class TrainConverter(Converter):
 
+class TrainConverter:
     def __init__(self, outputFile, interval, time_benchmark):
         self.outputFile = outputFile
         self.interval = interval

@@ -1,10 +1,9 @@
 import csv
 
 import pandas as pd
-from converter import Converter
 
 
-class FitConverter(Converter):
+class FitConverter:
     def __init__(self, inputFile, outputFile, scaling):
         self.inputFile = inputFile
         self.outputFile = outputFile

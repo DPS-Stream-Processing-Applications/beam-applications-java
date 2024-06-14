@@ -34,7 +34,6 @@ class GridConverter:
                 sep=" ",
                 names=["UNIX_timestamp", "id", "value"],
                 dtype=dtypes,
-                # engine='pyarrow'
             ):
                 for row in chunk.itertuples():
                     if start_timestamp == None:

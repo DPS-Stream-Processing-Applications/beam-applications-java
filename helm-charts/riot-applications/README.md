@@ -37,7 +37,7 @@ kubectl apply -f templates/kafka-topic-senml-cleaned.yaml
 
 For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-cluster.yaml`.
 
-# Portforwarding
+# Port Forwarding
 To forward all ports run the following bash script.
 
 ```bash

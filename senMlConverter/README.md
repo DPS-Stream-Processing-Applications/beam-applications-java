@@ -1,47 +1,78 @@
 # Build the Docker Image
+Before you are able to run this application make sure to build the docker image.
+
 ```bash
 docker build -t senml_converter .
 ```
 
-# Preprocessing
->[!NOTE]
-> Please note that the processing can take some time,
-> because the application is not performance-optimized at all. 
+# Processing Datasets
 
->[!NOTE]
-> The docker container should be run with the `./data` folder of this project.
-> This is achieved via `$PWD/../data:/home`.
+>[!CAUTION]
+> This application makes use of pandas data frames and is not performance optimized.
+> Expect a significant runtime for these datasets.
+
+>[!IMPORTANT]
+> The docker container needs access to the local file system to read the input files and write the output file.
+> This is achieved by mounting the target directory as a [volume])(https://docs.docker.com/storage/volumes/).
+> Moving forward, the `data` directory of the project root is the target volume.
+
+## Environment Variables
+This application uses environment variables as input for runtime parameters.
+The following are used independently of the dataset that is being processed:
+
+| Environment Variable | Description |
+|----------------------|-------------|
+| `DATASET`            | Represents the dataset to be processed. Possible values: `TAXI`, `FIT`, `GRID`. |
+| `OUTPUT_FILE`        | Path of the output file. It should be an absolute path relative to the Docker container's `/home` directory. Example: `/home/grid_events.csv`. |
+| `SCALING`            | The Scaling factor for the elapsed time between events. The original timestamps of the datasets are in UNIX format. The elapsed time is calculated relative to the first timestamp (`startTime`). $$(timestamp - startTime) * scalingFactor$$ This preserves the original time distribution, impacting only the frequency of events. |
 
 ## TAXI Dataset
-Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).
-From this zip file the files `trip_data_1.csv` and `trip_fare_1.csv` are required. 
+Used for this the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
+From this zip file the files `trip_data_*.csv` and `trip_fare_*.csv` are required. 
 
 Place these files into the `data` folder of this project.
-When running the docker container as shown below, two files will be created in the `data` folder.
-`input_joined.csv` contains the joined table of these two datasets, while the `output_taxi.csv` file contains the senml-output format used for the kafkaProducer.
-For this creating entries from the 2013-01-14 to the 2013-01-21 will be included, as described in the RIOTBench paper.
-Because these seven days would be too long for the benchmark the milliseconds are divided by a scaling factor which can be specified.
+When running the docker container as shown below, two files will be created:
+- `input_joined.csv` contains the joined table of these two datasets
+-  `OUTPUT_FILE` file contains the SenML output format used for the `kafkaProducer`.
+   Using the files `trip_fare_1.csv` and `trip_data_1.csv` will result in the same dataset used in the original RIOTBench paper.
+   This will contain data from `2013-01-14` to `2013-01-21`.
 
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="TAXI" \
-    -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
-    -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
-    -e OUTPUT_FILE="/home/output_taxi.csv" \
-    -e SCALING="260" \
+    -e OUTPUT_FILE="/home/riot_events_TAXI.csv" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 
 ## FIT Dataset
-Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the file into the `data` folder
+The dataset used here is [MHEALTH](https://archive.ics.uci.edu/dataset/319/mhealth+dataset), which is available for download from the
+UC Irvine Machine Learning Repository.
+
+After unzipping move the `*.log` files from the acquired `MHEALTHDATASET` folder into the `data` folder.
+
+>[!NOTE]
+> You can also choose a subset of the files if you are after a smaller sample size.
+
+    📁 data
+    ├── 📄 mHealth_subject1.log
+    ├── 📄 mHealth_subject2.log
+    ├── 📄 mHealth_subject3.log
+    ├── 📄 mHealth_subject4.log
+    ├── 📄 mHealth_subject5.log
+    ├── 📄 mHealth_subject6.log
+    ├── 📄 mHealth_subject7.log
+    ├── 📄 mHealth_subject8.log
+    ├── 📄 mHealth_subject9.log
+    └── 📄 mHealth_subject10.log
 
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="FIT" \
-    -e OUTPUT_FILE="/home/output_fit.csv" \
-    -e SCALING="260" \
+    -e OUTPUT_FILE="/home/riot_events_FIT.csv" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 
@@ -63,9 +94,10 @@ After unzipping, you should get the following folder structure:
     └── 📦 File6.txt.zip
 
 The Folders starting with `File` are regular `zip` archives containing `txt` files with the same name.
-These are the files you want to move into the `data` in this directory.
+These are the files you want to move into the `data` directory.
 
->[!NOTE] You can also choose a subset of the files if you are after a smaller sample size.
+>[!NOTE]
+> You can also choose a subset of the files if you are after a smaller sample size.
 
     📁 data
     ├── 📄 File1.txt
@@ -75,16 +107,12 @@ These are the files you want to move into the `data` in this directory.
     ├── 📄 File5.txt
     └── 📄 File6.txt
 
->[!NOTE]
-> The `OUTPUT_FILE` argument should use the path relative to the name of the mounted volume.
-> In this example this projects `data` directory is mounted as `home`.
-
 ```bash
-docker run --rm -it -v \
-    $PWD/../data:/home \
+docker run --rm -it \
+    -v $PWD/../data:/home \
     -e DATASET="GRID" \
-    -e OUTPUT_FILE="/home/output_grid.csv" \
-    -e SCALING="260" \
+    -e OUTPUT_FILE="/home/riot_events_GRID.csv" \
+    -e SCALING="0.5" \
     senml_converter
 ```
 

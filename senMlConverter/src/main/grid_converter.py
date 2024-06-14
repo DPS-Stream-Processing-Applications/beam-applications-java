@@ -1,55 +1,56 @@
 import csv
 
+import numpy as np
 import pandas as pd
-from converter import Converter
+from pandas.core.generic import DtypeArg
 
 
-class GridConverter(Converter):
-    def __init__(self, inputFile: str, outputFile: str, scaling_factor: float):
-        self.inputFile: str = inputFile
-        self.outputFile: str = outputFile
+class GridConverter:
+    def __init__(self, outputFile: str, scaling_factor: float):
+        self.output_file: str = outputFile
         self.scaling_factor: float = scaling_factor
+        self.start_timestamp: int | None = None
 
-    def convert_to_senml_csv(self, chunk_size):
-        with open(self.outputFile, "w", newline="") as csvfile:
+    def convert_to_senml_csv(self, input_file: str, chunk_size: int):
+        with open(self.output_file, "a") as csvfile:
             writer = csv.writer(
                 csvfile,
                 delimiter="|",
-                quotechar="",
-                quoting=csv.QUOTE_NONE,
-                escapechar=" ",
+                quoting=csv.QUOTE_MINIMAL,
+                escapechar=None,
+                quotechar=" ",
             )
 
+            dtypes: DtypeArg = {
+                "UNIX_timestamp": np.int64,
+                "id": np.float64,
+                "value": np.float64,
+            }
+
             for chunk in pd.read_csv(
-                self.inputFile,
+                input_file,
                 chunksize=chunk_size,
                 sep=" ",
                 names=["UNIX_timestamp", "id", "value"],
+                dtype=dtypes,
             ):
-                start_timestamp: int = 0
-                for j, row in chunk.iterrows():
-                    # NOTE::
-                    # Item format:
-                    # (UNIX_timestamp, id, value)
-                    relative_timestamp = start_timestamp + (
-                        row["UNIX_timestamp"] / self.scaling_factor
+                for row in chunk.itertuples(index=False):
+                    if self.start_timestamp == None:
+                        self.start_timestamp = row.UNIX_timestamp
+
+                    relative_elapsed_time: int = int(
+                        (row.UNIX_timestamp - self.start_timestamp)
+                        * self.scaling_factor
                     )
                     writer.writerow(
                         [
-                            int(relative_timestamp),
+                            relative_elapsed_time,
                             (
-                                "["
-                                f'{{"n": "id", "u": "double", "v": {row["id"]}}},'
-                                f'{{"n": "grid_measurement", "u": "double", "v": {row["value"]}}},'
-                                f'{{"n": "timestamp", "u": "s", "v": {row["UNIX_timestamp"]}}}'
-                                "]"
+                                r"["
+                                f'{{"n":"id","u":"double","v":{row.id}}},'
+                                f'{{"n":"grid_measurement","u":"double","v":{row.value}}},'
+                                f'{{"n":"timestamp","u":"s","v":{row.UNIX_timestamp}}}'
+                                r"]"
                             ),
                         ]
                     )
-
-    def converter_to_senml_riotbench_csv(self):
-        # INFO:
-        # This dataset is not going to be used for the `TRAIN` and `PRED` workflows,
-        # because there is only a single field for each datapoint.
-        # Therefore, the original riotbench format for csv can be skiped.
-        pass

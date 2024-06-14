@@ -3,7 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.entity;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ErrorEstimateEntry implements Serializable {
+public class ErrorEstimateEntry implements Serializable, MqttPublishInput {
   private String meta;
   private float error;
   private String msgid;
@@ -53,6 +53,11 @@ public class ErrorEstimateEntry implements Serializable {
 
   public String getObsval() {
     return obsval;
+  }
+
+  @Override
+  public String getRes() {
+    return String.valueOf(error);
   }
 
   public void setObsval(String obsval) {

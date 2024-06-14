@@ -3,9 +3,8 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.ReadFromDatabaseTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
   private static Logger l;
-  private static final Object DATABASE_LOCK = new Object();
   private final String dataSetType;
   SenMlParse senMLParseTask;
   private Properties p;
@@ -26,23 +24,10 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
   private boolean isJson;
 
-  private ReadFromDatabaseTask readFromDatabaseTask;
-
-  private String connectionUrl;
-
-  private String dataBaseName;
-
-  public ParsePredictBeam(
-      Properties p_,
-      String dataSetType,
-      boolean isJson,
-      String connectionUrl,
-      String dataBaseName) {
+  public ParsePredictBeam(Properties p_, String dataSetType, boolean isJson) {
     p = p_;
     this.dataSetType = dataSetType;
     this.isJson = isJson;
-    this.connectionUrl = connectionUrl;
-    this.dataBaseName = dataBaseName;
   }
 
   public static void initLogger(Logger l_) {
@@ -56,69 +41,32 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
       senMLParseTask = new SenMlParse(dataSetType, isJson);
       senMLParseTask.setup(l, p);
       observableFields = new ArrayList<>();
-      readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, dataBaseName);
-      synchronized (DATABASE_LOCK) {
-        readFromDatabaseTask.setup(l, p);
-      }
       ArrayList<String> metaList = new ArrayList<>();
 
       String meta;
-      // InputStream inputStream = null;
-      byte[] csvContent = null;
+      String line;
       if (dataSetType.equals("TAXI")) {
         idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_TAXI");
-        /*
-        inputStream =
-                this.getClass()
-                        .getResourceAsStream(
-                                "/resources/datasets/taxi-schema-without-annotation.csv");
-
-         */
-        HashMap<String, String> map = new HashMap<>();
-        map.put("fileName", "taxi-schema-without-annotation_csv");
-        synchronized (DATABASE_LOCK) {
-          readFromDatabaseTask.doTask(map);
-        }
-        csvContent = readFromDatabaseTask.getLastResult();
+        line =
+            "taxi_identifier,hack_license,pickup_datetime,timestamp,trip_time_in_secs,trip_distance,"
+                + "pickup_longitude,pickup_latitude,dropoff_longitude,dropoff_latitude,payment_type,fare_amount,"
+                + "surcharge,mta_tax,tip_amount,tolls_amount,total_amount";
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_TAXI");
       } else if (dataSetType.equals("SYS")) {
         idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
-        /*
-        inputStream =
-                this.getClass()
-                        .getResourceAsStream(
-                                "/resources/datasets/sys-schema_without_annotationfields.txt");
-
-         */
-        HashMap<String, String> map = new HashMap<>();
-        map.put("fileName", "sys-schema_without_annotationfields_txt");
-        synchronized (DATABASE_LOCK) {
-          readFromDatabaseTask.doTask(map);
-        }
-        csvContent = readFromDatabaseTask.getLastResult();
+        line = "timestamp,source,longitude,latitude,temperature,humidity,light,dust,airquality_raw";
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
       } else if (dataSetType.equals("FIT")) {
         idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
-        /*
-        inputStream =
-                this.getClass()
-                        .getResourceAsStream("/resources/datasets/mhealth_schema.csv");
-
-         */
-        HashMap<String, String> map = new HashMap<>();
-        map.put("fileName", "mhealth_schema_csv");
-        synchronized (DATABASE_LOCK) {
-          readFromDatabaseTask.doTask(map);
-        }
-        csvContent = readFromDatabaseTask.getLastResult();
+        line =
+            "subjectId,timestamp,acc_chest_x,acc_chest_y,acc_chest_z,ecg_lead_1,ecg_lead_2,acc_ankle_x,"
+                + "acc_ankle_y,acc_ankle_z,gyro_ankle_x,gyro_ankle_y,gyro_ankle_z,magnetometer_ankle_x,"
+                + "magnetometer_ankle_y,magnetometer_ankle_z,acc_arm_x,acc_arm_y,acc_arm_z,gyro_arm_x,gyro_"
+                + "arm_y,gyro_arm_z,magnetometer_arm_x,magnetometer_arm_y,magnetometer_arm_z,label";
         meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
       } else {
         throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
       }
-
-      // InputStreamReader reader = new InputStreamReader(inputStream);
-      ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
-      BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
       /* read meta field list from property */
       metaFields = meta.split(",");
@@ -128,16 +76,13 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
       /* read csv schema to read fields observable into a list
       excluding meta fields read above */
-      String line = br.readLine();
       String[] obsType = line.split(",");
       for (String field : obsType) {
         if (!metaList.contains(field)) {
           observableFields.add(field);
         }
       }
-
-      br.close();
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException("Error when setting up ParsePredictBeam: " + e);
     }

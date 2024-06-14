@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.database;
 
-import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -35,7 +35,7 @@ public class WriteToDatabase implements Serializable {
       // byte[] pdfData = readFileToByteArray(path);
       byte[] pdfData;
 
-      try (InputStream inputStream = TrainJob.class.getResourceAsStream(path)) {
+      try (InputStream inputStream = FlinkJob.class.getResourceAsStream(path)) {
         pdfData = inputStream.readAllBytes();
       } catch (Exception e) {
         throw new RuntimeException("Exception when trying to save files into db");

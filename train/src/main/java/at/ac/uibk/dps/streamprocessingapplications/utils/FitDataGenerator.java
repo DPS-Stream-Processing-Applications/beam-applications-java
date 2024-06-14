@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
-import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.FIT_data;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
@@ -49,12 +49,12 @@ public class FitDataGenerator {
 
   public FIT_data getNextDataEntry() {
     String csvFile = dataSetPath;
-    long totalNumberLines = TrainJob.countLines(csvFile);
+    long totalNumberLines = FlinkJob.countLines(csvFile);
     rowToParse = rowToParse % totalNumberLines;
     FIT_data fitData = new FIT_data();
     try {
       if (isCsvFile) {
-        InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+        InputStream inputStream = FlinkJob.class.getResourceAsStream(dataSetPath);
         if (inputStream == null) {
           throw new IOException("Resource not found: " + dataSetPath);
         }
@@ -112,7 +112,7 @@ public class FitDataGenerator {
         if (rowToParse == 0) {
           rowToParse = 1;
         }
-        InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+        InputStream inputStream = FlinkJob.class.getResourceAsStream(dataSetPath);
         if (inputStream == null) {
           throw new IOException("Resource not found: " + dataSetPath);
         }

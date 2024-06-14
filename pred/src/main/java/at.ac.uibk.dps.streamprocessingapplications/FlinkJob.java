@@ -6,37 +6,19 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.*;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentClass;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.ArgumentParser;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.factory.PredCustomOptions;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Properties;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
-public class PredJob {
-
-  public static long countLines(String resourceFileName) {
-    long lines = 0;
-    try (InputStream inputStream = PredJob.class.getResourceAsStream(resourceFileName)) {
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-        while ((reader.readLine()) != null) {
-          lines++;
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException("Error when counting lines in resource file: " + e.getMessage());
-    }
-    return lines;
-  }
+public class FlinkJob {
 
   public static String checkDataType(String expriRunId) {
     if (expriRunId.contains("SYS")) {
@@ -67,7 +49,7 @@ public class PredJob {
 
     Properties p_ = new Properties();
     try (InputStream input =
-        PredJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+        FlinkJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
       p_.load(input);
 
     } catch (IOException e) {
@@ -93,9 +75,7 @@ public class PredJob {
         throw new RuntimeException("Type not recognized");
     }
 
-    long lines = countLines(inputFileName);
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
-    String kafkaTopic = argumentClass.getKafkaTopic();
     boolean isJson = inputFileName.contains("senml");
     String databaseUrl = argumentClass.getDatabaseUrl();
     String databaseName = "mydb";
@@ -109,34 +89,25 @@ public class PredJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
+    options.setJobName("predjob");
 
     Pipeline p = Pipeline.create(options);
 
-    PCollection<String> inputFile = p.apply(Create.of("test"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+
+    PCollection<String> inputFile2 = p.apply(new ReadSenMLSource("pred-model"));
 
     PCollection<SourceEntry> sourceData =
         inputFile.apply(
-            "Source",
-            ParDo.of(
-                new SourceBeam(
-                    inputFileName,
-                    spoutLogFileName,
-                    lines,
-                    kafkaBootstrapServers,
-                    kafkaTopic,
-                    dataSetType)));
+            "Source", ParDo.of(new SourceBeam(inputFileName, spoutLogFileName, dataSetType)));
 
     PCollection<MqttSubscribeEntry> sourceDataMqtt =
-        inputFile.apply(
-            "MQTT Subscribe",
-            ParDo.of(new KafkaSubscribeBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+        inputFile2.apply("MQTT Subscribe", ParDo.of(new KafkaSubscribeBeam(p_)));
     PCollection<BlobReadEntry> blobRead =
         sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
     PCollection<SenMlEntry> mlParseData =
-        sourceData.apply(
-            "SenML Parse",
-            ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson, databaseUrl, databaseName)));
+        sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
 
     PCollection<LinearRegressionEntry> linearRegression1 =
         mlParseData.apply(
@@ -179,12 +150,12 @@ public class PredJob {
     PCollection<MqttPublishEntry> publish1 =
         errorEstimate.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam1(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
 
     PCollection<MqttPublishEntry> publish2 =
         decisionTree.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam2(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
     PCollection<MqttPublishEntry> publish =
         PCollectionList.of(publish1)
             .and(publish2)

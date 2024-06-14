@@ -3,7 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.entity;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class DecisionTreeEntry implements Serializable {
+public class DecisionTreeEntry implements Serializable, MqttPublishInput {
   private String meta;
   private String obsval;
   private String msgid;

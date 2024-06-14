@@ -15,17 +15,16 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
-public class TrainJob {
+public class FlinkJob {
 
   public static long countLines(String resourceFileName) {
     long lines = 0;
-    try (InputStream inputStream = TrainJob.class.getResourceAsStream(resourceFileName)) {
+    try (InputStream inputStream = FlinkJob.class.getResourceAsStream(resourceFileName)) {
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
         while ((reader.readLine()) != null) {
           lines++;
@@ -95,18 +94,9 @@ public class TrainJob {
         throw new RuntimeException("Type not recognized");
     }
 
-    long linesCount = countLines(inputFileName);
-
-    /*
-          Properties p_ = new Properties();
-          InputStream input = new FileInputStream(taskPropFilename);
-          p_.load(input);
-
-    */
-
     Properties p_ = new Properties();
     try (InputStream input =
-        TrainJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+        FlinkJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
       p_.load(input);
 
     } catch (IOException e) {
@@ -124,26 +114,22 @@ public class TrainJob {
         PipelineOptionsFactory.fromArgs(args).withValidation().as(PredCustomOptions.class);
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
+    options.setLatencyTrackingInterval(5L);
+    options.setJobName("predjob");
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);
 
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
-    String kafkaTopic = argumentClass.getKafkaTopic();
 
-    PCollection<String> inputFile = p.apply(Create.of("test"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
 
     PCollection<SourceEntry> timerSource =
         inputFile.apply(
             "Timer Source",
             ParDo.of(
                 new TimerSourceBeam(
-                    inputFileName,
-                    spoutLogFileName,
-                    argumentClass.getScalingFactor(),
-                    (linesCount - 1),
-                    kafkaBootstrapServers,
-                    kafkaTopic)));
+                    inputFileName, spoutLogFileName, argumentClass.getScalingFactor())));
 
     PCollection<DbEntry> dataFromAzureDB =
         timerSource.apply(
@@ -172,7 +158,7 @@ public class TrainJob {
     PCollection<MqttPublishEntry> mqttPublish =
         blobUpload.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-sub-task")));
 
     mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
     p.run();

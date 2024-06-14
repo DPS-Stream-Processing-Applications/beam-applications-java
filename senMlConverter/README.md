@@ -26,6 +26,22 @@ The following are used independently of the dataset that is being processed:
 | `OUTPUT_FILE`        | Path of the output file. It should be an absolute path relative to the Docker container's `/home` directory. Example: `/home/grid_events.csv`. |
 | `SCALING`            | The Scaling factor for the elapsed time between events. The original timestamps of the datasets are in UNIX format. The elapsed time is calculated relative to the first timestamp (`startTime`). $$(timestamp - startTime) * scalingFactor$$ This preserves the original time distribution, impacting only the frequency of events. |
 
+
+## TRAIN Dataset
+
+No file needs to be placed inside the `data` folder. Duration is the total time of the benchmark
+in minutes, interval is how often the model should train inside the duration time. 
+
+```bash
+docker run --rm -it -v \
+    $PWD/../data:/home \
+    -e DATASET="TRAIN" \
+    -e OUTPUT_FILE="/home/output_train.csv" \
+    -e INTERVAL="30" \
+    -e DURATION="60" \
+    senml_converter
+```
+
 ## TAXI Dataset
 Used for this the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
 From this zip file the files `trip_data_*.csv` and `trip_fare_*.csv` are required. 
@@ -116,3 +132,48 @@ docker run --rm -it \
     senml_converter
 ```
 
+## SYS Dataset (workaround)
+
+This is a workaround, as of now the timestamps from the grid dataset are used and
+values based on the example data for SYS in the riotbench repository are used.
+
+Running it like the grid example above:
+
+This dataset was provided with the demand of confidentiality therefore, it is not available publicly.
+The zip archive will require the [pkware zip tool](https://www.pkware.com/products/zip-reader) to unzip.
+It is also `password protected`.
+
+After unzipping, you should get the following folder structure:
+
+    📁 CER Electricity Revised March 2012
+    ├── 📁 CER_Electricity_Data
+    ├── 📁 CER_Electricity_Documentation
+    ├── 📦 File1.txt.zip
+    ├── 📦 File2.txt.zip
+    ├── 📦 File3.txt.zip
+    ├── 📦 File4.txt.zip
+    ├── 📦 File5.txt.zip
+    └── 📦 File6.txt.zip
+
+The Folders starting with `File` are regular `zip` archives containing `txt` files with the same name.
+These are the files you want to move into the `data` in this directory.
+
+>[!NOTE] You can also choose a subset of the files if you are after a smaller sample size.
+
+    📁 data
+    ├── 📄 File1.txt
+    ├── 📄 File2.txt
+    ├── 📄 File3.txt
+    ├── 📄 File4.txt
+    ├── 📄 File5.txt
+    └── 📄 File6.txt
+
+
+```bash
+docker run --rm -it -v \
+$PWD/../data:/home \
+-e DATASET="SYS" \
+ -e OUTPUT_FILE="/home/output_sys.csv" \
+ -e SCALING="160" \
+  senml_converter
+```

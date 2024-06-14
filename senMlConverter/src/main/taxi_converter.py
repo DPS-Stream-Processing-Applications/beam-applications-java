@@ -9,7 +9,8 @@ from pandas.core.generic import DtypeArg
 def date_to_unix_timestamp(date_string: str) -> int:
     date_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
     unix_timestamp = date_object.timestamp()
-    return int(unix_timestamp)
+    # Convert to milliseconds
+    return int(unix_timestamp * 1000)
 
 
 class TaxiConverter:
@@ -74,7 +75,6 @@ class TaxiConverter:
                     "dropoff_latitude",
                 ],
                 dtype=dtypes_data,
-                # engine="pyarrow",
             )
 
             dtypes_fare: DtypeArg = {
@@ -110,7 +110,6 @@ class TaxiConverter:
                     "total_amount",
                 ],
                 dtype=dtypes_fare,
-                # engine="pyarrow",
             )
 
             start_timestamp: int | None = None
@@ -119,21 +118,18 @@ class TaxiConverter:
                     data_chunk.itertuples(index=False),
                     fare_chunk.itertuples(index=False),
                 ):
-                    # timestamp: int = int(date_to_unix_timestamp(row["pickup_datetime"]))
-                    # # NOTE:
-                    # # We want the event stream to always start from 0.
-                    # # The first row is
-                    # if j == 1:
-                    #     start_timestamp = timestamp
-                    #
-                    # relative_elapsed_time_scaled: float = (
-                    #     timestamp - start_timestamp
-                    # ) * self.scaling_factor
+                    timestamp: int = date_to_unix_timestamp(data_row.pickup_datetime)
+                    if start_timestamp == None:
+                        start_timestamp = timestamp
+
+                    relative_elapsed_time_scaled: int = int(
+                        (timestamp - start_timestamp) * self.scaling_factor
+                    )
 
                     writer.writerow(
                         [
                             # NOTE: Casting to int to have clean millisecond value
-                            20,
+                            relative_elapsed_time_scaled,
                             (
                                 "["
                                 f'{{"u":"string","n":"taxi_identifier","vs":{data_row.medallion}"}},'

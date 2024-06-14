@@ -12,6 +12,7 @@ docker build -t senml_converter .
 > The docker container should be run with the `./data` folder of this project.
 > This is achieved via `$PWD/../data:/home`.
 
+
 ## TRAIN Dataset
 
 No file needs to be placed inside the `data` folder. Duration is the total time of the benchmark
@@ -27,13 +28,11 @@ docker run --rm -it -v \
     senml_converter
 ```
 
-
-
 ## TAXI Dataset
 Used for this is the `FOIL2013.zip`, which can be downloaded from [here](https://databank.illinois.edu/datasets/IDB-9610843).
 From this zip file the files `trip_data_1.csv` and `trip_fare_1.csv` are required. 
 
-Place these two files into the `data` folder of this project.
+Place these files into the `data` folder of this project.
 When running the docker container as shown below, two files will be created in the `data` folder.
 `input_joined.csv` contains the joined table of these two datasets, while the `output_taxi.csv` file contains the senml-output format used for the kafkaProducer.
 For this creating entries from the 2013-01-14 to the 2013-01-21 will be included, as described in the RIOTBench paper.
@@ -51,14 +50,14 @@ docker run --rm -it -v \
 ```
 
 ## FIT Dataset
-Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the folder into the `data` folder. The `mHEALTHDATASET` folder should be the only folder in the `data` folder.
+Used for this is the mhealth+dataset.zip, which can be downloaded from this website [FIT download](https://archive.ics.uci.edu/dataset/319/mhealth+dataset). Unzip the file into the `data` folder
 
 ```bash
 docker run --rm -it -v \
     $PWD/../data:/home \
     -e DATASET="FIT" \
     -e OUTPUT_FILE="/home/output_fit.csv" \
-    -e SCALING="660" \
+    -e SCALING="260" \
     senml_converter
 ```
 
@@ -92,7 +91,6 @@ These are the files you want to move into the `data` in this directory.
     ├── 📄 File5.txt
     └── 📄 File6.txt
 
-
 >[!NOTE]
 > The `OUTPUT_FILE` argument should use the path relative to the name of the mounted volume.
 > In this example this projects `data` directory is mounted as `home`.
@@ -106,8 +104,7 @@ docker run --rm -it -v \
     senml_converter
 ```
 
-
-## SYS Dataset
+## SYS Dataset (workaround)
 
 This is a workaround, as of now the timestamps from the grid dataset are used and
 values based on the example data for SYS in the riotbench repository are used.
@@ -152,4 +149,3 @@ $PWD/../data:/home \
  -e SCALING="160" \
   senml_converter
 ```
-

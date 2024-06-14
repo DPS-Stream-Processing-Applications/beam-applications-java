@@ -33,7 +33,7 @@ public class KalmanRegressionPlot extends DoFn<Iterable<TimestampedValue<List<Do
             .height(600)
             .title(getClass().getSimpleName())
             .xAxisTitle("Time")
-            .yAxisTitle("Distinct Count")
+            .yAxisTitle("Kalman")
             .build();
 
     List<Double> sortedMeans =

@@ -1,3 +1,4 @@
+The default build command will build this Job for the `TAXI` dataset.
 ```bash
 ../gradlew build
 flink run ./build/FlinkJob.jar

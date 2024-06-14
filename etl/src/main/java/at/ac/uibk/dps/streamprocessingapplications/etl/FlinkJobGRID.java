@@ -1,11 +1,11 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl;
 
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.AnnotationFunction;
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunction;
-import at.ac.uibk.dps.streamprocessingapplications.etl.taxi.RangeFilterFunction;
+import at.ac.uibk.dps.streamprocessingapplications.etl.grid.AnnotationFunction;
+import at.ac.uibk.dps.streamprocessingapplications.etl.grid.InterpolationFunction;
+import at.ac.uibk.dps.streamprocessingapplications.etl.grid.RangeFilterFunction;
 import at.ac.uibk.dps.streamprocessingapplications.etl.transforms.ETLPipeline;
-import at.ac.uibk.dps.streamprocessingapplications.shared.TaxiSenMLParserJSON;
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
+import at.ac.uibk.dps.streamprocessingapplications.shared.GridSenMLParserJSON;
+import at.ac.uibk.dps.streamprocessingapplications.shared.model.GridMeasurement;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.WriteStringSink;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sources.ReadSenMLSource;
@@ -13,12 +13,12 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
-public class FlinkJob {
+public class FlinkJobGRID {
 
   public static void main(String[] args) {
     FlinkPipelineOptions options =
@@ -32,8 +32,8 @@ public class FlinkJob {
             .apply(new ReadSenMLSource("senml-source"))
             .apply(
                 new ETLPipeline<>(
-                    TypeDescriptor.of(TaxiRide.class),
-                    TaxiSenMLParserJSON::parseSenMLPack,
+                    TypeDescriptor.of(GridMeasurement.class),
+                    GridSenMLParserJSON::parseSenMLPack,
                     new RangeFilterFunction(),
                     // TaxiTestObjects.buildTestBloomFilter(),
                     null,
@@ -42,7 +42,7 @@ public class FlinkJob {
                     new AnnotationFunction()))
             .apply(
                 "Serialize SenML to String",
-                MapElements.into(TypeDescriptors.strings()).via(TaxiRide::toString));
+                MapElements.into(TypeDescriptors.strings()).via(GridMeasurement::toString));
     etl_strings.apply(new WriteStringSink("senml-cleaned"));
     etl_strings.apply(new StoreStringInDBSink("senml-cleaned"));
 

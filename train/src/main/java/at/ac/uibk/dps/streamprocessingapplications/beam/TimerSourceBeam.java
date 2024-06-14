@@ -4,10 +4,10 @@ import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.genevents.logging.BatchedFileLogging;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.kafka.clients.consumer.*;
 
 public class TimerSourceBeam extends DoFn<String, SourceEntry> {
   BlockingQueue<List<String>> eventQueue;
@@ -18,27 +18,15 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> {
   long msgId;
 
   public TimerSourceBeam(
-      String csvFileName,
-      String outSpoutCSVLogFileName,
-      double scalingFactor,
-      String experiRunId,
-      long lines,
-      String bootstrapserver,
-      String topic) {
+      String csvFileName, String outSpoutCSVLogFileName, double scalingFactor, String experiRunId) {
     this.csvFileName = csvFileName;
     this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
     this.scalingFactor = scalingFactor;
     this.experiRunId = experiRunId;
   }
 
-  public TimerSourceBeam(
-      String csvFileName,
-      String outSpoutCSVLogFileName,
-      double scalingFactor,
-      long lines,
-      String bootstrapserver,
-      String topic) {
-    this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "", lines, bootstrapserver, topic);
+  public TimerSourceBeam(String csvFileName, String outSpoutCSVLogFileName, double scalingFactor) {
+    this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "");
   }
 
   @Setup
@@ -127,10 +115,9 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> {
   public void processElement(@Element String input, OutputReceiver<SourceEntry> out) {
     try {
       SourceEntry values = new SourceEntry();
-      String rowString = input;
-      String ROWKEYSTART = rowString.split(",")[1];
-      String ROWKEYEND = rowString.split(",")[2];
-      values.setRowString(rowString);
+      String ROWKEYSTART = input.split(",")[1];
+      String ROWKEYEND = input.split(",")[2];
+      values.setRowString(input);
       msgId++;
       values.setMsgid(Long.toString(msgId));
       values.setRowKeyStart(ROWKEYSTART);

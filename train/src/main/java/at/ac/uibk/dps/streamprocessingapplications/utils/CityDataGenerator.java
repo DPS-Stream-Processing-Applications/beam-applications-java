@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
-import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SYS_City;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
@@ -45,12 +45,12 @@ public class CityDataGenerator {
 
   public SYS_City getNextDataEntry() {
     String csvFile = dataSetFileName;
-    long totalNumberLines = TrainJob.countLines(csvFile);
+    long totalNumberLines = FlinkJob.countLines(csvFile);
     rowToParse = rowToParse % totalNumberLines;
     SYS_City sysCity = new SYS_City();
     try {
       if (isCsvFile) {
-        InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetFileName);
+        InputStream inputStream = FlinkJob.class.getResourceAsStream(dataSetFileName);
         if (inputStream == null) {
           throw new IOException("Resource not found: " + dataSetFileName);
         }
@@ -92,7 +92,6 @@ public class CityDataGenerator {
             }
           }
         }
-        // FIXME: Complete logic for a normal csv file
       } else {
         if (rowToParse == 0) {
           rowToParse = 1;

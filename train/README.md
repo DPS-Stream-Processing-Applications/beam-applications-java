@@ -45,6 +45,10 @@ The following commands are automatically inlining this IP adress.
 
 ## Commands
 
+>[!NOTE]
+> The Train application uses a different inputFile than all other applications. It can be constructed via
+> the `senMlConverter`. One line consists of (timestamp | rowStart | rowEnd)
+
 ### Example command for SYS-Data
 ```bash
 flink run -m localhost:8081 \

@@ -5,7 +5,7 @@ plugins {
   // id("flink-job-conventions")
 }
 
-val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.TrainJob"
+val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.FlinkJob"
 
 application { mainClass = mainClassName }
 
@@ -56,7 +56,7 @@ java {
 tasks.named<Test>("test") { useJUnitPlatform() }
 
 tasks.named<Jar>("jar") {
-  archiveBaseName.set("TrainJob")
+  archiveBaseName.set("FlinkJob")
   destinationDirectory.set(file("build"))
   manifest {
     attributes(

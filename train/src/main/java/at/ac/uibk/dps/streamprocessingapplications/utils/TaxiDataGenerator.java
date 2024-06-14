@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.utils;
 
-import at.ac.uibk.dps.streamprocessingapplications.TrainJob;
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Measurement;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.SensorData;
 import at.ac.uibk.dps.streamprocessingapplications.entity.azure.Taxi_Trip;
@@ -51,13 +51,13 @@ public class TaxiDataGenerator {
 
   public Taxi_Trip getNextDataEntry() {
     String csvFile = dataSetPath;
-    long totalNumberLines = TrainJob.countLines(csvFile);
+    long totalNumberLines = FlinkJob.countLines(csvFile);
     rowToParse = rowToParse % totalNumberLines;
 
     Taxi_Trip taxiTrip = new Taxi_Trip();
     try {
       if (isCsvFile) {
-        InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+        InputStream inputStream = FlinkJob.class.getResourceAsStream(dataSetPath);
         if (inputStream == null) {
           throw new IOException("Resource not found: " + dataSetPath);
         }
@@ -101,7 +101,7 @@ public class TaxiDataGenerator {
         if (rowToParse == 0) {
           rowToParse = 1;
         }
-        InputStream inputStream = TrainJob.class.getResourceAsStream(dataSetPath);
+        InputStream inputStream = FlinkJob.class.getResourceAsStream(dataSetPath);
         if (inputStream == null) {
           throw new IOException("Resource not found: " + dataSetPath);
         }

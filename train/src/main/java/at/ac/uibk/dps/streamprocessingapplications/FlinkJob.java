@@ -20,11 +20,11 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
-public class TrainJob {
+public class FlinkJob {
 
   public static long countLines(String resourceFileName) {
     long lines = 0;
-    try (InputStream inputStream = TrainJob.class.getResourceAsStream(resourceFileName)) {
+    try (InputStream inputStream = FlinkJob.class.getResourceAsStream(resourceFileName)) {
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
         while ((reader.readLine()) != null) {
           lines++;
@@ -96,7 +96,7 @@ public class TrainJob {
 
     Properties p_ = new Properties();
     try (InputStream input =
-        TrainJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+        FlinkJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
       p_.load(input);
 
     } catch (IOException e) {
@@ -115,6 +115,7 @@ public class TrainJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
+    options.setJobName("predjob");
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);

@@ -27,7 +27,6 @@ The following are used independently of the dataset that is being processed:
 | `SCALING`            | The Scaling factor for the elapsed time between events. The original timestamps of the datasets are in UNIX format. The elapsed time is calculated relative to the first timestamp (`startTime`). $$(timestamp - startTime) * scalingFactor$$ This preserves the original time distribution, impacting only the frequency of events. |
 
 ## TAXI Dataset
-14Mill in 8 min
 Used for this is the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
 From this zip file the files `trip_data_*.csv` and `trip_fare_*.csv` are required. 
 

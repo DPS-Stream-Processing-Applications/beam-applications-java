@@ -16,18 +16,17 @@ def date_to_unix_timestamp(date_string: str) -> int:
 class TaxiConverter:
     def __init__(
         self,
-        input_file_data: str,
-        input_file_fare: str,
         output_file: str,
         scaling_factor: float,
     ):
-        self.input_file_data: str = input_file_data
-        self.input_file_fare: str = input_file_fare
-        self.outputFile: str = output_file
+        self.output_file: str = output_file
         self.scaling_factor: float = scaling_factor
+        self.start_timestamp: int | None = None
 
-    def convert_to_senml_csv(self, chunk_size):
-        with open(self.outputFile, "w") as csvfile:
+    def convert_to_senml_csv(
+        self, input_file_data: str, input_file_fare: str, chunk_size: int
+    ):
+        with open(self.output_file, "a") as csvfile:
             writer = csv.writer(
                 csvfile,
                 delimiter="|",
@@ -54,7 +53,7 @@ class TaxiConverter:
             }
 
             data_chunk_iterator = pd.read_csv(
-                self.input_file_data,
+                input_file_data,
                 header=0,
                 chunksize=chunk_size,
                 sep=",",
@@ -92,7 +91,7 @@ class TaxiConverter:
             }
 
             fare_chunk_iterator = pd.read_csv(
-                self.input_file_fare,
+                input_file_fare,
                 header=0,
                 chunksize=chunk_size,
                 sep=",",
@@ -112,18 +111,17 @@ class TaxiConverter:
                 dtype=dtypes_fare,
             )
 
-            start_timestamp: int | None = None
             for data_chunk, fare_chunk in zip(data_chunk_iterator, fare_chunk_iterator):
                 for data_row, fare_row in zip(
                     data_chunk.itertuples(index=False),
                     fare_chunk.itertuples(index=False),
                 ):
                     timestamp: int = date_to_unix_timestamp(data_row.pickup_datetime)
-                    if start_timestamp == None:
-                        start_timestamp = timestamp
+                    if self.start_timestamp == None:
+                        self.start_timestamp = timestamp
 
                     relative_elapsed_time_scaled: int = int(
-                        (timestamp - start_timestamp) * self.scaling_factor
+                        (timestamp - self.start_timestamp) * self.scaling_factor
                     )
 
                     writer.writerow(

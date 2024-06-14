@@ -1,0 +1,6 @@
+apiVersion: k3d.io/v1alpha3
+kind: Simple
+name: riot-test-cluster
+servers: 1
+agents: 0
+image: rancher/k3s:v1.28.10-k3s1

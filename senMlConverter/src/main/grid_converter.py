@@ -35,7 +35,7 @@ class GridConverter:
                 names=["UNIX_timestamp", "id", "value"],
                 dtype=dtypes,
             ):
-                for row in chunk.itertuples():
+                for row in chunk.itertuples(index=False):
                     if start_timestamp == None:
                         start_timestamp = row.UNIX_timestamp
 

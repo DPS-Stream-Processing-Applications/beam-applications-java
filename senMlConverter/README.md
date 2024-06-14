@@ -27,7 +27,7 @@ The following are used independently of the dataset that is being processed:
 | `SCALING`            | The Scaling factor for the elapsed time between events. The original timestamps of the datasets are in UNIX format. The elapsed time is calculated relative to the first timestamp (`startTime`). $$(timestamp - startTime) * scalingFactor$$ This preserves the original time distribution, impacting only the frequency of events. |
 
 ## TAXI Dataset
-Used for this is the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
+Used for this the `FOIL2013.zip`, which can be downloaded from [this databank](https://databank.illinois.edu/datasets/IDB-9610843).
 From this zip file the files `trip_data_*.csv` and `trip_fare_*.csv` are required. 
 
 Place these files into the `data` folder of this project.
@@ -49,6 +49,23 @@ docker run --rm -it \
 ## FIT Dataset
 The dataset used here is [MHEALTH](https://archive.ics.uci.edu/dataset/319/mhealth+dataset), which is available for download from the
 UC Irvine Machine Learning Repository.
+
+After unzipping move the `*.log` files from the acquired `MHEALTHDATASET` folder into the `data` folder.
+
+>[!NOTE]
+> You can also choose a subset of the files if you are after a smaller sample size.
+
+    📁 data
+    ├── 📄 mHealth_subject1.log
+    ├── 📄 mHealth_subject2.log
+    ├── 📄 mHealth_subject3.log
+    ├── 📄 mHealth_subject4.log
+    ├── 📄 mHealth_subject5.log
+    ├── 📄 mHealth_subject6.log
+    ├── 📄 mHealth_subject7.log
+    ├── 📄 mHealth_subject8.log
+    ├── 📄 mHealth_subject9.log
+    └── 📄 mHealth_subject10.log
 
 ```bash
 docker run --rm -it \

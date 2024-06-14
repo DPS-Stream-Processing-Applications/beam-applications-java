@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: flink-cluster-metrics
+  # INFO:
+  # The label is required by Prometheus.
+  # Check https://github.com/prometheus-operator/kube-prometheus/issues/1392#issuecomment-1411719953.
+  labels:
+    release: prometheus
+spec:
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app: flink-session-cluster
+  podMetricsEndpoints:
+    - port: metrics

@@ -1,11 +1,8 @@
-from converter import Converter
 import csv
-import pandas as pd
 import random
 
 
-class TrainConverter(Converter):
-
+class TrainConverter:
     def __init__(self, outputFile, interval, time_benchmark):
         self.outputFile = outputFile
         self.interval = interval
@@ -37,6 +34,3 @@ class TrainConverter(Converter):
                 writer.writerow([timestamp, (list_senml[0])])
                 timestamp = timestamp + interval
                 timestamp_date = timestamp_date + random.randint(1000, 100000)
-
-    def converter_to_senml_riotbench_csv(self, chunk_size):
-        pass

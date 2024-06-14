@@ -8,19 +8,9 @@
 # Run
 > [!WARNING]
 > Make sure the kubernetes port is forwarded before you try running this program!
+Because gradle handles interrupts differently, we launch the producer standalone.
 
 ```bash
-../gradlew run --args $(pwd)/../data/<output_file>.csv
-```
-
-## Test the train application
-
-```bash
-../gradlew run --args $(pwd)/test_input_TRAIN_SYS.csv
-```
-
-## Test the pred application
-
-```bash
-../gradlew run --args $(pwd)/test_input_PRED_TAXI.csv
+../gradlew build
+java -jar build/KafkaProducer.jar ../data/<name_of_csv_file>  10 "senml-source"
 ```

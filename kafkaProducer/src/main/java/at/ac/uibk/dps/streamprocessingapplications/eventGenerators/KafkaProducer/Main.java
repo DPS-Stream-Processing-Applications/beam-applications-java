@@ -1,62 +1,62 @@
 package at.ac.uibk.dps.streamprocessingapplications.eventGenerators.KafkaProducer;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import sun.misc.Signal;
 
 public class Main {
   public static void main(String[] args) {
-    if (args.length == 0 || args[0].trim().isEmpty()) {
-      // System.out.println("You need to specify a path!");
+    if (args.length != 3 || args[0].trim().isEmpty() || args[1].trim().isEmpty() || args[2].trim().isEmpty()) {
+      System.out.println("Usage: <path_to_csv> <number_of_threads> <kafka_topic>");
       return;
     }
 
-    Properties props = new Properties();
-    props.put("bootstrap.servers", "localhost:9093");
-    props.put("key.serializer", LongSerializer.class.getName());
-    props.put("value.serializer", StringSerializer.class.getName());
+    final String FILE_PATH = args[0];
+    final int THREAD_COUNT = Integer.parseInt(args[1]);
+    final String KAFKA_TOPIC = args[2];
 
-    String topic = "senml-source";
+    final Properties kafkaProperties = new Properties();
+    kafkaProperties.put("bootstrap.servers", "localhost:9093");
+    kafkaProperties.put("key.serializer", LongSerializer.class.getName());
+    kafkaProperties.put("value.serializer", StringSerializer.class.getName());
 
-    BlockingQueue<Event> eventQueue = new DelayQueue<>();
-    ExecutorService producer = Executors.newFixedThreadPool(1);
-    CSVParser parser = new CSVParserBuilder().withSeparator('|').build();
-    CSVReader reader;
+    final AtomicBoolean running = new AtomicBoolean(true);
 
-    try {
-      reader =
-          new CSVReaderBuilder(new FileReader(args[0]))
-              .withSkipLines(1)
-              .withCSVParser(parser)
-              .build();
-      producer.submit(new EventProducer(eventQueue, reader));
-    } catch (FileNotFoundException e) {
-      // System.out.println("file_not_found");
-    }
-    // HACK for initial startup...
-    while (eventQueue.isEmpty()) {}
-
-    ExecutorService consumers = Executors.newFixedThreadPool(64);
-    for (int i = 0; i < 4; i++) {
-      consumers.submit(new EventConsumer(eventQueue, props, topic));
+    List<Thread> threads = new ArrayList<>(THREAD_COUNT);
+    long unixStartTime = System.currentTimeMillis();
+    for (int i = 0; i < THREAD_COUNT; i++) {
+      Thread thread =
+          new Thread(
+              new EventProducer(
+                  running,
+                  unixStartTime,
+                  FILE_PATH,
+                  i,
+                  THREAD_COUNT,
+                  KAFKA_TOPIC,
+                  kafkaProperties));
+      threads.add(thread);
+      thread.start();
     }
 
-    try {
-      producer.awaitTermination(3, TimeUnit.SECONDS);
-      consumers.awaitTermination(3, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-    producer.shutdown();
-    consumers.shutdown();
+    Signal.handle(
+        new Signal("INT"), // SIGINT
+        signal -> {
+          System.out.println("\nDetected SIGINT, shutting down...");
+          running.set(false);
+        });
 
-    // TODO: Fix infinite runtime
+    for (Thread thread : threads) {
+      try {
+        thread.join();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    System.out.println("All threads finished.");
   }
 }

@@ -11,9 +11,6 @@ dependencies {
    * For this implementation it needs to match the kafka version in `kafka-cluster.yaml`.
    */
   implementation("org.apache.kafka:kafka-clients:3.7.0")
-
-  testImplementation(platform("org.junit:junit-bom:5.9.1"))
-  testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 val mainClassName = "at.ac.uibk.dps.streamprocessingapplications.eventGenerators.KafkaProducer.Main"

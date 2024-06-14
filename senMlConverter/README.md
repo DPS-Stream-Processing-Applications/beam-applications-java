@@ -15,11 +15,11 @@ docker build -t senml_converter .
 ## TRAIN Dataset
 
 No file needs to be placed inside the `data` folder. Duration is the total time of the benchmark
-in minutes, interval is how often the model should train inside the benchmark time. 
+in minutes, interval is how often the model should train inside the duration time. 
 
 ```bash
 docker run --rm -it -v \
-    $PWD/data:/home \
+    $PWD/../data:/home \
     -e DATASET="TRAIN" \
     -e OUTPUT_FILE="/home/output_train.csv" \
     -e INTERVAL="30" \
@@ -41,7 +41,7 @@ Because these seven days would be too long for the benchmark the milliseconds ar
 
 ```bash
 docker run --rm -it -v \
-    $PWD/data:/home \
+    $PWD/../data:/home \
     -e DATASET="TAXI" \
     -e INPUT_FILE_FARE="/home/trip_fare_1.csv" \
     -e INPUT_FILE_TRIP="/home/trip_data_1.csv" \
@@ -55,7 +55,7 @@ Used for this is the mhealth+dataset.zip, which can be downloaded from this webs
 
 ```bash
 docker run --rm -it -v \
-    $PWD/data:/home \
+    $PWD/../data:/home \
     -e DATASET="FIT" \
     -e OUTPUT_FILE="/home/output_fit.csv" \
     -e SCALING="660" \
@@ -145,6 +145,11 @@ These are the files you want to move into the `data` in this directory.
 
 
 ```bash
-docker run --rm -it -v $PWD/data:/home -e DATASET="SYS" -e OUTPUT_FILE="/home/output_sys.csv" -e SCALING="160" senml_converter
+docker run --rm -it -v \
+$PWD/../data:/home \
+-e DATASET="SYS" \
+ -e OUTPUT_FILE="/home/output_sys.csv" \
+ -e SCALING="160" \
+  senml_converter
 ```
 

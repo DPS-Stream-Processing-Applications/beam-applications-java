@@ -94,15 +94,6 @@ public class TrainJob {
         throw new RuntimeException("Type not recognized");
     }
 
-    long linesCount = countLines(inputFileName);
-
-    /*
-          Properties p_ = new Properties();
-          InputStream input = new FileInputStream(taskPropFilename);
-          p_.load(input);
-
-    */
-
     Properties p_ = new Properties();
     try (InputStream input =
         TrainJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
@@ -123,12 +114,12 @@ public class TrainJob {
         PipelineOptionsFactory.fromArgs(args).withValidation().as(PredCustomOptions.class);
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
+    options.setLatencyTrackingInterval(5L);
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);
 
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
-    String kafkaTopic = argumentClass.getKafkaTopic();
 
     PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
 
@@ -137,12 +128,7 @@ public class TrainJob {
             "Timer Source",
             ParDo.of(
                 new TimerSourceBeam(
-                    inputFileName,
-                    spoutLogFileName,
-                    argumentClass.getScalingFactor(),
-                    (linesCount - 1),
-                    kafkaBootstrapServers,
-                    kafkaTopic)));
+                    inputFileName, spoutLogFileName, argumentClass.getScalingFactor())));
 
     PCollection<DbEntry> dataFromAzureDB =
         timerSource.apply(
@@ -171,7 +157,7 @@ public class TrainJob {
     PCollection<MqttPublishEntry> mqttPublish =
         blobUpload.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-sub-task")));
 
     mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
     p.run();

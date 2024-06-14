@@ -18,7 +18,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 
-public class PredJob {
+public class FlinkJob {
 
   public static String checkDataType(String expriRunId) {
     if (expriRunId.contains("SYS")) {
@@ -49,7 +49,7 @@ public class PredJob {
 
     Properties p_ = new Properties();
     try (InputStream input =
-        PredJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
+        FlinkJob.class.getResourceAsStream("/resources/configs/all_tasks.properties")) {
       p_.load(input);
 
     } catch (IOException e) {
@@ -89,6 +89,7 @@ public class PredJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
+    options.setJobName("predjob");
 
     Pipeline p = Pipeline.create(options);
 

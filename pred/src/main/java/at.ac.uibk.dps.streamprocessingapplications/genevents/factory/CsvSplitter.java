@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.genevents.factory;
 
-import at.ac.uibk.dps.streamprocessingapplications.PredJob;
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
 import com.opencsv.CSVReader;
 import java.io.*;
 import java.text.ParseException;
@@ -25,7 +25,7 @@ public class CsvSplitter {
   public static int peakRate;
 
   public static List<String> extractHeadersFromCSV(String inputFileName) {
-    try (InputStream inputStream = PredJob.class.getResourceAsStream(inputFileName);
+    try (InputStream inputStream = FlinkJob.class.getResourceAsStream(inputFileName);
         CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
       String[] headers = reader.readNext(); // use .intern() later
       reader.close();
@@ -47,7 +47,7 @@ public class CsvSplitter {
   public static List<TableClass> roundRobinSplitCsvToMemory(
       String inputSortedCSVFileName, int numThreads, double accFactor, String datasetType)
       throws IOException {
-    InputStream inputStream = PredJob.class.getResourceAsStream(inputSortedCSVFileName);
+    InputStream inputStream = FlinkJob.class.getResourceAsStream(inputSortedCSVFileName);
     if (inputStream == null) {
       throw new IOException("Resource not found: " + inputSortedCSVFileName);
     }

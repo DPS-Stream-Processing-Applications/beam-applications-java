@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.kafka.clients.consumer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,27 +31,15 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
   }
 
   public SourceBeam(
-      String csvFileName,
-      String outSpoutCSVLogFileName,
-      String experiRunId,
-      long lines,
-      String bootstrap,
-      String topic,
-      String datasetType) {
+      String csvFileName, String outSpoutCSVLogFileName, String experiRunId, String datasetType) {
     this.csvFileName = csvFileName;
     this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
     this.experiRunId = experiRunId;
     this.datasetType = datasetType;
   }
 
-  public SourceBeam(
-      String csvFileName,
-      String outSpoutCSVLogFileName,
-      long lines,
-      String bootstrap,
-      String topic,
-      String datasetType) {
-    this(csvFileName, outSpoutCSVLogFileName, "", lines, bootstrap, topic, datasetType);
+  public SourceBeam(String csvFileName, String outSpoutCSVLogFileName, String datasetType) {
+    this(csvFileName, outSpoutCSVLogFileName, "", datasetType);
   }
 
   private long extractTimeStamp(String row) {
@@ -96,13 +83,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
 
       e.printStackTrace();
     }
-    // this.eventGen = new EventGen(this, this.scalingFactor);
-    // this.eventQueue = new LinkedBlockingQueue<>();
-    // String uLogfilename = this.outSpoutCSVLogFileName + msgId;
-    boolean isJson = csvFileName.contains("senml");
     initLogger(LoggerFactory.getLogger("APP"));
-
-    // this.eventGen.launch(this.csvFileName, uLogfilename, -1, isJson); // Launch threads
   }
 
   @ProcessElement

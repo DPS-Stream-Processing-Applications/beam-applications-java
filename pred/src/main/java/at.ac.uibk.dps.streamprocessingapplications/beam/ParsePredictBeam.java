@@ -3,9 +3,8 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.ReadFromDatabaseTask;
 import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
   private static Logger l;
-  private static final Object DATABASE_LOCK = new Object();
   private final String dataSetType;
   SenMlParse senMLParseTask;
   private Properties p;
@@ -26,23 +24,10 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
 
   private boolean isJson;
 
-  private ReadFromDatabaseTask readFromDatabaseTask;
-
-  private String connectionUrl;
-
-  private String dataBaseName;
-
-  public ParsePredictBeam(
-      Properties p_,
-      String dataSetType,
-      boolean isJson,
-      String connectionUrl,
-      String dataBaseName) {
+  public ParsePredictBeam(Properties p_, String dataSetType, boolean isJson) {
     p = p_;
     this.dataSetType = dataSetType;
     this.isJson = isJson;
-    this.connectionUrl = connectionUrl;
-    this.dataBaseName = dataBaseName;
   }
 
   public static void initLogger(Logger l_) {

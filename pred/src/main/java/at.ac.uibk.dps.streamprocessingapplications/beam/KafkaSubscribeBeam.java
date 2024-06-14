@@ -1,7 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
-import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaConsumer;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -11,25 +10,19 @@ import org.slf4j.LoggerFactory;
 
 public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
   private static long msgid = 1;
-  private static Logger l; // TODO: Ensure logger is initialized before use
-  MyKafkaConsumer myKafkaConsumer;
+  private static Logger l;
+
   String spoutLogFileName = null;
   Properties p;
 
-  String bootStrapServer;
-  String topic;
-
-  public KafkaSubscribeBeam(Properties p_, String spoutLogFileName, String server, String topic) {
-    // this.csvFileNameOutSink = csvFileNameOutSink;
+  public KafkaSubscribeBeam(Properties p_, String spoutLogFileName) {
     p = p_;
     this.spoutLogFileName = spoutLogFileName;
     initLogger(LoggerFactory.getLogger("APP"));
   }
 
-  public KafkaSubscribeBeam(Properties p_, String server, String topic) {
+  public KafkaSubscribeBeam(Properties p_) {
     p = p_;
-    this.bootStrapServer = server;
-    this.topic = topic;
   }
 
   public static void initLogger(Logger l_) {
@@ -49,13 +42,11 @@ public class KafkaSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
     if (arg1 != null) {
       try {
         msgid++;
-        // ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Exception in processElement of MqttBeam " + e);
       }
       if (l.isInfoEnabled()) l.info("arg1 in MQTTSubscribeSpout {}", arg1);
-      // System.out.println("arg " + arg1);
       out.output(new MqttSubscribeEntry(arg1.split("-")[1], arg1, Long.toString(msgid)));
     }
   }

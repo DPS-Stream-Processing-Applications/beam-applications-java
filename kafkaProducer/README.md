@@ -12,5 +12,5 @@ Because gradle handles interrupts differently, we launch the producer standalone
 
 ```bash
 ../gradlew build
-java -jar build/KafkaProducer.jar ../data/<name_of_csv_file>  <number_of_threads>
+java -jar build/KafkaProducer.jar ../data/<name_of_csv_file>  10 "senml-source"
 ```

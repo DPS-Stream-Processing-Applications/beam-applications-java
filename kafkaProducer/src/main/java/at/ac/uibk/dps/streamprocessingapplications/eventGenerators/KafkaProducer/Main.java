@@ -10,15 +10,14 @@ import sun.misc.Signal;
 
 public class Main {
   public static void main(String[] args) {
-    if (args.length != 2 || args[0].trim().isEmpty() || args[1].trim().isEmpty()) {
-      System.out.println("Usage: <path_to_csv> <number_of_threads>");
+    if (args.length != 3 || args[0].trim().isEmpty() || args[1].trim().isEmpty() || args[2].trim().isEmpty()) {
+      System.out.println("Usage: <path_to_csv> <number_of_threads> <kafka_topic>");
       return;
     }
 
     final String FILE_PATH = args[0];
     final int THREAD_COUNT = Integer.parseInt(args[1]);
-
-    final String KAFKA_TOPIC = "senml-source";
+    final String KAFKA_TOPIC = args[2];
 
     final Properties kafkaProperties = new Properties();
     kafkaProperties.put("bootstrap.servers", "localhost:9093");

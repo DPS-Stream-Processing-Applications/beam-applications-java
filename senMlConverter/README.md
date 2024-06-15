@@ -174,6 +174,6 @@ docker run --rm -it -v \
 $PWD/../data:/home \
 -e DATASET="SYS" \
  -e OUTPUT_FILE="/home/output_sys.csv" \
- -e SCALING="160" \
+ -e SCALING="0.5" \
   senml_converter
 ```

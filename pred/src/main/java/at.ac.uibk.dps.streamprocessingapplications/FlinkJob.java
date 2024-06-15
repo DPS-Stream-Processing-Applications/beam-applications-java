@@ -150,12 +150,12 @@ public class FlinkJob {
     PCollection<MqttPublishEntry> publish1 =
         errorEstimate.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
 
     PCollection<MqttPublishEntry> publish2 =
         decisionTree.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
     PCollection<MqttPublishEntry> publish =
         PCollectionList.of(publish1)
             .and(publish2)

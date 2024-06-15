@@ -158,7 +158,7 @@ public class FlinkJob {
     PCollection<MqttPublishEntry> mqttPublish =
         blobUpload.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-publish")));
 
     mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
     p.run();

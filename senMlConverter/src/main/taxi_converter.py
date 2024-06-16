@@ -130,8 +130,8 @@ class TaxiConverter:
                             relative_elapsed_time_scaled,
                             (
                                 "["
-                                f'{{"u":"string","n":"taxi_identifier","vs":{data_row.medallion}"}},'
-                                f'{{"u":"string","n":"hack_license","vs":"{data_row.hack_license}}},'
+                                f'{{"u":"string","n":"taxi_identifier","vs":"{data_row.medallion}"}},'
+                                f'{{"u":"string","n":"hack_license","vs":"{data_row.hack_license}"}},'
                                 f'{{"u":"time","n":"pickup_datetime","vs":"{data_row.pickup_datetime}"}},'
                                 f'{{"u":"s","n":"trip_time_in_secs","v":"{data_row.trip_time_in_secs}"}},'
                                 f'{{"u":"m","n":"trip_distance","v":"{data_row.trip_distance}"}},'

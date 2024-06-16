@@ -9,6 +9,7 @@ repositories { mavenCentral() }
 dependencies {
   implementation("org.json:json:20240205")
   implementation(project(":shared"))
+  implementation("commons-cli:commons-cli:1.8.0")
 }
 
 tasks.named<Jar>("jar") {

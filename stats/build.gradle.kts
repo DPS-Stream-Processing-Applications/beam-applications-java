@@ -10,6 +10,7 @@ dependencies {
   implementation(project(":shared"))
   implementation("org.knowm.xchart:xchart:3.8.7")
   implementation("org.apache.commons:commons-math:2.2")
+  implementation("commons-cli:commons-cli:1.8.0")
 }
 
 tasks.named<Jar>("jar") {

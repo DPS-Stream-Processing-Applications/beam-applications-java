@@ -39,7 +39,7 @@ public class FlinkJob {
       experiRunId = cmd.getOptionValue("experiRunId");
     } catch (ParseException e) {
       System.out.println(e.getMessage());
-      formatter.printHelp("CliTool", cliOptions);
+      formatter.printHelp("FlinkJob", cliOptions);
       System.exit(1);
     }
 

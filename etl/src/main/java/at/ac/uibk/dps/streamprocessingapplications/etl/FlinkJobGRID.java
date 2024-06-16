@@ -13,6 +13,5 @@ public class FlinkJobGRID {
     options.setJobName("ETL-GRID");
 
     PipelineBuilder.buildGRIDPipeline(options).run();
-
   }
 }

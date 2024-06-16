@@ -24,28 +24,8 @@ public class FlinkJobGRID {
     FlinkPipelineOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(FlinkPipelineOptions.class);
     options.setRunner(FlinkRunner.class);
-    // options.setParallelism(4);
+    options.setJobName("ETL-GRID");
 
-    Pipeline pipeline = Pipeline.create(options);
-    PCollection<String> etl_strings =
-        pipeline
-            .apply(new ReadSenMLSource("senml-source"))
-            .apply(
-                new ETLPipeline<>(
-                    TypeDescriptor.of(GridMeasurement.class),
-                    GridSenMLParserJSON::parseSenMLPack,
-                    new RangeFilterFunction(),
-                    // TaxiTestObjects.buildTestBloomFilter(),
-                    null,
-                    new InterpolationFunction(),
-                    5,
-                    new AnnotationFunction()))
-            .apply(
-                "Serialize SenML to String",
-                MapElements.into(TypeDescriptors.strings()).via(GridMeasurement::toString));
-    etl_strings.apply(new WriteStringSink("senml-cleaned"));
-    etl_strings.apply(new StoreStringInDBSink("senml-cleaned"));
-
-    pipeline.run();
+    PipelineBuilder.buildGRIDPipeline(options);
   }
 }

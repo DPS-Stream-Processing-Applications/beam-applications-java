@@ -115,7 +115,7 @@ public class FlinkJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
-    options.setJobName("trainjob");
+    options.setJobName("TRAIN-"+dataSetType);
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);

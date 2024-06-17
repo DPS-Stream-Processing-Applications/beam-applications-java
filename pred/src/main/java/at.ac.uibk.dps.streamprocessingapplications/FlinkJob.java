@@ -89,7 +89,7 @@ public class FlinkJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
-    options.setJobName("predjob");
+    options.setJobName("PRED-"+dataSetType);
 
     Pipeline p = Pipeline.create(options);
 

@@ -12,10 +12,10 @@ subprojects {
             endWithNewline()
         }
 
-        /*kotlinGradle {
+        kotlinGradle {
             ktlint()
             ktfmt()
-        }*/
+        }
 
         java {
             removeUnusedImports()

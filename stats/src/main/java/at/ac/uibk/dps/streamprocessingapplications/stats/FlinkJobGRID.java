@@ -10,7 +10,7 @@ public class FlinkJobGRID {
     FlinkPipelineOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(FlinkPipelineOptions.class);
     options.setRunner(FlinkRunner.class);
-    options.setJobName("STATS-FIT");
+    options.setJobName("STATS-GRID");
 
     PipelineBuilder.buildGRIDPipeline(options).run();
   }

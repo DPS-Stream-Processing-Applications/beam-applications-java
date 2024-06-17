@@ -14,7 +14,7 @@ dependencies {
 }
 
 tasks.named<Jar>("jar") {
-  archiveBaseName.set("FlinkJobFIT")
+  archiveBaseName.set("FlinkJob")
   destinationDirectory.set(file("build"))
   manifest {
     /* NOTE:
@@ -22,7 +22,7 @@ tasks.named<Jar>("jar") {
      */
     val mainClass =
         project.findProperty("mainClass")?.toString()
-            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI"
+            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
     attributes(
         "Main-Class" to mainClass,
     )

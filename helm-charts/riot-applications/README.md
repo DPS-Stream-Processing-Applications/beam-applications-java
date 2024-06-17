@@ -40,6 +40,7 @@ kubectl apply -f templates/kafka-topic-senml-cleaned.yaml
 kubectl apply -f templates/kafka-topic-pred-model.yaml
 kubectl apply -f templates/kafka-topic-pred-publish.yaml
 kubectl apply -f templates/kafka-topic-train-publish.yaml
+kubectl apply -f templates/kafka-topic-train-source.yaml
 ```
 
 For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-cluster.yaml`.

@@ -122,7 +122,7 @@ public class FlinkJob {
 
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
 
-    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource(argumentClass.getKafkaTopic()));
 
     PCollection<SourceEntry> timerSource =
         inputFile.apply(

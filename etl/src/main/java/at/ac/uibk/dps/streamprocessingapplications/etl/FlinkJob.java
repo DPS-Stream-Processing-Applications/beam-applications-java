@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl;
 
+import java.util.Arrays;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -34,8 +35,13 @@ public class FlinkJob {
     CommandLine cmd;
     String experiRunId = null;
 
+    String[] filteredArgs =
+        Arrays.stream(args)
+            .filter(a -> a.startsWith("-eri") || a.startsWith("--experiRunId"))
+            .toArray(String[]::new);
+
     try {
-      cmd = parser.parse(cliOptions, args);
+      cmd = parser.parse(cliOptions, filteredArgs);
       experiRunId = cmd.getOptionValue("experiRunId");
     } catch (ParseException e) {
       System.out.println(e.getMessage());

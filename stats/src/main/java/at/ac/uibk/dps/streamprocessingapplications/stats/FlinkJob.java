@@ -34,8 +34,13 @@ public class FlinkJob {
     CommandLine cmd;
     String experiRunId = null;
 
+    String[] filteredArgs =
+        Arrays.stream(args)
+            .filter(a -> a.startsWith("-eri") || a.startsWith("--experiRunId"))
+            .toArray(String[]::new);
+
     try {
-      cmd = parser.parse(cliOptions, args);
+      cmd = parser.parse(cliOptions, filteredArgs);
       experiRunId = cmd.getOptionValue("experiRunId");
     } catch (ParseException e) {
       System.out.println(e.getMessage());

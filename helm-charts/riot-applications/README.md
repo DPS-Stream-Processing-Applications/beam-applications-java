@@ -88,7 +88,7 @@ kubectl apply -f templates/mongodb-pv.yaml
 kubectl apply -f templates/mongodb-pvc.yaml
 kubectl apply -f templates/mongodb-secret.yaml
 ```
-After the cluster is configured Flink jobs can be deployed normally through `flink run <path_to_jar>`.
+After the cluster is configured, Flink jobs can be deployed through `flink run`.
 
 # Prometheus Stack
 Install the Prometheus stack before installing this projects custom helm-chart.

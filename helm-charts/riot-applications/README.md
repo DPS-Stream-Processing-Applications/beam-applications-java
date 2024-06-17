@@ -34,7 +34,9 @@ Installing the kafka operator as well as setting up the topics:
 helm repo add strimzi https://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
 
-kubectl apply -f templates/kafka-cluster.yaml 
+kubectl apply -f templates/kafka-cluster.yaml
+kubectl apply -f templates/kafka-topic-senml-source.yaml 
+kubectl apply -f templates/kafka-topic-senml-cleaned.yaml  
 kubectl apply -f templates/kafka-topic-pred-model.yaml
 kubectl apply -f templates/kafka-topic-pred-publish.yaml
 kubectl apply -f templates/kafka-topic-train-publish.yaml

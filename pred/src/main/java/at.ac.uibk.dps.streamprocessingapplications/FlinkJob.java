@@ -93,7 +93,7 @@ public class FlinkJob {
 
     Pipeline p = Pipeline.create(options);
 
-    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource(argumentClass.getKafkaTopic()));
 
     PCollection<String> inputFile2 = p.apply(new ReadSenMLSource("pred-model"));
 

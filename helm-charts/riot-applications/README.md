@@ -21,7 +21,11 @@ Installing the `Flink` operator and deploying a session cluster:
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
 helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
+# INFO: If the cert-manager installation failed, use --set webhook.create=false
+helm install  flink-operator flink-operator-repo/flink-kubernetes-operator --set webhook.create=false
+```
 
+```bash
 kubectl apply -f templates/flink-session-cluster-deployment.yaml
 ```
 # Kafka

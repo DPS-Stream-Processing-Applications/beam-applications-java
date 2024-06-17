@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats;
 
+import java.util.Arrays;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;

@@ -111,11 +111,41 @@ class TaxiConverter:
                 dtype=dtypes_fare,
             )
 
+            skipped_rows_counter: int = 0
             for data_chunk, fare_chunk in zip(data_chunk_iterator, fare_chunk_iterator):
                 for data_row, fare_row in zip(
                     data_chunk.itertuples(index=False),
                     fare_chunk.itertuples(index=False),
                 ):
+                    # NOTE:
+                    # Some of the rows contain `nan` values.
+                    # These need to be skipped.
+                    used_elements = [
+                        data_row.medallion,
+                        data_row.hack_license,
+                        data_row.pickup_datetime,
+                        data_row.trip_time_in_secs,
+                        data_row.trip_distance,
+                        data_row.pickup_longitude,
+                        data_row.pickup_latitude,
+                        data_row.dropoff_longitude,
+                        data_row.dropoff_latitude,
+                        fare_row.payment_type,
+                        fare_row.fare_amount,
+                        fare_row.surcharge,
+                        fare_row.mta_tax,
+                        fare_row.tip_amount,
+                        fare_row.tolls_amount,
+                        fare_row.total_amount,
+                    ]
+                    if any(pd.isna(element) for element in used_elements):
+                        skipped_rows_counter += 1
+                        print(
+                            f"Number of rows skipped due to NaN conversion: {skipped_rows_counter}",
+                            end="\r",
+                        )
+                        continue
+
                     timestamp: int = date_to_unix_timestamp(data_row.pickup_datetime)
                     if self.start_timestamp == None:
                         self.start_timestamp = timestamp

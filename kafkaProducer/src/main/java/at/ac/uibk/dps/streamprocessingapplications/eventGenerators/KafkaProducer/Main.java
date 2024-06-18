@@ -10,7 +10,10 @@ import sun.misc.Signal;
 
 public class Main {
   public static void main(String[] args) {
-    if (args.length != 3 || args[0].trim().isEmpty() || args[1].trim().isEmpty() || args[2].trim().isEmpty()) {
+    if (args.length != 3
+        || args[0].trim().isEmpty()
+        || args[1].trim().isEmpty()
+        || args[2].trim().isEmpty()) {
       System.out.println("Usage: <path_to_csv> <number_of_threads> <kafka_topic>");
       return;
     }

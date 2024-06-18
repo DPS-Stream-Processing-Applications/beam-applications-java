@@ -13,7 +13,7 @@ class TrainConverter:
             writer = csv.writer(
                 csvfile,
                 delimiter="|",
-                quotechar="",
+                quotechar=" ",
                 quoting=csv.QUOTE_NONE,
                 escapechar=" ",
             )

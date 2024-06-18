@@ -2,6 +2,7 @@ import csv
 import random
 
 import pandas as pd
+from datetime import datetime, timedelta
 
 
 class SysConverter:
@@ -23,12 +24,40 @@ class SysConverter:
             )
         return random.randint(low, up)
 
+    def decode_time(self, code):
+        time_code = int(code[3:])
+        minutes = (time_code - 1) * 30
+        decoded_time = timedelta(minutes=minutes)
+        hours, remainder = divmod(decoded_time.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        formatted_time = f"{hours:02}:{minutes:02}:{seconds:02}"
+
+        return decoded_time
+
+    def decode_date(self, code):
+        day_code = int(code[:3])
+        start_date = datetime(2009, 1, 1)
+        return start_date + timedelta(days=day_code - 1)
+
+    def decode_date(self, code):
+        day_code = int(code[:3])
+        start_date = datetime(2009, 1, 1)
+        return start_date + timedelta(days=day_code - 1)
+
+    def decode_datetime_to_unix(self, code):
+        decoded_date = self.decode_date(code)
+        decoded_time = self.decode_time(code)
+
+        combined_datetime = decoded_date + decoded_time
+        unix_time = int(combined_datetime.timestamp())
+        return unix_time
+
     def convert_to_senml_csv(self, chunk_size):
         with open(self.outputFile, "w", newline="") as csvfile:
             writer = csv.writer(
                 csvfile,
                 delimiter="|",
-                quotechar="",
+                quotechar=" ",
                 quoting=csv.QUOTE_NONE,
                 escapechar=" ",
             )
@@ -42,23 +71,18 @@ class SysConverter:
                 for j, row in chunk.iterrows():
                     delay_stamp = 0
                     if self.first_date == 0:
-                        first_timestamp = decode_datetime_to_unix(
+                        first_timestamp = self.decode_datetime_to_unix(
                             str(int(row["timecode"]))
                         )
                         self.first_date = first_timestamp
-                        delay_stamp = 5 * 1000
                     else:
                         delay_stamp = (
-                            decode_datetime_to_unix(str(int(row["timecode"])))
-                            - first_timestamp
+                            self.decode_datetime_to_unix(str(int(row["timecode"])))
+                            - self.first_date
                         )
-                        if delay_stamp == 0:
-                            delay_stamp = 5
-                        delay_stamp = delay_stamp * 1000
-                        if delay_stamp != 5000:
-                            delay_stamp = int(delay_stamp / self.scaling_factor)
                         if delay_stamp < 0:
                             delay_stamp = delay_stamp * -1
+                        delay_stamp = delay_stamp * self.scaling_factor
 
                     source = "ci4lrerertvs" + str(int(row["id"]))
                     longitude = self.generate_random_floats(1, 200)
@@ -87,8 +111,8 @@ class SysConverter:
                         ]
                     )
 
-    def converter_to_senml_riotbench_csv(self, chunk_size):
-        pass
-
     def get_first_date(self):
         return self.first_date
+    
+
+

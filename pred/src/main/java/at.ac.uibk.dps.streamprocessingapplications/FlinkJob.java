@@ -89,11 +89,11 @@ public class FlinkJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
-    options.setJobName("predjob");
+    options.setJobName("PRED");
 
     Pipeline p = Pipeline.create(options);
 
-    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource(argumentClass.getKafkaTopic()));
 
     PCollection<String> inputFile2 = p.apply(new ReadSenMLSource("pred-model"));
 
@@ -150,12 +150,12 @@ public class FlinkJob {
     PCollection<MqttPublishEntry> publish1 =
         errorEstimate.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
 
     PCollection<MqttPublishEntry> publish2 =
         decisionTree.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
     PCollection<MqttPublishEntry> publish =
         PCollectionList.of(publish1)
             .and(publish2)

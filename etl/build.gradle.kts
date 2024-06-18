@@ -9,6 +9,7 @@ repositories { mavenCentral() }
 dependencies {
   implementation("org.json:json:20240205")
   implementation(project(":shared"))
+  implementation("commons-cli:commons-cli:1.8.0")
 }
 
 tasks.named<Jar>("jar") {
@@ -20,7 +21,7 @@ tasks.named<Jar>("jar") {
      */
     val mainClass =
         project.findProperty("mainClass")?.toString()
-            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI"
+            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
     attributes(
         "Main-Class" to mainClass,
     )

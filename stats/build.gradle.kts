@@ -10,10 +10,11 @@ dependencies {
   implementation(project(":shared"))
   implementation("org.knowm.xchart:xchart:3.8.7")
   implementation("org.apache.commons:commons-math:2.2")
+  implementation("commons-cli:commons-cli:1.8.0")
 }
 
 tasks.named<Jar>("jar") {
-  archiveBaseName.set("FlinkJobFIT")
+  archiveBaseName.set("FlinkJob")
   destinationDirectory.set(file("build"))
   manifest {
     /* NOTE:
@@ -21,7 +22,7 @@ tasks.named<Jar>("jar") {
      */
     val mainClass =
         project.findProperty("mainClass")?.toString()
-            ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI"
+            ?: "at.ac.uibk.dps.streamprocessingapplications.stats.FlinkJob"
     attributes(
         "Main-Class" to mainClass,
     )

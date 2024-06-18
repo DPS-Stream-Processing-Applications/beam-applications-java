@@ -1,19 +1,46 @@
-The default build command will build this Job for the `TAXI` dataset.
+# Build
+The default build of this job is a monolithic job `ETL` which can be configured via the `--experiRunId` command line option later.
+
 ```bash
 ../gradlew build
-flink run ./build/FlinkJob.jar
 ```
 
-If you want to compile using a different main class you can do so by overriding `mainClass` with the `-P` flag.
+You can also build the job for the specific dataset. Far this the -P
 
-Example for the `FIT` implementation:
+If you want to build the dedicated jobs for each dataset, you can do so by overriding `mainClass` with the `-PmainClass` option.
+Available main classes are:
+
+## TAXI
+
+```bash
+../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI
+
+```
+
+## FIT
+
 ```bash
 ../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobFIT
-flink run ./build/FlinkJob.jar
 ```
 
-Example for the `GRID` implementation:
+## GRID
+
 ```bash
 ../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobGRID
+```
+
+# Run
+
+If you chose the default build you can now specify the dataset via the `--experiRunId` option.
+Available options: `TAXI`, `FIT` and `GRID`.
+
+Example with `TAXI`.
+```bash
+flink run ./build/FlinkJob.jar --experiRunId=TAXI
+```
+
+For the specific builds you can just omit the `experiRunId` option.
+
+```bash
 flink run ./build/FlinkJob.jar
 ```

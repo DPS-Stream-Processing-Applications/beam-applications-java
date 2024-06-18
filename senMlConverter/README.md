@@ -36,7 +36,7 @@ in minutes, interval is how often the model should train inside the duration tim
 docker run --rm -it -v \
     $PWD/../data:/home \
     -e DATASET="TRAIN" \
-    -e OUTPUT_FILE="/home/output_train.csv" \
+    -e OUTPUT_FILE="/home/riot_events_TRAIN.csv" \
     -e INTERVAL="30" \
     -e DURATION="60" \
     senml_converter
@@ -173,7 +173,7 @@ These are the files you want to move into the `data` in this directory.
 docker run --rm -it -v \
 $PWD/../data:/home \
 -e DATASET="SYS" \
- -e OUTPUT_FILE="/home/output_sys.csv" \
+ -e OUTPUT_FILE="/home/riot_events_SYS.csv" \
  -e SCALING="0.5" \
   senml_converter
 ```

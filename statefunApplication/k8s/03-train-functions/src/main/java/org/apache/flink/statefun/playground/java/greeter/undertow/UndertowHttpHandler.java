@@ -21,42 +21,43 @@ package org.apache.flink.statefun.playground.java.greeter.undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 import org.apache.flink.statefun.sdk.java.slice.Slice;
 import org.apache.flink.statefun.sdk.java.slice.Slices;
+
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A simple Undertow {@link HttpHandler} that delegates requests from StateFun runtime processes to
  * a StateFun {@link RequestReplyHandler}.
  */
 public final class UndertowHttpHandler implements HttpHandler {
-  private final RequestReplyHandler handler;
+    private final RequestReplyHandler handler;
 
-  public UndertowHttpHandler(RequestReplyHandler handler) {
-    this.handler = Objects.requireNonNull(handler);
-  }
-
-  @Override
-  public void handleRequest(HttpServerExchange exchange) {
-    exchange.getRequestReceiver().receiveFullBytes(this::onRequestBody);
-  }
-
-  private void onRequestBody(HttpServerExchange exchange, byte[] requestBytes) {
-    exchange.dispatch();
-    CompletableFuture<Slice> future = handler.handle(Slices.wrap(requestBytes));
-    future.whenComplete((response, exception) -> onComplete(exchange, response, exception));
-  }
-
-  private void onComplete(HttpServerExchange exchange, Slice responseBytes, Throwable ex) {
-    if (ex != null) {
-      ex.printStackTrace(System.out);
-      exchange.getResponseHeaders().put(Headers.STATUS, 500);
-      exchange.endExchange();
-      return;
+    public UndertowHttpHandler(RequestReplyHandler handler) {
+        this.handler = Objects.requireNonNull(handler);
     }
-    exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
-    exchange.getResponseSender().send(responseBytes.asReadOnlyByteBuffer());
-  }
+
+    @Override
+    public void handleRequest(HttpServerExchange exchange) {
+        exchange.getRequestReceiver().receiveFullBytes(this::onRequestBody);
+    }
+
+    private void onRequestBody(HttpServerExchange exchange, byte[] requestBytes) {
+        exchange.dispatch();
+        CompletableFuture<Slice> future = handler.handle(Slices.wrap(requestBytes));
+        future.whenComplete((response, exception) -> onComplete(exchange, response, exception));
+    }
+
+    private void onComplete(HttpServerExchange exchange, Slice responseBytes, Throwable ex) {
+        if (ex != null) {
+            ex.printStackTrace(System.out);
+            exchange.getResponseHeaders().put(Headers.STATUS, 500);
+            exchange.endExchange();
+            return;
+        }
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
+        exchange.getResponseSender().send(responseBytes.asReadOnlyByteBuffer());
+    }
 }

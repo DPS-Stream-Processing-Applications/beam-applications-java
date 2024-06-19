@@ -26,13 +26,14 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Db_E
 
 public class AnnotateFn implements StatefulFunction {
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/annotation");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTreeTrain");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(AnnotateFn::new)
                     .build();
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTreeTrain");
+    private static Logger l;
+    AnnotateDTClass annotateDTClass;
+    private Properties p;
 
     public static void initLogger(Logger l_) {
         l = l_;
@@ -49,11 +50,6 @@ public class AnnotateFn implements StatefulFunction {
         annotateDTClass = new AnnotateDTClass();
         annotateDTClass.setup(l, p);
     }
-
-
-    private static Logger l;
-    AnnotateDTClass annotateDTClass;
-    private Properties p;
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {

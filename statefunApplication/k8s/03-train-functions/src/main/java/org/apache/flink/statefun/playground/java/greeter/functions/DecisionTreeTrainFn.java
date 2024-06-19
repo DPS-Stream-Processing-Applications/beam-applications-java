@@ -27,18 +27,15 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Trai
 public class DecisionTreeTrainFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/decisionTreeTrain");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/blobWrite");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(DecisionTreeTrainFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/blobWrite");
     private static Logger l;
-    private String dataSetType;
     DecisionTreeTrainBatched decisionTreeTrainBatched;
     String datasetName;
+    private String dataSetType;
     private Properties p;
 
     private String connectionUrl;

@@ -121,7 +121,7 @@ public class TaxiDataGenerator {
                 if (rowToParse == 0) {
                     rowToParse = 1;
                 }
-                InputStream inputStream =  Files.newInputStream(Paths.get(dataSetPath));
+                InputStream inputStream = Files.newInputStream(Paths.get(dataSetPath));
                 if (inputStream == null) {
                     throw new IOException("Resource not found: " + dataSetPath);
                 }

@@ -22,11 +22,7 @@ import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -36,22 +32,17 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Sour
 
 public final class TimerSourceFn implements StatefulFunction {
 
-    private static Logger l;
-
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/source");
-
     static final TypeName INBOX = TypeName.typeNameFromString("pred/tableRead");
-
     private static final ValueSpec<Long> MSGID_COUNT = ValueSpec
             .named("message_counter")
             .withLongType();
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withValueSpec(MSGID_COUNT)
                     .withSupplier(TimerSourceFn::new)
                     .build();
-
+    private static Logger l;
 
     public static void initLogger(Logger l_) {
         l = l_;

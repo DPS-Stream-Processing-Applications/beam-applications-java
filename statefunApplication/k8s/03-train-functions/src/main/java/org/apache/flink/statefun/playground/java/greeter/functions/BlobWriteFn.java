@@ -28,20 +28,21 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Trai
 public class BlobWriteFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/blobWrite");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublishTrain");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(BlobWriteFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublishTrain");
     private static Logger l;
     AzureBlobUploadTask azureBlobUploadTask;
     String baseDirname = "";
     String fileName = "T";
     String datasetName = "";
     private Properties p;
+
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     public void setup() throws IOException {
         p = new Properties();
@@ -56,11 +57,6 @@ public class BlobWriteFn implements StatefulFunction {
         datasetName = p.getProperty("TRAIN.DATASET_NAME");
         azureBlobUploadTask.setup(l, p);
     }
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {

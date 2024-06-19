@@ -27,18 +27,15 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Trai
 public class LinearRegressionTrainFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/linearRegressionTrain");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/blobWrite");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(LinearRegressionTrainFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/blobWrite");
     private static Logger l;
-    private String dataSetType;
     LinearRegressionTrainBatched linearRegressionTrainBatched;
     String datasetName;
+    private String dataSetType;
     private Properties p;
 
     public static void initLogger(Logger l_) {

@@ -33,16 +33,12 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Sour
 public class TableReadFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/tableRead");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/annotation");
-
-    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegressionTrain");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(TableReadFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/annotation");
+    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegressionTrain");
     private static Logger l;
     private String datatype;
     private Properties p;

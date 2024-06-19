@@ -6,98 +6,99 @@ import java.io.Serializable;
 
 public class TrainEntry implements Serializable {
 
-  @JsonProperty("model")
-  private String model;
-  @JsonProperty("msgid")
-  private String msgid;
-  @JsonProperty("rowKeyEnd")
-  private String rowKeyEnd;
-  @JsonProperty("analyticType")
-  private String analyticType;
-  @JsonProperty("fileName")
-  private String fileName;
+    @JsonProperty("model")
+    private String model;
+    @JsonProperty("msgid")
+    private String msgid;
+    @JsonProperty("rowKeyEnd")
+    private String rowKeyEnd;
+    @JsonProperty("analyticType")
+    private String analyticType;
+    @JsonProperty("fileName")
+    private String fileName;
 
-  @JsonProperty("dataSetType")
-  private String dataSetType;
+    @JsonProperty("dataSetType")
+    private String dataSetType;
 
-  public TrainEntry(
-      String model, String msgid, String rowKeyEnd, String analyticType, String fileName, String dataSetType) {
-    this.model = model;
-    this.msgid = msgid;
-    this.rowKeyEnd = rowKeyEnd;
-    this.analyticType = analyticType;
-    this.fileName = fileName;
-    this.dataSetType = dataSetType;
-  }
+    public TrainEntry(
+            String model, String msgid, String rowKeyEnd, String analyticType, String fileName, String dataSetType) {
+        this.model = model;
+        this.msgid = msgid;
+        this.rowKeyEnd = rowKeyEnd;
+        this.analyticType = analyticType;
+        this.fileName = fileName;
+        this.dataSetType = dataSetType;
+    }
 
-  public TrainEntry() {}
+    public TrainEntry() {
+    }
 
-  public String getModel() {
-    return model;
-  }
+    public String getModel() {
+        return model;
+    }
 
-  public void setModel(String model) {
-    this.model = model;
-  }
+    public void setModel(String model) {
+        this.model = model;
+    }
 
-  public String getMsgid() {
-    return msgid;
-  }
+    public String getMsgid() {
+        return msgid;
+    }
 
-  public String getDataSetType() {
-    return dataSetType;
-  }
+    public void setMsgid(String msgid) {
+        this.msgid = msgid;
+    }
 
-  public void setDataSetType(String dataSetType) {
-    this.dataSetType = dataSetType;
-  }
+    public String getDataSetType() {
+        return dataSetType;
+    }
 
-  public void setMsgid(String msgid) {
-    this.msgid = msgid;
-  }
+    public void setDataSetType(String dataSetType) {
+        this.dataSetType = dataSetType;
+    }
 
-  public String getRowKeyEnd() {
-    return rowKeyEnd;
-  }
+    public String getRowKeyEnd() {
+        return rowKeyEnd;
+    }
 
-  public void setRowKeyEnd(String rowKeyEnd) {
-    this.rowKeyEnd = rowKeyEnd;
-  }
+    public void setRowKeyEnd(String rowKeyEnd) {
+        this.rowKeyEnd = rowKeyEnd;
+    }
 
-  public String getAnalyticType() {
-    return analyticType;
-  }
+    public String getAnalyticType() {
+        return analyticType;
+    }
 
-  public void setAnalyticType(String analyticType) {
-    this.analyticType = analyticType;
-  }
+    public void setAnalyticType(String analyticType) {
+        this.analyticType = analyticType;
+    }
 
-  public String getFileName() {
-    return fileName;
-  }
+    public String getFileName() {
+        return fileName;
+    }
 
-  public void setFileName(String fileName) {
-    this.fileName = fileName;
-  }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-  @Override
-  public String toString() {
-    return "TrainEntry{"
-        + "model='"
-        + model
-        + '\''
-        + ", msgid='"
-        + msgid
-        + '\''
-        + ", rowKeyEnd='"
-        + rowKeyEnd
-        + '\''
-        + ", analyticType='"
-        + analyticType
-        + '\''
-        + ", fileName='"
-        + fileName
-        + '\''
-        + '}';
-  }
+    @Override
+    public String toString() {
+        return "TrainEntry{"
+                + "model='"
+                + model
+                + '\''
+                + ", msgid='"
+                + msgid
+                + '\''
+                + ", rowKeyEnd='"
+                + rowKeyEnd
+                + '\''
+                + ", analyticType='"
+                + analyticType
+                + '\''
+                + ", fileName='"
+                + fileName
+                + '\''
+                + '}';
+    }
 }

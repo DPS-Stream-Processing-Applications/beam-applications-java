@@ -42,9 +42,8 @@ public final class GreeterAppServer {
         functions.withStatefulFunction(TableReadFn.SPEC);
         functions.withStatefulFunction(SinkTrainFn.SPEC);
 
-
-        System.out.println(System.getenv("MONGO_DB_ADDRESS"));
         String ipAddress = System.getenv("MONGO_DB_ADDRESS");
+        System.out.println(ipAddress);
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
 

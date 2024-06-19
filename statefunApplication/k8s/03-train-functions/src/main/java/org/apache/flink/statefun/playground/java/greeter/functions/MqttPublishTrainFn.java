@@ -25,14 +25,11 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.Mqtt
 
 public class MqttPublishTrainFn implements StatefulFunction {
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/mqttPublishTrain");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/sinkTrain");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(MqttPublishTrainFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/sinkTrain");
     private static Logger l;
     MyKafkaProducer myKafkaProducer;
     String server;

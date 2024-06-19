@@ -30,15 +30,15 @@ public class SourceEntry implements Serializable {
         this.dataSetType = dataSetType;
     }
 
+    public SourceEntry() {
+    }
+
     public String getDataSetType() {
         return dataSetType;
     }
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
-    }
-
-    public SourceEntry() {
     }
 
     public String getRowString() {

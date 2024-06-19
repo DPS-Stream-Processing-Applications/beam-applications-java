@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.UserLogin;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
@@ -41,12 +40,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_JSON_TYPE;
 
-/**
- * A stateful function that is invoked with {@link UserLogin} events, and persists in state storage
- * the number of times we've seen the user log in as well as the user's last seen timestamp. This
- * function in-turn invokes {@link BlobReadFn} with the user information to generate a personalized
- * greetings message.
- */
+
 public final class SourceFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/source");

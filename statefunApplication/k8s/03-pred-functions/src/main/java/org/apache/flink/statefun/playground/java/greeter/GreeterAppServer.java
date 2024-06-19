@@ -26,11 +26,9 @@ import org.apache.flink.statefun.playground.java.greeter.undertow.UndertowHttpHa
 import org.apache.flink.statefun.sdk.java.StatefulFunctions;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 
-import java.io.IOException;
-
 /**
  * Entry point to start an {@link Undertow} web server that exposes the functions that build up our
- * User Greeter application, {@link SourceFn} and {@link BlobReadFn}.
+ * application, {@link SourceFn} and {@link BlobReadFn}.
  *
  * <p>Here we are using the {@link Undertow} web server just to show a very simple demonstration.
  * You may choose any web server that can handle HTTP request and responses, for example, Spring,
@@ -39,7 +37,7 @@ import java.io.IOException;
 public final class GreeterAppServer {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         final StatefulFunctions functions = new StatefulFunctions();
         functions.withStatefulFunction(SourceFn.SPEC);
         functions.withStatefulFunction(BlobReadFn.SPEC);

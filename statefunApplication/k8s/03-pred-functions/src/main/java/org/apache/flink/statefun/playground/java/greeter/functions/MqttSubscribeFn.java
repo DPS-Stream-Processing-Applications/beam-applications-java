@@ -31,11 +31,7 @@ public class MqttSubscribeFn implements StatefulFunction {
 
     private static Logger l;
 
-    String spoutLogFileName = null;
     Properties p;
-
-    String bootStrapServer;
-    String topic;
 
     public static void initLogger(Logger l_) {
         l = l_;

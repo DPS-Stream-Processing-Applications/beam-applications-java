@@ -30,6 +30,8 @@ kubectl create -f 01-minio -n statefun
 
 ## Create the function:
 
+Ensure to modify the environment variables in the `functions-service.yaml` file located in the `03-train-functions` folder and `03-pred-functions` folder.
+This file exists in each folder, depending on whether you want to use train or pred.
 ### For the train application
 
 ```

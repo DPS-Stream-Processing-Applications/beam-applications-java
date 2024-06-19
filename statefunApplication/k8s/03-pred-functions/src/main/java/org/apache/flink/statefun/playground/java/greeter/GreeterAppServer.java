@@ -53,8 +53,9 @@ public final class GreeterAppServer {
         functions.withStatefulFunction(SinkFn.SPEC);
         functions.withStatefulFunction(MqttPublishFn.SPEC);
 
-        System.out.println("New version 4");
-        WriteToDatabase writeToDatabase = new WriteToDatabase("mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
+        System.out.println(System.getenv("MONGO_DB_ADDRESS"));
+        String ipAddress = System.getenv("MONGO_DB_ADDRESS");
+        WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
 
 

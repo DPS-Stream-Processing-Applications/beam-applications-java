@@ -137,9 +137,9 @@ public final class SourceFn implements StatefulFunction {
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) {
         String rowString = new String(message.rawValue().toByteArray(), StandardCharsets.UTF_8);
-        String datasetType = checkDataSetType("{\"e\":" + rowString + ",\"bt\": \"1358101800000\"}");
+        String datasetType = System.getenv("DATASET");
         if (datasetType == null) {
-            throw new RuntimeException("dataset is null");
+            throw new RuntimeException("Dataset is null");
         }
         String newRow;
         try {

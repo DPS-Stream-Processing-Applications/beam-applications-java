@@ -56,7 +56,8 @@ public class LinearRegressionFn implements StatefulFunction {
         }
         this.dataSetType = datasetType;
         if (linearRegressionPredictor == null) {
-            linearRegressionPredictor = new LinearRegressionPredictor("mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
+            String ipAddress = System.getenv("MONGO_DB_ADDRESS");
+            linearRegressionPredictor = new LinearRegressionPredictor(ipAddress, "mydb");
             initLogger(LoggerFactory.getLogger("APP"));
             linearRegressionPredictor.setup(l, p);
         }

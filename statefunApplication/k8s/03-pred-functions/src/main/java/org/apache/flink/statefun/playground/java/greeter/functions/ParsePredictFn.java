@@ -156,7 +156,8 @@ public class ParsePredictFn implements StatefulFunction {
 
         try {
             SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
-            setup(sourceEntry.getDataSetType(), "mongodb://adminuser:password123@192.168.58.2:32000/", "mydb");
+            String ipAddress = System.getenv("MONGO_DB_ADDRESS");
+            setup(sourceEntry.getDataSetType(),ipAddress, "mydb");
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
 

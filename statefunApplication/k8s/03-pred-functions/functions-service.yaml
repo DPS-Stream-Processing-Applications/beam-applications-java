@@ -31,11 +31,16 @@ spec:
     spec:
       containers:
         - name: functions 
-          image:  jungerindy/statefun_pred:latest
+          image: jungerindy/statefun_pred:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
               name: endpoint
+          env:
+            - name: MONGO_DB_ADDRESS
+              value: "mongodb://adminuser:password123@192.168.58.2:32000/"
+            - name: DATASET
+              value: "TAXI"
           livenessProbe:
             tcpSocket:
               port: 8000

@@ -73,7 +73,7 @@ public final class TimerSourceFn implements StatefulFunction {
 
         values.setRowKeyStart(ROWKEYSTART);
         values.setRowKeyEnd(ROWKEYEND);
-        values.setDataSetType("TAXI");
+        values.setDataSetType(System.getenv("DATASET"));
         context.send(
                 MessageBuilder.forAddress(INBOX, String.valueOf(values.getMsgid()))
                         .withCustomType(Source_ENTRY_JSON_TYPE, values)

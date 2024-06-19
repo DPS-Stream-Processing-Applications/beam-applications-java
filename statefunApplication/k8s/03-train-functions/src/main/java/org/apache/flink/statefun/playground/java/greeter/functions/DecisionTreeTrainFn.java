@@ -60,7 +60,7 @@ public class DecisionTreeTrainFn implements StatefulFunction {
             throw new RuntimeException(e);
         }
         this.dataSetType = dataSetType;
-        this.connectionUrl = "mongodb://adminuser:password123@192.168.58.2:32000/";
+        this.connectionUrl = System.getenv("MONGO_DB_ADDRESS");
         this.dataBaseName = "mydb";
         decisionTreeTrainBatched = new DecisionTreeTrainBatched(connectionUrl, dataBaseName);
         decisionTreeTrainBatched.setup(l, p);

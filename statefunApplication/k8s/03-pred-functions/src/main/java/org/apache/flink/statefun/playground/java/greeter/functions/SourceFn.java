@@ -49,22 +49,47 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOUR
  */
 public final class SourceFn implements StatefulFunction {
 
-    private static Logger l;
-
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/source");
-
     static final TypeName INBOX = TypeName.typeNameFromString("pred/senmlParse");
-
     private static final ValueSpec<Long> MSGID_COUNT = ValueSpec
             .named("message_counter")
             .withLongType();
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withValueSpec(MSGID_COUNT)
                     .withSupplier(SourceFn::new)
                     .build();
+    private static Logger l;
 
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
+
+    protected static String checkDataSetType(String input) {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject;
+        JSONArray jsonArr;
+        try {
+            jsonObject = (JSONObject) jsonParser.parse(input);
+            jsonArr = (JSONArray) jsonObject.get("e");
+        } catch (org.json.simple.parser.ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        String n;
+        for (int j = 0; j < jsonArr.size(); j++) {
+            jsonObject = (JSONObject) jsonArr.get(j);
+
+            n = (jsonObject.get("n") == null) ? "empty" : (String) jsonObject.get("n");
+
+            if (n.equals("taxi_identifier")) {
+                return "TAXI";
+            }
+
+
+        }
+        return null;
+    }
 
     private long extractTimeStamp(String row) {
         Gson gson = new Gson();
@@ -101,38 +126,6 @@ public final class SourceFn implements StatefulFunction {
         Random r = new Random();
         initLogger(LoggerFactory.getLogger("APP"));
     }
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
-
-    protected static String checkDataSetType(String input) {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject;
-        JSONArray jsonArr;
-        try {
-            jsonObject = (JSONObject) jsonParser.parse(input);
-            jsonArr = (JSONArray) jsonObject.get("e");
-        } catch (org.json.simple.parser.ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        String n;
-        for (int j = 0; j < jsonArr.size(); j++) {
-            jsonObject = (JSONObject) jsonArr.get(j);
-
-            n = (jsonObject.get("n") == null) ? "empty" : (String) jsonObject.get("n");
-
-            if (n.equals("taxi_identifier")) {
-                return "TAXI";
-            }
-
-
-        }
-        return null;
-    }
-
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) {

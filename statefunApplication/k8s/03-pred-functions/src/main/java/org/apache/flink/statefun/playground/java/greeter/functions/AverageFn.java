@@ -28,20 +28,20 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.SENM
 public class AverageFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/average");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(AverageFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
     private static Logger l;
-    private String dataSetType;
     Map<String, BlockWindowAverage> blockWindowAverageMap;
+    private String dataSetType;
     private Properties p;
     private ArrayList<String> useMsgList;
 
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     public void setup(String dataSetType) {
         this.dataSetType = dataSetType;
@@ -60,12 +60,6 @@ public class AverageFn implements StatefulFunction {
         }
         initLogger(l);
     }
-
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {

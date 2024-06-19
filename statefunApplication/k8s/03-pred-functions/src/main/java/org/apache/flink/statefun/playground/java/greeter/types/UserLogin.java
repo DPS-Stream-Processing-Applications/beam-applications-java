@@ -30,31 +30,30 @@ import org.apache.flink.statefun.sdk.java.types.Type;
  */
 public final class UserLogin {
 
-  public enum LoginType {
-    WEB,
-    MOBILE
-  }
+    @JsonProperty("user_id")
+    private String userId;
+    @JsonProperty("user_name")
+    private String userName;
+    @JsonProperty("login_type")
+    private LoginType loginType;
 
-  @JsonProperty("user_id")
-  private String userId;
+    public UserLogin() {
+    }
 
-  @JsonProperty("user_name")
-  private String userName;
+    public String getUserId() {
+        return userId;
+    }
 
-  @JsonProperty("login_type")
-  private LoginType loginType;
+    public String getUserName() {
+        return userName;
+    }
 
-  public UserLogin() {}
+    public LoginType getLoginType() {
+        return loginType;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public LoginType getLoginType() {
-    return loginType;
-  }
+    public enum LoginType {
+        WEB,
+        MOBILE
+    }
 }

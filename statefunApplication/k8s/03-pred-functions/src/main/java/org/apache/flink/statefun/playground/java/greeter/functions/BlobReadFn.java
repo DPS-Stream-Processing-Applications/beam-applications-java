@@ -49,14 +49,10 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.MQTT
 public final class BlobReadFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/blobRead");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
-
-    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME).withSupplier(BlobReadFn::new).build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
+    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
     private static Logger l;
     Properties p;
     AzureBlobDownloadTask azureBlobDownloadTask;

@@ -13,7 +13,8 @@ public final class SourceEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
-    public SourceEntry() {}
+    public SourceEntry() {
+    }
 
     public SourceEntry(long msgid, String payload, String dataSetType) {
         this.msgid = msgid;

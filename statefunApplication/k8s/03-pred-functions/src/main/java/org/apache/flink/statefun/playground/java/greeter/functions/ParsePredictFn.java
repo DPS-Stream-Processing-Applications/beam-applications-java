@@ -27,36 +27,26 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOUR
 
 public class ParsePredictFn implements StatefulFunction {
 
-    private static Logger l;
-
-    SenMlParse senMLParseTask;
-    private static final Object DATABASE_LOCK = new Object();
-    private String dataSetType;
-
-    private Properties p;
-    private ArrayList<String> observableFields;
-    private String[] metaFields;
-    private String idField;
-
-    private boolean isJson;
-
-    private ReadFromDatabaseTask readFromDatabaseTask;
-
-    private String connectionUrl;
-
-    private String dataBaseName;
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/senmlParse");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
-
-    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
-
-    static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(ParsePredictFn::new)
                     .build();
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
+    static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
+    static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
+    private static final Object DATABASE_LOCK = new Object();
+    private static Logger l;
+    SenMlParse senMLParseTask;
+    private String dataSetType;
+    private Properties p;
+    private ArrayList<String> observableFields;
+    private String[] metaFields;
+    private String idField;
+    private boolean isJson;
+    private ReadFromDatabaseTask readFromDatabaseTask;
+    private String connectionUrl;
+    private String dataBaseName;
 
     public static void initLogger(Logger l_) {
         l = l_;
@@ -157,7 +147,7 @@ public class ParsePredictFn implements StatefulFunction {
         try {
             SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
             String ipAddress = System.getenv("MONGO_DB_ADDRESS");
-            setup(sourceEntry.getDataSetType(),ipAddress, "mydb");
+            setup(sourceEntry.getDataSetType(), ipAddress, "mydb");
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
 

@@ -29,17 +29,14 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.*;
 public class DecisionTreeFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/decisionTree");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(DecisionTreeFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
     private static Logger l;
-    private String dataSetType;
     DecisionTreeClassify decisionTreeClassify;
+    private String dataSetType;
 
     public static void initLogger(Logger l_) {
         l = l_;
@@ -82,7 +79,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 Float res = decisionTreeClassify.doTask(map);
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC",senMlEntry.getDataSetType());
+                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", senMlEntry.getDataSetType());
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)
@@ -128,7 +125,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 Float res = decisionTreeClassify.doTask(map);
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC",blobReadEntry.getDataSetType());
+                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", blobReadEntry.getDataSetType());
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)

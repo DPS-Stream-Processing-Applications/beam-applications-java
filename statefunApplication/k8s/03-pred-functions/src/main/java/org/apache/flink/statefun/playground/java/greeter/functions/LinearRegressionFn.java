@@ -30,18 +30,14 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.*;
 public class LinearRegressionFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/linearRegression");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(LinearRegressionFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
     private static Logger l;
-    private String dataSetType;
     LinearRegressionPredictor linearRegressionPredictor = null;
-
+    private String dataSetType;
 
     public static void initLogger(Logger l_) {
         l = l_;

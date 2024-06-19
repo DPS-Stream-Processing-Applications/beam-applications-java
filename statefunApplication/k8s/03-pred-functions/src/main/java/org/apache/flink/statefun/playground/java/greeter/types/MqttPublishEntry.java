@@ -48,16 +48,16 @@ public final class MqttPublishEntry {
         return obsval;
     }
 
+    public void setObsval(String obsval) {
+        this.obsval = obsval;
+    }
+
     public String getDataSetType() {
         return dataSetType;
     }
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
-    }
-
-    public void setObsval(String obsval) {
-        this.obsval = obsval;
     }
 
     @Override

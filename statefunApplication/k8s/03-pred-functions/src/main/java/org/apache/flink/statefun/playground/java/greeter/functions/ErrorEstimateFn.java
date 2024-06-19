@@ -22,19 +22,20 @@ import static org.apache.flink.statefun.playground.java.greeter.types.Types.*;
 
 public class ErrorEstimateFn implements StatefulFunction {
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/errorEstimate");
-
-    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
-
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(ErrorEstimateFn::new)
                     .build();
-
+    static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
     private static Logger l;
     private String dataSetType;
     private Properties p;
     private String Res = "0";
     private String avgRes = "0";
+
+    public static void initLogger(Logger l_) {
+        l = l_;
+    }
 
     public void setup(String dataSetType) {
         this.dataSetType = dataSetType;
@@ -47,11 +48,6 @@ public class ErrorEstimateFn implements StatefulFunction {
         this.dataSetType = dataSetType;
         initLogger(LoggerFactory.getLogger("APP"));
     }
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {

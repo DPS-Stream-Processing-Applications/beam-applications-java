@@ -17,6 +17,16 @@ public final class MqttSubscribeEntry {
     private String dataSetType;
 
 
+    public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid, String dataSetType) {
+        this.analaytictype = analaytictype;
+        this.blobModelPath = blobModelPath;
+        this.msgid = msgid;
+        this.dataSetType = dataSetType;
+    }
+
+    public MqttSubscribeEntry() {
+    }
+
     public String getAnalaytictype() {
         return analaytictype;
     }
@@ -35,16 +45,6 @@ public final class MqttSubscribeEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
-    }
-
-    public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid, String dataSetType) {
-        this.analaytictype = analaytictype;
-        this.blobModelPath = blobModelPath;
-        this.msgid = msgid;
-        this.dataSetType = dataSetType;
-    }
-
-    public MqttSubscribeEntry() {
     }
 
     @Override

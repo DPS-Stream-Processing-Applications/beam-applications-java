@@ -30,6 +30,8 @@ data:
     metrics.reporters: prom
     metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
     metrics.reporter.prom.port: 9999
+    # Added for latency tracking
+    taskmanager.latency-tracking-interval: 30000  # 30000 milliseconds (30 seconds)
 
   log4j-console.properties: |+
           monitorInterval=30

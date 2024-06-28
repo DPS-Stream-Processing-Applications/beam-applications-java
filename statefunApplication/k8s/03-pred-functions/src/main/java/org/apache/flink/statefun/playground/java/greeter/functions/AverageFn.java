@@ -117,6 +117,7 @@ public class AverageFn implements StatefulFunction {
                     AverageEntry averageEntry =
                             new AverageEntry(
                                     sensorMeta, sensorID, obsType, avgres.toString(), obsVal, msgId, "AVG", senMlEntry.getDataSetType());
+                    averageEntry.setArrivalTime(senMlEntry.getArrivalTime());
                     context.send(
                             MessageBuilder.forAddress(INBOX, String.valueOf(averageEntry.getMsgid()))
                                     .withCustomType(AVERAGE_ENTRY_JSON_TYPE, averageEntry)

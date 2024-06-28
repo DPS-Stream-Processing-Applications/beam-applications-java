@@ -69,7 +69,7 @@ public class MyKafkaProducer extends AbstractTask<String, String>
             input = String.valueOf(ThreadLocalRandom.current().nextInt(100));
         } else input = m;
 
-        try (KafkaProducer producer = createKafkaProducer()) {
+        try (KafkaProducer<Long, byte[]> producer = createKafkaProducer()) {
             ProducerRecord<Long, byte[]> test =
                     new ProducerRecord<>(topic, messageCount.get(), input.getBytes());
             producer.send(test, this);

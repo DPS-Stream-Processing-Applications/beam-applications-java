@@ -50,7 +50,7 @@ public class MqttPublishFn implements StatefulFunction {
             throw new RuntimeException(e);
         }
         this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
-        this.topic = "pred-topic-2";
+        this.topic = "pred-sub-task";
         myKafkaProducer = new MyKafkaProducer(server, topic, p);
         myKafkaProducer.setup(l, p);
 
@@ -84,11 +84,15 @@ public class MqttPublishFn implements StatefulFunction {
 
                 if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
 
-                HashMap<String, String> map = new HashMap();
+                HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-                // mqttPublishTask.doTask(map);
-
+                myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, decisionTreeEntry.getDataSetType());
+                mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
+                context.send(
+                        MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
+                                .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)
+                                .build());
 
 
             } else if (message.is(ERROR_ESTIMATE_ENTRY_JSON_TYPE)) {
@@ -115,9 +119,11 @@ public class MqttPublishFn implements StatefulFunction {
 
                 if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
 
-                HashMap<String, String> map = new HashMap();
+                HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
+                myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, errorEstimateEntry.getDataSetType());
+                mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
                                 .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)

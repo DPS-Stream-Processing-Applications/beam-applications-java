@@ -23,6 +23,9 @@ public final class ErrorEstimateEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public ErrorEstimateEntry(
             String meta, float error, String msgid, String analyticType, String obsval, String dataSetType) {
         this.meta = meta;
@@ -82,6 +85,14 @@ public final class ErrorEstimateEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

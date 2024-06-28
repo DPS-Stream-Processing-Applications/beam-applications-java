@@ -22,6 +22,9 @@ public final class DecisionTreeEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public DecisionTreeEntry(
             String meta, String obsval, String msgid, String res, String analyticType, String dataSetType) {
         this.meta = meta;
@@ -81,6 +84,14 @@ public final class DecisionTreeEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

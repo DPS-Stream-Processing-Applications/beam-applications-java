@@ -94,7 +94,7 @@ public final class BlobReadFn implements StatefulFunction {
                 l.info("downloaded updated model file {} with size {}", BlobModelPath, 23);
 
             BlobReadEntry blobReadEntry = new BlobReadEntry(BlobModelObject, msgId, "modelupdate", analyticsType, "meta", mqttSubscribeEntry.getDataSetType());
-
+            blobReadEntry.setArrivalTime(mqttSubscribeEntry.getArrivalTime());
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(blobReadEntry.getMsgid()))
                             .withCustomType(BLOB_READ_ENTRY_JSON_TYPE, blobReadEntry)

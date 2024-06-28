@@ -13,6 +13,9 @@ public final class SourceEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public SourceEntry() {
     }
 
@@ -36,6 +39,14 @@ public final class SourceEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

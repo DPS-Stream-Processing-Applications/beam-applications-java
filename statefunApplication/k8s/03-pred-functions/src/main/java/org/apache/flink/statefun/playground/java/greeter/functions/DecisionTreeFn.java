@@ -60,9 +60,11 @@ public class DecisionTreeFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
 
         try {
+            long arrivalTime;
             if (message.is(SENML_ENTRY_JSON_TYPE)) {
 
                 SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
+                arrivalTime = senMlEntry.getArrivalTime();
                 setup(senMlEntry.getDataSetType());
                 String sensorMeta = senMlEntry.getMeta();
 
@@ -94,6 +96,7 @@ public class DecisionTreeFn implements StatefulFunction {
             } else if (message.is(BLOB_READ_ENTRY_JSON_TYPE)) {
                 BlobReadEntry blobReadEntry = message.as(BLOB_READ_ENTRY_JSON_TYPE);
                 setup(blobReadEntry.getDataSetType());
+                arrivalTime = blobReadEntry.getArrivalTime();
                 String msgtype = blobReadEntry.getMsgType();
                 String analyticsType = blobReadEntry.getAnalyticType();
                 String sensorMeta = blobReadEntry.getMeta();
@@ -126,6 +129,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", blobReadEntry.getDataSetType());
+                        decisionTreeEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)

@@ -18,6 +18,9 @@ public final class MqttPublishEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public MqttPublishEntry(String msgid, String meta, String obsval, String dataSetType) {
         this.msgid = msgid;
         this.meta = meta;
@@ -58,6 +61,14 @@ public final class MqttPublishEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

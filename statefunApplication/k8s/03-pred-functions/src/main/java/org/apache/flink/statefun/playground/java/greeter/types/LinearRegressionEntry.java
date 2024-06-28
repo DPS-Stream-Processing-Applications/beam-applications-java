@@ -22,6 +22,9 @@ public final class LinearRegressionEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public LinearRegressionEntry(
             String meta, String obsval, String msgid, String res, String analyticType, String dataSetType) {
         this.meta = meta;
@@ -81,6 +84,14 @@ public final class LinearRegressionEntry {
 
     public void setAnalyticType(String analyticType) {
         this.analyticType = analyticType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

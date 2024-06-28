@@ -1,7 +1,6 @@
 package org.apache.flink.statefun.playground.java.greeter.functions;
 
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
-import org.apache.flink.statefun.playground.java.greeter.tasks.ReadFromDatabaseTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.SenMlParse;
 import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
 import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
@@ -35,25 +34,19 @@ public class ParsePredictFn implements StatefulFunction {
     static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
     static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
-    private static final Object DATABASE_LOCK = new Object();
     private static Logger l;
     SenMlParse senMLParseTask;
-    private String dataSetType;
     private Properties p;
     private ArrayList<String> observableFields;
     private String[] metaFields;
     private String idField;
-    private boolean isJson;
-    private ReadFromDatabaseTask readFromDatabaseTask;
-    private String connectionUrl;
-    private String dataBaseName;
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
 
-    public void setup(String dataSetType, String connectionUrl, String dataBaseName) {
+    public void setup(String dataSetType) {
         p = new Properties();
         try (InputStream input = Files.newInputStream(Paths.get("/resources/all_tasks.properties"))) {
             p.load(input);
@@ -94,21 +87,14 @@ public class ParsePredictFn implements StatefulFunction {
 
             } else if (dataSetType.equals("SYS")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_SYS");
-                HashMap<String, String> map = new HashMap<>();
-                map.put("fileName", "sys-schema_without_annotationfields_txt");
-                synchronized (DATABASE_LOCK) {
-                    readFromDatabaseTask.doTask(map);
-                }
-                csvContent = readFromDatabaseTask.getLastResult();
+                line = "timestamp,source,longitude,latitude,temperature,humidity,light,dust,airquality_raw";
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_SYS");
             } else if (dataSetType.equals("FIT")) {
                 idField = p.getProperty("PARSE.ID_FIELD_SCHEMA_FIT");
-                HashMap<String, String> map = new HashMap<>();
-                map.put("fileName", "mhealth_schema_csv");
-                synchronized (DATABASE_LOCK) {
-                    readFromDatabaseTask.doTask(map);
-                }
-                csvContent = readFromDatabaseTask.getLastResult();
+                line = "subjectId,timestamp,acc_chest_x,acc_chest_y,acc_chest_z,ecg_lead_1,ecg_lead_2,acc_ankle_x,"
+                        + "acc_ankle_y,acc_ankle_z,gyro_ankle_x,gyro_ankle_y,gyro_ankle_z,magnetometer_ankle_x,"
+                        + "magnetometer_ankle_y,magnetometer_ankle_z,acc_arm_x,acc_arm_y,acc_arm_z,gyro_arm_x,gyro_"
+                        + "arm_y,gyro_arm_z,magnetometer_arm_x,magnetometer_arm_y,magnetometer_arm_z,label";
                 meta = p.getProperty("PARSE.META_FIELD_SCHEMA_FIT");
             } else {
                 throw new IllegalArgumentException("Invalid dataSetType: " + dataSetType);
@@ -146,8 +132,7 @@ public class ParsePredictFn implements StatefulFunction {
 
         try {
             SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
-            String ipAddress = System.getenv("MONGO_DB_ADDRESS");
-            setup(sourceEntry.getDataSetType(), ipAddress, "mydb");
+            setup(sourceEntry.getDataSetType());
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
 
@@ -185,6 +170,7 @@ public class ParsePredictFn implements StatefulFunction {
                             obsVal.toString(),
                             "MSGTYPE",
                             "DumbType", sourceEntry.getDataSetType());
+            senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(senMlEntry.getMsgid()))

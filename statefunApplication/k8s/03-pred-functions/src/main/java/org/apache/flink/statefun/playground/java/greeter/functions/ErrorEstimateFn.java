@@ -53,9 +53,11 @@ public class ErrorEstimateFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
 
         try {
+            long arrivalTime;
             if (message.is(LINEAR_REGRESSION_ENTRY_JSON_TYPE)) {
                 LinearRegressionEntry linearRegressionEntry = message.as(LINEAR_REGRESSION_ENTRY_JSON_TYPE);
                 setup(linearRegressionEntry.getDataSetType());
+                arrivalTime = linearRegressionEntry.getArrivalTime();
                 String msgId = linearRegressionEntry.getMsgid();
                 String analyticsType = linearRegressionEntry.getAnalyticType();
 
@@ -100,6 +102,7 @@ public class ErrorEstimateFn implements StatefulFunction {
             } else if (message.is(AVERAGE_ENTRY_JSON_TYPE)) {
                 AverageEntry averageEntry = message.as(AVERAGE_ENTRY_JSON_TYPE);
                 setup(averageEntry.getDataSetType());
+                arrivalTime = averageEntry.getArrivalTime();
                 String msgId = averageEntry.getMsgid();
                 String analyticsType = averageEntry.getAnalyticType();
                 String sensorMeta = averageEntry.getMeta();
@@ -127,6 +130,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                     }
                     if (l.isInfoEnabled()) l.info(("errval -" + errval));
                     ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, averageEntry.getDataSetType());
+                    errorEstimateEntry.setArrivalTime(arrivalTime);
                     context.send(
                             MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
                                     .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)

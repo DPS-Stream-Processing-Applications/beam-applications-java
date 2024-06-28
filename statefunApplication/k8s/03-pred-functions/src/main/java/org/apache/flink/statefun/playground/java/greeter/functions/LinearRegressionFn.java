@@ -64,23 +64,15 @@ public class LinearRegressionFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         initLogger(LoggerFactory.getLogger("APP"));
         try {
+            long arrivalTime;
             if (message.is(SENML_ENTRY_JSON_TYPE)) {
                 SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
                 setup(senMlEntry.getDataSetType());
+                arrivalTime = senMlEntry.getArrivalTime();
                 this.dataSetType = senMlEntry.getDataSetType();
                 String sensorMeta = senMlEntry.getMeta();
                 String msgtype = senMlEntry.getMsgtype();
                 String obsVal = senMlEntry.getObsVal();
-                /*
-                if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
-                    obsVal = "10,1955.22,27";
-                } else {
-                    obsVal = "22.7,49.3,0,1955.22,27";
-                }
-
-                 */
-
-                //String msgId = "0";
                 String msgId = senMlEntry.getMsgid();
 
                 if (!msgtype.equals("modelupdate")) {
@@ -93,7 +85,7 @@ public class LinearRegressionFn implements StatefulFunction {
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, obsVal);
                 Float res = linearRegressionPredictor.doTask(map);
-                //Float res = 2.0f;
+
                 if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
                 if (res != null) {
@@ -114,13 +106,13 @@ public class LinearRegressionFn implements StatefulFunction {
 
                 BlobReadEntry blobReadEntry = message.as(BLOB_READ_ENTRY_JSON_TYPE);
                 setup(blobReadEntry.getDataSetType());
+                arrivalTime = blobReadEntry.getArrivalTime();
                 this.dataSetType = blobReadEntry.getDataSetType();
                 String sensorMeta = blobReadEntry.getMeta();
                 String msgtype = blobReadEntry.getMsgType();
                 String analyticsType = blobReadEntry.getAnalyticType();
 
                 String obsVal = "";
-                //String msgId = "0";
                 String msgId = blobReadEntry.getMsgid();
 
                 if (dataSetType.equals("TAXI") | dataSetType.equals("FIT")) {
@@ -160,6 +152,7 @@ public class LinearRegressionFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", blobReadEntry.getDataSetType());
+                        linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
                                         .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)

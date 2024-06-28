@@ -27,6 +27,9 @@ public final class AverageEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public AverageEntry(
             String meta,
             String sensorId,
@@ -110,6 +113,14 @@ public final class AverageEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

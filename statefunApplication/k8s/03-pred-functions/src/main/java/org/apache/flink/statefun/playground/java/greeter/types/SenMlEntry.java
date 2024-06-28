@@ -29,6 +29,9 @@ public final class SenMlEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public SenMlEntry(
             String msgid,
             String sensorID,
@@ -112,6 +115,14 @@ public final class SenMlEntry {
 
     public void setObsVal(String obsVal) {
         this.obsVal = obsVal;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

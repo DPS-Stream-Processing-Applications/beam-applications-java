@@ -104,7 +104,7 @@ public final class SourceFn implements StatefulFunction {
     private long convertToUnixTimeStamp(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        long unixTimestampSeconds = 0;
+        long unixTimestampSeconds;
         try {
             Date date = dateFormat.parse(dateString);
             long unixTimestamp = date.getTime();
@@ -144,6 +144,9 @@ public final class SourceFn implements StatefulFunction {
 
             msgId += 1;
             context.storage().set(MSGID_COUNT, msgId);
+            if (msgId % 100 == 0) {
+                sourceEntry.setArrivalTime(System.currentTimeMillis());
+            }
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(sourceEntry.getMsgid()))

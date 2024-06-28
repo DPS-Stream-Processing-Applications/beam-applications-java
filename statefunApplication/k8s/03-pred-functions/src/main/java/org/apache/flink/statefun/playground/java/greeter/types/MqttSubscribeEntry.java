@@ -16,6 +16,9 @@ public final class MqttSubscribeEntry {
     @JsonProperty("datasetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
 
     public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid, String dataSetType) {
         this.analaytictype = analaytictype;
@@ -45,6 +48,14 @@ public final class MqttSubscribeEntry {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

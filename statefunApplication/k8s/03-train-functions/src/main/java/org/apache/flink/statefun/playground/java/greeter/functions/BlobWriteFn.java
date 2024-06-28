@@ -75,6 +75,7 @@ public class BlobWriteFn implements StatefulFunction {
         if (blobRes != null) {
             if (blobRes != Float.MIN_VALUE) {
                 BlobUploadEntry blobUploadEntry = new BlobUploadEntry(msgId, fileName, trainEntry.getDataSetType());
+                blobUploadEntry.setArrivalTime(trainEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(blobUploadEntry.getMsgid()))
                                 .withCustomType(BlobUpload_ENTRY_JSON_TYPE, blobUploadEntry)

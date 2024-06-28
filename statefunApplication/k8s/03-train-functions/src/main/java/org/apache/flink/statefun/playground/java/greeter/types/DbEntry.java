@@ -15,6 +15,9 @@ public class DbEntry implements Serializable {
     @JsonProperty("dataSetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public DbEntry(String mgsid, String trainData, String rowKeyEnd, String dataSetType) {
         this.mgsid = mgsid;
         this.trainData = trainData;
@@ -55,6 +58,14 @@ public class DbEntry implements Serializable {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

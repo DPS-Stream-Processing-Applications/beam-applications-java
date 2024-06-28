@@ -12,6 +12,9 @@ public class MqttPublishEntry implements Serializable {
     @JsonProperty("dataSetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public MqttPublishEntry(String msgid, String dataSetType) {
         this.msgid = msgid;
         this.dataSetType = dataSetType;
@@ -38,6 +41,14 @@ public class MqttPublishEntry implements Serializable {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

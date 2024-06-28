@@ -66,6 +66,7 @@ public class AnnotateFn implements StatefulFunction {
         String annotData = annotateDTClass.getLastResult();
 
         AnnotateEntry entry = new AnnotateEntry(msgId, annotData, rowkeyend, dbEntry.getDataSetType());
+        entry.setArrivalTime(dbEntry.getArrivalTime());
 
         context.send(
                 MessageBuilder.forAddress(INBOX, String.valueOf(entry.getMsgid()))

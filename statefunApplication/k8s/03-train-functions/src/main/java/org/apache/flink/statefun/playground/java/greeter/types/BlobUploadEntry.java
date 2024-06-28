@@ -14,6 +14,9 @@ public class BlobUploadEntry implements Serializable {
     @JsonProperty("dataSetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public BlobUploadEntry(String msgid, String fileName, String dataSetType) {
         this.msgid = msgid;
         this.fileName = fileName;
@@ -45,6 +48,14 @@ public class BlobUploadEntry implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @java.lang.Override

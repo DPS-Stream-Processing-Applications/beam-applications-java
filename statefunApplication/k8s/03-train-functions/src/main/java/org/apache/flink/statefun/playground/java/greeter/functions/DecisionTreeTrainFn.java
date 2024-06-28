@@ -102,6 +102,7 @@ public class DecisionTreeTrainFn implements StatefulFunction {
         if (res != null) {
             if (res != Float.MIN_VALUE) {
                 TrainEntry trainEntry = new TrainEntry("model", msgid, rowKeyEnd, "MLR", filename, annotateEntry.getDataSetType());
+                trainEntry.setArrivalTime(annotateEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(trainEntry.getMsgid()))
                                 .withCustomType(Train_ENTRY_JSON_TYPE, trainEntry)

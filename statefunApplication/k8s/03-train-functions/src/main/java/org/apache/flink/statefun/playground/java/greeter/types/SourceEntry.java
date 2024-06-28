@@ -22,6 +22,9 @@ public class SourceEntry implements Serializable {
     @JsonProperty("dataSetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public SourceEntry(String rowString, String msgid, String rowKeyStart, String rowKeyEnd, String dataSetType) {
         this.rowString = rowString;
         this.msgid = msgid;
@@ -71,6 +74,14 @@ public class SourceEntry implements Serializable {
 
     public void setRowKeyEnd(String rowKeyEnd) {
         this.rowKeyEnd = rowKeyEnd;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

@@ -185,6 +185,7 @@ public class TableReadFn implements StatefulFunction {
         entry.setTrainData(bf.toString());
         entry.setRowKeyEnd(ROWKEYEND);
         entry.setDataSetType(sourceEntry.getDataSetType());
+        entry.setArrivalTime(sourceEntry.getArrivalTime());
 
         context.send(
                 MessageBuilder.forAddress(INBOX, String.valueOf(entry.getMgsid()))

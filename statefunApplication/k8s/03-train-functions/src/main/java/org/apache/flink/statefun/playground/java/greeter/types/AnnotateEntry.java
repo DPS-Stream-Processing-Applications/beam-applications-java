@@ -18,6 +18,9 @@ public class AnnotateEntry implements Serializable {
     @JsonProperty("dataSetType")
     private String dataSetType;
 
+    @JsonProperty("arrivalTime")
+    private long arrivalTime;
+
     public AnnotateEntry(String msgid, String annotData, String rowKeyEnd, String dataSetType) {
         this.msgid = msgid;
         this.annotData = annotData;
@@ -58,6 +61,14 @@ public class AnnotateEntry implements Serializable {
 
     public void setDataSetType(String dataSetType) {
         this.dataSetType = dataSetType;
+    }
+
+    public long getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
     @Override

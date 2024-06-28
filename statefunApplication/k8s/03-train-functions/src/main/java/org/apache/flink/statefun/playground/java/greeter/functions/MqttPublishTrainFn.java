@@ -68,6 +68,7 @@ public class MqttPublishTrainFn implements StatefulFunction {
         Float res = 93f;
         myKafkaProducer.doTask(map);
         MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId);
+        mqttPublishEntry.setArrivalTime(blobUploadEntry.getArrivalTime());
         context.send(
                 MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
                         .withCustomType(MqttPublish_ENTRY_JSON_TYPE, mqttPublishEntry)

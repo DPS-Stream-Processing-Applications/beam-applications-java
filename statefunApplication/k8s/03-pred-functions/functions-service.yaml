@@ -31,8 +31,8 @@ spec:
     spec:
       containers:
         - name: functions 
-          #image: jungerindy/statefun_pred:latest
-          image:  pred-functions
+          image: jungerindy/statefun_pred:latest
+          #image:  pred-functions
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

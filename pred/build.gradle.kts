@@ -22,6 +22,7 @@ dependencies {
   implementation("org.apache.beam:beam-runners-flink-1.16:2.54.0")
   implementation("org.apache.beam:beam-sdks-java-io-kafka:2.54.0")
   implementation("org.slf4j:slf4j-jdk14:1.7.32")
+  implementation("ch.qos.logback:logback-classic:1.3.11")
   implementation("org.apache.logging.log4j:log4j-core:2.23.1")
   implementation("org.json:json:20240205")
   implementation("com.microsoft.azure:azure-storage:4.0.0")

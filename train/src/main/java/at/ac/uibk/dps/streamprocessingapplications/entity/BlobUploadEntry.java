@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class BlobUploadEntry implements Serializable {
   private String msgid;
   private String fileName;
+  private long arrivalTime;
 
   public BlobUploadEntry(String msgid, String fileName) {
     this.msgid = msgid;
@@ -25,5 +26,13 @@ public class BlobUploadEntry implements Serializable {
 
   public void setFileName(String fileName) {
     this.fileName = fileName;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 }

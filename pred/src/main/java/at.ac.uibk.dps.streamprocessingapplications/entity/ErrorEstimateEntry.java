@@ -9,6 +9,7 @@ public class ErrorEstimateEntry implements Serializable, MqttPublishInput {
   private String msgid;
   private String analyticType;
   private String obsval;
+  private long arrivalTime;
 
   public ErrorEstimateEntry(
       String meta, float error, String msgid, String analyticType, String obsval) {
@@ -55,13 +56,21 @@ public class ErrorEstimateEntry implements Serializable, MqttPublishInput {
     return obsval;
   }
 
+  public void setObsval(String obsval) {
+    this.obsval = obsval;
+  }
+
   @Override
   public String getRes() {
     return String.valueOf(error);
   }
 
-  public void setObsval(String obsval) {
-    this.obsval = obsval;
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

@@ -87,7 +87,6 @@ public class JsonSplitter {
 
       int timestampColIndex = 0;
       DateTime date = null;
-      // FIXME!
       datasetType = "SENML";
       if (datasetType.equals("TAXI")) {
         timestampColIndex = 3;
@@ -168,7 +167,6 @@ public class JsonSplitter {
    * @throws IOException
    */
   public static void main(String[] args) throws ParseException, IOException {
-    // TODO Auto-generated method stub
     int defaultNumThreads = 4, defaultPeakRate = 100;
     switch (args.length) {
       case 2:

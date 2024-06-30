@@ -6,6 +6,7 @@ public class AnnotateEntry implements Serializable {
   private String msgid;
   private String annotData;
   private String rowKeyEnd;
+  private long arrivalTime;
 
   public AnnotateEntry(String msgid, String annotData, String rowKeyEnd) {
     this.msgid = msgid;
@@ -35,6 +36,14 @@ public class AnnotateEntry implements Serializable {
 
   public void setRowKeyEnd(String rowKeyEnd) {
     this.rowKeyEnd = rowKeyEnd;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

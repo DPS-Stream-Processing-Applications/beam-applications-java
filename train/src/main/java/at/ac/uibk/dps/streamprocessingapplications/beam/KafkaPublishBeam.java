@@ -48,6 +48,6 @@ public class KafkaPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
     Float res = 93f;
     if (l.isInfoEnabled()) l.info("MQTT result:{}", res);
     myKafkaProducer.doTask(map);
-    out.output(new MqttPublishEntry(msgId));
+    out.output(new MqttPublishEntry(msgId, input.getArrivalTime()));
   }
 }

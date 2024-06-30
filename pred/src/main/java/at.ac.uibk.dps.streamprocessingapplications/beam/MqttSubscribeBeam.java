@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
 
   private static long msgid = 1;
-  private static Logger l; // TODO: Ensure logger is initialized before use
+  private static Logger l;
   MQTTSubscribeTask mqttSubscribeTask;
   String spoutLogFileName = null;
   Properties p;
@@ -46,7 +46,6 @@ public class MqttSubscribeBeam extends DoFn<String, MqttSubscribeEntry> {
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<MqttSubscribeEntry> out)
       throws IOException {
-    // TODO Read packet and forward to next bolt
     HashMap<String, String> map = new HashMap();
     map.put(AbstractTask.DEFAULT_KEY, "dummy");
     // mqttSubscribeTask.doTask(map);

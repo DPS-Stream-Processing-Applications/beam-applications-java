@@ -1,9 +1,7 @@
 ## Commandline arguments
 
-
 * URL for database
 * experiRunId (FIT/SYS/TAXI/GRID- number)
-
 
 ## General process
 
@@ -12,7 +10,6 @@
 3. Find server address of both services
 4. Start flink application (will run forever)
 5. Start kafkaProducer (will also run forever)
-
 
 ## Setting up MongoDb
 
@@ -27,15 +24,18 @@ kubectl apply -f .
 ```
 
 I used this command to get the ip-address and port of my db
+
 ````bash
 minikube service --url mongo-nodeport-svc
 ````
 
 Or on the kubernetes cluster:
+
 ```bash
 kubectl get nodes -o \
     jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
 ```
+
 This will read the first nodes `InternalIP` to use in the `databaseUrl` argument.
 The following commands are automatically inlining this IP adress.
 
@@ -45,11 +45,12 @@ The following commands are automatically inlining this IP adress.
 
 ## Commands
 
->[!NOTE]
+> [!NOTE]
 > The Train application uses a different inputFile than all other applications. It can be constructed via
 > the `senMlConverter`. One line consists of (timestamp | rowStart | rowEnd)
 
 ### Example command for SYS-Data
+
 ```bash
 flink run -m localhost:8081 \
     ./pred/build/PredJob.jar \
@@ -59,9 +60,11 @@ flink run -m localhost:8081 \
     ):32000/ \
     --experiRunId=SYS-210
 ```
+
 $(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 ### Example command for TAXI-Data
+
 ```bash
 flink run -m localhost:8081 \
     ./pred/build/PredJob.jar \
@@ -73,6 +76,7 @@ flink run -m localhost:8081 \
 ```
 
 ### Example command for FIT-Data
+
 ```bash
 flink run -m localhost:8081 \
     ./pred/build/PredJob.jar \
@@ -82,6 +86,7 @@ flink run -m localhost:8081 \
     ):32000/ \
     --experiRunId=FIT-210
 ```
+
 ---
 
 <!--

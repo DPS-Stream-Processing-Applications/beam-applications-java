@@ -63,10 +63,12 @@ public class KafkaPublishBeam2 extends DoFn<DecisionTreeEntry, MqttPublishEntry>
 
     if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
 
-    HashMap<String, String> map = new HashMap();
+    HashMap<String, String> map = new HashMap<>();
     map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
     myKafkaProducer.doTask(map);
 
-    out.output(new MqttPublishEntry(msgId, meta, obsVal));
+    MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal);
+    mqttPublishEntry.setArrivalTime(input.getArrivalTime());
+    out.output(mqttPublishEntry);
   }
 }

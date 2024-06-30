@@ -7,6 +7,7 @@ public class MqttPublishEntry implements Serializable {
   private String msgid;
   private String meta;
   private String obsval;
+  private long arrivalTime;
 
   public MqttPublishEntry(String msgid, String meta, String obsval) {
     this.msgid = msgid;
@@ -36,6 +37,14 @@ public class MqttPublishEntry implements Serializable {
 
   public void setObsval(String obsval) {
     this.obsval = obsval;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

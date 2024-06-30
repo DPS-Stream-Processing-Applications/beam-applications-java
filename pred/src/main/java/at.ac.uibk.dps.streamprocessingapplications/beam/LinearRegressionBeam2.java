@@ -70,9 +70,6 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
       //            if(l.isInfoEnabled())
       //                l.info("blob model size "+blobModelObject.toString());
 
-      // TODO:  1- Either write model file to local disk - no task code change
-      // TODO:  2- Pass it as bytestream , need to update the code for task
-
       try {
         LinearRegressionPredictor.lr =
             (LinearRegression) SerializationHelper.read(bytesInputStream);
@@ -97,9 +94,12 @@ public class LinearRegressionBeam2 extends DoFn<BlobReadEntry, LinearRegressionE
     if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
     if (res != null) {
-      if (res != Float.MIN_VALUE)
-        out.output(new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR"));
-      else {
+      if (res != Float.MIN_VALUE) {
+        LinearRegressionEntry linearRegressionEntry =
+            new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR");
+        linearRegressionEntry.setArrivalTime(input.getArrivalTime());
+        out.output(linearRegressionEntry);
+      } else {
         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
         throw new RuntimeException("Res is null or float.min");
       }

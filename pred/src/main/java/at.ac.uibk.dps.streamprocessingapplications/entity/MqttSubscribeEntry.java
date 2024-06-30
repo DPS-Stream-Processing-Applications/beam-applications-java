@@ -4,22 +4,23 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class MqttSubscribeEntry implements Serializable {
-  private String Analaytictype;
-  private String BlobModelPath;
+  private String analyticType;
+  private String blobModelPath;
   private String msgid;
+  private long arrivalTime;
 
-  public MqttSubscribeEntry(String analaytictype, String blobModelPath, String msgid) {
-    Analaytictype = analaytictype;
-    BlobModelPath = blobModelPath;
+  public MqttSubscribeEntry(String analyticType, String blobModelPath, String msgid) {
+    this.analyticType = analyticType;
+    this.blobModelPath = blobModelPath;
     this.msgid = msgid;
   }
 
   public String getBlobModelPath() {
-    return BlobModelPath;
+    return blobModelPath;
   }
 
   public void setBlobModelPath(String blobModelPath) {
-    BlobModelPath = blobModelPath;
+    blobModelPath = blobModelPath;
   }
 
   public String getMsgid() {
@@ -30,12 +31,16 @@ public class MqttSubscribeEntry implements Serializable {
     this.msgid = msgid;
   }
 
-  public String getAnalaytictype() {
-    return Analaytictype;
+  public String getAnalyticType() {
+    return analyticType;
   }
 
-  public void setAnalaytictype(String analaytictype) {
-    Analaytictype = analaytictype;
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override
@@ -55,10 +60,10 @@ public class MqttSubscribeEntry implements Serializable {
   public String toString() {
     return "MqttSubscribeEntry{"
         + "Analytictype='"
-        + Analaytictype
+        + analyticType
         + '\''
         + ", BlobModelPath='"
-        + BlobModelPath
+        + blobModelPath
         + '\''
         + ", msgid='"
         + msgid

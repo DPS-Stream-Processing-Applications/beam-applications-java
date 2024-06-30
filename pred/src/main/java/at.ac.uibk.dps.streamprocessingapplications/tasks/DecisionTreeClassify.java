@@ -13,7 +13,7 @@ import weka.core.Instances;
  *
  * @author shukla, simmhan
  */
-public class DecisionTreeClassify extends AbstractTask {
+public class DecisionTreeClassify extends AbstractTask<String, String> {
 
   private static final Object SETUP_LOCK = new Object();
   // Sample data, assuming arff file has headers for Sense-Your-City dataset
@@ -53,7 +53,7 @@ public class DecisionTreeClassify extends AbstractTask {
   //	// Sample data, assuming arff file has headers for TAXI dataset
   private static int useMsgField;
   private static Instances instanceHeader;
-  private static int resultAttrNdx; // Index of result attribute in arff file
+  private static int resultAttrNdx;
   private final String dataSetType;
 
   public DecisionTreeClassify(String dataSetType) {
@@ -116,16 +116,16 @@ public class DecisionTreeClassify extends AbstractTask {
   }
 
   @Override
-  protected Float doTaskLogic(Map map) {
-    String m = (String) map.get(AbstractTask.DEFAULT_KEY);
+  protected Float doTaskLogic(Map<String, String> map) {
+    String m = map.get(AbstractTask.DEFAULT_KEY);
     Instance testInstance = null;
     try {
       String[] testTuple = null;
-      if (useMsgField > 0) { // useMsgField is used as flag
+      boolean isCityOrFit = dataSetType.equals("SYS") | dataSetType.equals("FIT");
+      if (useMsgField > 0) {
         testTuple = m.split(",");
       } else {
-        //				System.out.println("TestS : in do task" );
-        if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+        if (isCityOrFit) {
           testTuple = SAMPLE_INPUT_SYS.split(",");
         }
         if (dataSetType.equals("TAXI")) {
@@ -135,13 +135,15 @@ public class DecisionTreeClassify extends AbstractTask {
       if (dataSetType.equals("TAXI")) {
         instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_TAXI), l);
       }
-      if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+      if (isCityOrFit) {
         instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_SYS), l);
       }
       testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
+      l.debug("test {}", testInstance);
+      System.out.println("Instance: " + testInstance);
 
-      // int classification = (int) j48tree.classifyInstance(testInstance);
-      int classification = 2;
+      int classification = (int) j48tree.classifyInstance(testInstance);
+      // int classification = 2;
       // int classification = 2;
       // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
 
@@ -151,7 +153,7 @@ public class DecisionTreeClassify extends AbstractTask {
         l.info("Test data               : {}", testInstance);
         // l.info("Test data classification result {}, {}", result, classification);
       }
-      return Float.valueOf(classification);
+      return (float) classification;
     } catch (Exception e) {
       l.warn("error with classification of testInstance: " + testInstance, e);
       throw new RuntimeException(e);

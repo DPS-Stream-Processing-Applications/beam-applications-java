@@ -185,7 +185,6 @@ public class CsvSplitter {
    */
   /*
   public static void main(String[] args) throws ParseException, IOException {
-      // TODO Auto-generated method stub
       int defaultNumThreads = 4, defaultPeakRate = 100;
       switch (args.length) {
           case 2:

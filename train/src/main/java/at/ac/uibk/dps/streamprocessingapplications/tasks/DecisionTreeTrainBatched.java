@@ -79,8 +79,6 @@ public class DecisionTreeTrainBatched extends AbstractTask {
   }
 
   public void setup(Logger l_, Properties p_) {
-    // TODO: Later, have option of training using instances present in data file rather than
-    // just from messages
     super.setup(l_, p_);
     synchronized (SETUP_LOCK) {
       if (!doneSetup) { // Do setup only once for this task

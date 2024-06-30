@@ -92,11 +92,11 @@ public class AverageBeam extends DoFn<SenMlEntry, AverageEntry> {
       if (avgres != null) {
         if (avgres != Float.MIN_VALUE) {
           if (l.isInfoEnabled()) l.info("avgres AVG:{}", avgres);
-
-          out.output(
+          AverageEntry averageEntry =
               new AverageEntry(
-                  sensorMeta, sensorID, obsType, avgres.toString(), obsVal, msgId, "AVG"));
-
+                  sensorMeta, sensorID, obsType, avgres.toString(), obsVal, msgId, "AVG");
+          averageEntry.setArrivalTime(input.getArrivalTime());
+          out.output(averageEntry);
         } else {
           if (l.isWarnEnabled()) l.warn("Error in BlockWindowAverageBolt");
           throw new RuntimeException();

@@ -11,6 +11,7 @@ public class AverageEntry implements Serializable {
   private String obsVal;
   private String msgid;
   private String analyticType;
+  private long arrivalTime;
 
   public AverageEntry(
       String meta,
@@ -83,6 +84,14 @@ public class AverageEntry implements Serializable {
 
   public void setAnalyticType(String analyticType) {
     this.analyticType = analyticType;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

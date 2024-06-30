@@ -124,6 +124,6 @@ public class AzureBlobUploadTask extends AbstractTask<String, Float> {
     // int result = putAzBlob(container,localFileSourcePath,l);
 
     int result = 1;
-    return Float.valueOf(result);
+    return (float) result;
   }
 }

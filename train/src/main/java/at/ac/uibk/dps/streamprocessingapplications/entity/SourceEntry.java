@@ -8,6 +8,7 @@ public class SourceEntry implements Serializable {
   private String msgid;
   private String rowKeyStart;
   private String rowKeyEnd;
+  private long arrivalTime;
 
   public SourceEntry(String rowString, String msgid, String rowKeyStart, String rowKeyEnd) {
     this.rowString = rowString;
@@ -48,6 +49,14 @@ public class SourceEntry implements Serializable {
 
   public void setRowKeyEnd(String rowKeyEnd) {
     this.rowKeyEnd = rowKeyEnd;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

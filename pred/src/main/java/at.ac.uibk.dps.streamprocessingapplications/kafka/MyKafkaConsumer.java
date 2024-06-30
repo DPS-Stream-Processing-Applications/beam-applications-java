@@ -17,13 +17,12 @@ import org.apache.kafka.common.serialization.LongDeserializer;
 
 public class MyKafkaConsumer extends AbstractTask<String, String>
     implements ConsumerRebalanceListener, OffsetCommitCallback, Serializable {
+  protected AtomicLong messageCount = new AtomicLong(0);
   private String BOOTSTRAP_SERVERS;
   private String GROUP_ID;
   private long POLL_TIMEOUT_MS;
   private String TOPIC_NAME;
-
   private KafkaConsumer<Long, byte[]> kafkaConsumer;
-  protected AtomicLong messageCount = new AtomicLong(0);
   private Map<TopicPartition, OffsetAndMetadata> pendingOffsets = new HashMap<>();
 
   public MyKafkaConsumer(

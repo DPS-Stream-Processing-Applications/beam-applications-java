@@ -48,7 +48,6 @@ public class TableClass implements Iterable<RowClass>, Iterator<RowClass> {
 
   @Override
   public boolean hasNext() {
-    // TODO Auto-generated method stub
     return index < rows.size();
     //		if(index == rows.size())
     //			return false;
@@ -57,20 +56,15 @@ public class TableClass implements Iterable<RowClass>, Iterator<RowClass> {
 
   @Override
   public RowClass next() {
-    // TODO Auto-generated method stub
     index++;
     return new RowClass(this.ts.get(index - 1), this.header, this.rows.get(index - 1));
   }
 
   @Override
-  public void remove() {
-    // TODO Auto-generated method stub
-
-  }
+  public void remove() {}
 
   @Override
   public Iterator<RowClass> iterator() {
-    // TODO Auto-generated method stub
     this.index = 0;
     return this;
   }

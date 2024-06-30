@@ -12,11 +12,10 @@ import org.slf4j.LoggerFactory;
 
 public class ReadDatabaseBeam extends DoFn<String, String> {
   private static Logger l;
-  private Properties p;
-  private ReadFromDatabaseTask readFromDatabaseTask;
-
   private final String connectionUrl;
   private final String databaseName;
+  private Properties p;
+  private ReadFromDatabaseTask readFromDatabaseTask;
 
   public ReadDatabaseBeam(Properties p, String connectionUrl, String databaseName) {
     this.p = p;
@@ -24,15 +23,15 @@ public class ReadDatabaseBeam extends DoFn<String, String> {
     this.databaseName = databaseName;
   }
 
+  public static void initLogger(Logger l_) {
+    l = l_;
+  }
+
   @Setup
   public void prepare() {
     readFromDatabaseTask = new ReadFromDatabaseTask(connectionUrl, databaseName);
     initLogger(LoggerFactory.getLogger("APP"));
     readFromDatabaseTask.setup(l, p);
-  }
-
-  public static void initLogger(Logger l_) {
-    l = l_;
   }
 
   @ProcessElement

@@ -12,11 +12,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 public class KafkaConsumerReader extends BoundedSource.BoundedReader<String> {
-  private final KafkaConsumer<String, String> consumer;
-
-  private final long numberOfLines;
-
   private static long counter = 1;
+  private final KafkaConsumer<String, String> consumer;
+  private final long numberOfLines;
 
   public KafkaConsumerReader(String kafkaBootstrapServers, String kafkaTopic, long numberOfLines) {
     this.numberOfLines = numberOfLines;

@@ -1,6 +1,8 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
+import org.apache.beam.sdk.metrics.Gauge;
+import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +10,20 @@ import org.slf4j.LoggerFactory;
 public class Sink extends DoFn<MqttPublishEntry, String> {
   private static final Logger LOG = LoggerFactory.getLogger("APP");
 
+  private final Gauge gauge;
+
+  public Sink() {
+    this.gauge = Metrics.gauge(Sink.class, "MyCustomGauge");
+  }
+
   @ProcessElement
   public void processElement(@Element MqttPublishEntry input, OutputReceiver<String> out) {
     String msgId = input.getMsgid();
     LOG.info("In sink: " + msgId);
+    if (input.getArrivalTime() != 0L) {
+      long latency = System.currentTimeMillis() - input.getArrivalTime();
+      gauge.set(latency);
+    }
     out.output(msgId);
   }
 }

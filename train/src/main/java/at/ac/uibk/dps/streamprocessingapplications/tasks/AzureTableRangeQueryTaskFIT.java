@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 
 public class AzureTableRangeQueryTaskFIT extends AbstractTask {
   private static final Object SETUP_LOCK = new Object();
-  // TODO: remove init values after config.properties has been initialized
   private static String storageConnStr;
   private static String tableName;
   private static String partitionKey;
@@ -132,13 +131,10 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     super.setup(l_, p_);
     synchronized (SETUP_LOCK) {
       if (!doneSetup) { // Do setup only once for this task
-        storageConnStr =
-            p_.getProperty("IO.AZURE_STORAGE_CONN_STR"); // TODO: add to config.property file
-        tableName =
-            p_.getProperty("IO.AZURE_TABLE.TABLE_NAME"); // TODO: pass table with TaxiDropoff
+        storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
+        tableName = p_.getProperty("IO.AZURE_TABLE.TABLE_NAME");
         // Entity
-        partitionKey = p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY"); // TODO: pass partition with
-        // TaxiDropoff Entity
+        partitionKey = p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY");
         useMsgField =
             Integer.parseInt(
                 p_.getProperty(
@@ -158,8 +154,6 @@ public class AzureTableRangeQueryTaskFIT extends AbstractTask {
     String rowKeyStart, rowKeyEnd;
     CloudTable cloudTbl = connectToAzTable(storageConnStr, tableName, l);
     l.warn("Table name is - " + cloudTbl.getName());
-    // FIXME: How do you advance the rowkey. Have a start and end for row key as input property?
-    //		String rowKeyStart,rowKeyEnd;
     if (useMsgField > 0) {
       //			rowKey = m.split(",")[useMsgField - 1];
       rowKeyStart = (String) map.get("ROWKEYSTART");

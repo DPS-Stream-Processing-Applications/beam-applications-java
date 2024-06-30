@@ -72,7 +72,10 @@ public class ErrorEstimateBeam1 extends DoFn<LinearRegressionEntry, ErrorEstimat
       }
 
       if (l.isInfoEnabled()) l.info(("errval -" + errval));
-      out.output(new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal));
+      ErrorEstimateEntry errorEstimateEntry =
+          new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal);
+      errorEstimateEntry.setArrivalTime(input.getArrivalTime());
+      out.output(errorEstimateEntry);
     }
   }
 }

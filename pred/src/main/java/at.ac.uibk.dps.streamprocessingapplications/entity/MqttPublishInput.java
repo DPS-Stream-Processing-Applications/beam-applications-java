@@ -10,4 +10,8 @@ public interface MqttPublishInput {
   String getObsval();
 
   String getRes();
+
+  public long getArrivalTime();
+
+  public void setArrivalTime(long arrivalTime);
 }

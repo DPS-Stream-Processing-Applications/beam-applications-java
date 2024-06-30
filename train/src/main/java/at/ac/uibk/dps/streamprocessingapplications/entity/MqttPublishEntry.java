@@ -4,9 +4,11 @@ import java.io.Serializable;
 
 public class MqttPublishEntry implements Serializable {
   private String msgid;
+  private long arrivalTime;
 
-  public MqttPublishEntry(String msgid) {
+  public MqttPublishEntry(String msgid, long arrivalTime) {
     this.msgid = msgid;
+    this.arrivalTime = arrivalTime;
   }
 
   public String getMsgid() {
@@ -15,6 +17,14 @@ public class MqttPublishEntry implements Serializable {
 
   public void setMsgid(String msgid) {
     this.msgid = msgid;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

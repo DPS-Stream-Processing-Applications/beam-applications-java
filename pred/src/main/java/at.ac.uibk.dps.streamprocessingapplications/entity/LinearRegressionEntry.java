@@ -9,6 +9,7 @@ public class LinearRegressionEntry implements Serializable {
   private String msgid;
   private String res;
   private String analyticType;
+  private long arrivalTime;
 
   public LinearRegressionEntry(
       String meta, String obsval, String msgid, String res, String analyticType) {
@@ -57,6 +58,14 @@ public class LinearRegressionEntry implements Serializable {
 
   public void setAnalyticType(String analyticType) {
     this.analyticType = analyticType;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

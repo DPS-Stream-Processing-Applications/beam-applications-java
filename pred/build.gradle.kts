@@ -62,5 +62,7 @@ tasks.named<Jar>("jar") {
   exclude("META-INF/*.RSA")
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+  from("src/main/resources/logback.xml")
+  from("\"src/main/resources/log4j2.xml")
   isZip64 = true
 }

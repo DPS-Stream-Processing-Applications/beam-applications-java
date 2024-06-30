@@ -42,7 +42,6 @@ public class WekaUtil {
     } catch (Exception e) {
       throw new RuntimeException("Error in prepareInstance " + e);
     }
-
     return instance;
   }
 
@@ -75,10 +74,9 @@ public class WekaUtil {
       trainingData = new Instances(reader);
       // Setting class attribute to last field
       trainingData.setClassIndex(trainingData.numAttributes() - 1);
-    } catch (IOException e) {
+    } catch (Exception e) {
       l.warn("error loading training instances", e);
       throw new RuntimeException("Error loading training instances " + e);
-      // return null;
     }
     return trainingData;
   }

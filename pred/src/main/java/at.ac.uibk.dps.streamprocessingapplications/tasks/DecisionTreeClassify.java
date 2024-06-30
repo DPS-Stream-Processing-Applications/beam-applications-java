@@ -1,5 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
@@ -98,8 +100,11 @@ public class DecisionTreeClassify extends AbstractTask<String, String> {
           throw new RuntimeException("Exception when setting up decisionTree " + e);
         }
         try {
-          // j48tree = (J48) weka.core.SerializationHelper.read(modelFilePath);
-          // if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
+          InputStream inputStream =
+              FlinkJob.class.getResourceAsStream(
+                  "/resources/datasets/DecisionTreeClassify-TAXI-withVeryGood.model");
+          j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
+          if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
 
           // SAMPLE_HEADER=p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
           instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
@@ -141,6 +146,11 @@ public class DecisionTreeClassify extends AbstractTask<String, String> {
       testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
       l.debug("test {}", testInstance);
       System.out.println("Instance: " + testInstance);
+      l.warn("test{}", testInstance);
+
+      if (j48tree == null) {
+        throw new RuntimeException("tree is null");
+      }
 
       int classification = (int) j48tree.classifyInstance(testInstance);
       // int classification = 2;

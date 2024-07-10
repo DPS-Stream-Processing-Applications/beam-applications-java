@@ -14,7 +14,7 @@ public class Sink extends DoFn<MqttPublishEntry, String> {
 
   public Sink(String csvFileNameOutSink) {
     this.csvFileNameOutSink = csvFileNameOutSink;
-    this.gauge = Metrics.gauge(Sink.class, "MyCustomGauge");
+    this.gauge = Metrics.gauge(Sink.class, "Custom_End_to_End_Latency");
   }
 
   @ProcessElement

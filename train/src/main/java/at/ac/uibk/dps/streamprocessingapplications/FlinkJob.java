@@ -138,7 +138,8 @@ public class FlinkJob {
 
     PCollection<TrainEntry> linearRegressionTrain =
         dataFromAzureDB.apply(
-            "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam(p_, dataSetType)));
+            "Multi Var Linear Regression",
+            ParDo.of(new LinearRegressionBeam(p_, dataSetType, databaseUrl)));
 
     PCollection<AnnotateEntry> annotatedData =
         dataFromAzureDB.apply("Annotation", ParDo.of(new AnnotateBeam(p_)));

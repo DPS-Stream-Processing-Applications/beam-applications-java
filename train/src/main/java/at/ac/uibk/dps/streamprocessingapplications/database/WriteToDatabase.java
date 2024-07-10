@@ -5,26 +5,18 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import java.io.*;
+import java.util.Date;
 import org.bson.Document;
 
 public class WriteToDatabase implements Serializable {
 
-  private String databaseUrl;
+  private final String databaseUrl;
 
-  private String dataBaseName;
+  private final String dataBaseName;
 
   public WriteToDatabase(String databaseUrl, String dataBaseName) {
     this.databaseUrl = databaseUrl;
     this.dataBaseName = dataBaseName;
-  }
-
-  private static byte[] readFileToByteArray(String filePath) throws IOException {
-    File file = new File(filePath);
-    byte[] fileData = new byte[(int) file.length()];
-    try (FileInputStream fis = new FileInputStream(file)) {
-      fis.read(fileData);
-    }
-    return fileData;
   }
 
   public void saveFileIntoDb(String path, String key) {
@@ -36,7 +28,8 @@ public class WriteToDatabase implements Serializable {
       byte[] pdfData;
 
       try (InputStream inputStream = FlinkJob.class.getResourceAsStream(path)) {
-        pdfData = inputStream.readAllBytes();
+          assert inputStream != null;
+          pdfData = inputStream.readAllBytes();
       } catch (Exception e) {
         throw new RuntimeException("Exception when trying to save files into db");
       }
@@ -47,6 +40,7 @@ public class WriteToDatabase implements Serializable {
 
       Document document = new Document();
       document.append(key, pdfData);
+      document.append("createdAt", new Date());
       collection.insertOne(document);
 
     } catch (Exception e) {

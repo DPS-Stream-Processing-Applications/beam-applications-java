@@ -19,11 +19,14 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
   String datasetName;
   private Properties p;
 
+  private String dataBaseUrl;
+
   // LinearRegression lr;
 
-  public LinearRegressionBeam(Properties p_, String datasetName) {
+  public LinearRegressionBeam(Properties p_, String datasetName, String dataBaseUrl) {
     this.p = p_;
     this.dataSetType = datasetName;
+    this.dataBaseUrl = dataBaseUrl;
   }
 
   public static void initLogger(Logger l_) {
@@ -34,8 +37,8 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
   public void setup() {
 
     initLogger(LoggerFactory.getLogger("APP"));
-    linearRegressionTrainBatched = new LinearRegressionTrainBatched();
-    linearRegressionTrainBatched.setup(l, p);
+    linearRegressionTrainBatched = new LinearRegressionTrainBatched(dataBaseUrl);
+    linearRegressionTrainBatched.setup(l, p, dataSetType);
   }
 
   @ProcessElement
@@ -54,8 +57,7 @@ public class LinearRegressionBeam extends DoFn<DbEntry, TrainEntry> {
     //        }
     //        out.close();
 
-    HashMap<String, String> map = new HashMap();
-    //        obsVal="22.7,49.3,0,1955.22,27"; //dummy
+    HashMap<String, String> map = new HashMap<>();
     map.put(AbstractTask.DEFAULT_KEY, trainData);
 
     if (dataSetType.equals("SYS")) {

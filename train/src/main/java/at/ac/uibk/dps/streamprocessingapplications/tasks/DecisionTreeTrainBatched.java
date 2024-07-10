@@ -13,7 +13,7 @@ import weka.core.Instances;
  *
  * @author shukla, simmhan
  */
-public class DecisionTreeTrainBatched extends AbstractTask {
+public class DecisionTreeTrainBatched extends AbstractTask<String, ByteArrayOutputStream> {
 
   private static final Object SETUP_LOCK = new Object();
 
@@ -141,20 +141,19 @@ public class DecisionTreeTrainBatched extends AbstractTask {
   }
 
   @Override
-  protected Float doTaskLogic(Map map) throws IOException {
+  protected Float doTaskLogic(Map<String, String> map) throws IOException {
 
     //		m="-71.106167,42.372802,-0.1,65.3,0,367.38,26";
     //		String modelname="TEST-DTC.model"+ UUID.randomUUID();
     //		map.put("FILENAME",modelname);
 
-    String m = (String) map.get(AbstractTask.DEFAULT_KEY);
-    String filename = (String) map.get("FILENAME");
+    String m = map.get(AbstractTask.DEFAULT_KEY);
+    String filename = map.get("FILENAME");
     // String arffContent = new String(Files.readAllBytes(Paths.get(instanceHeader)));
     // instancesBuf = new StringBuffer(arffContent);
     ByteArrayOutputStream model = new ByteArrayOutputStream();
     if (l.isInfoEnabled()) l.info("Range query res:{}", m);
-    System.out.println(modelFilePath);
-    int result = 0;
+    int result;
     try {
 
       // instancesBuf.append("\n").append(m).append("\n");
@@ -162,15 +161,8 @@ public class DecisionTreeTrainBatched extends AbstractTask {
       l.info("instancesBuf-" + instancesBuf.toString());
       StringReader stringReader = new StringReader(instancesBuf.toString());
       result = decisionTreeTrainAndSaveModel(stringReader, filename, model, l);
-
-      /*
-      if(l.isInfoEnabled()) {
-          l.info("Trained Model L.R.-{}", weka.core.SerializationHelper.read(fullFilePath).toString());
-      }
-       */
-
       super.setLastResult(model);
-      if (result >= 0) return (float) 0; // success
+      if (result >= 0) return (float) 0;
 
     } catch (Exception e) {
       l.warn("error training decision tree" + e);

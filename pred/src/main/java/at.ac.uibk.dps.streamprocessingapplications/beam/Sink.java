@@ -13,7 +13,7 @@ public class Sink extends DoFn<MqttPublishEntry, String> {
   private final Gauge gauge;
 
   public Sink() {
-    this.gauge = Metrics.gauge(Sink.class, "MyCustomGauge");
+    this.gauge = Metrics.gauge(Sink.class, "Custom_End_to_End_Latency");
   }
 
   @ProcessElement

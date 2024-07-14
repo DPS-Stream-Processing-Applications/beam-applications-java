@@ -100,15 +100,20 @@ public class DecisionTreeClassify extends AbstractTask<String, String> {
           throw new RuntimeException("Exception when setting up decisionTree " + e);
         }
         try {
-          InputStream inputStream =
-              FlinkJob.class.getResourceAsStream(
-                  "/resources/datasets/DecisionTreeClassify-TAXI-withVeryGood.model");
-          j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
-          if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
-
-          // SAMPLE_HEADER=p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
-          instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
-          if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
+          if (dataSetType.equals("TAXI")) {
+            InputStream inputStream =
+                FlinkJob.class.getResourceAsStream(
+                    "/resources/datasets/DecisionTreeClassify-TAXI-withVeryGood.model");
+            j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
+            instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
+          }
+          if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+            InputStream inputStream =
+                FlinkJob.class.getResourceAsStream(
+                    "/resources/datasets/DecisionTreeClassify-SYS-withExcellent.model");
+            j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
+            instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
+          }
 
           doneSetup = true;
         } catch (Exception e) {
@@ -153,21 +158,10 @@ public class DecisionTreeClassify extends AbstractTask<String, String> {
       }
 
       int classification = (int) j48tree.classifyInstance(testInstance);
-      // int classification = 2;
-      // int classification = 2;
-      // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
-
-      // System.out.println("DT result from task  " + result);
-      if (l.isInfoEnabled()) {
-        l.info(" ----------------------------------------- ");
-        l.info("Test data               : {}", testInstance);
-        // l.info("Test data classification result {}, {}", result, classification);
-      }
       return (float) classification;
     } catch (Exception e) {
       l.warn("error with classification of testInstance: " + testInstance, e);
       throw new RuntimeException(e);
-      // return Float.valueOf(Float.MIN_VALUE);
     }
   }
 }

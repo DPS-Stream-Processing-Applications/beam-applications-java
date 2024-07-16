@@ -50,7 +50,7 @@ The following commands are automatically inlining this IP adress.
 ### Example command for SYS-Data
 ```bash
 flink run -m localhost:8081 \
-    ./pred/build/PredJob.jar \
+    ./pred/build/FlinkJob.jar \
     --databaseUrl=mongodb://adminuser:password123@$(
         kubectl get nodes -o \
             jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
@@ -62,7 +62,7 @@ $(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="Internal
 ### Example command for TAXI-Data
 ```bash
 flink run -m localhost:8081 \
-    ./pred/build/PredJob.jar \
+    ./pred/build/FlinkJob.jar \
     --databaseUrl=mongodb://adminuser:password123@$(
         kubectl get nodes -o \
             jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \
@@ -73,7 +73,7 @@ flink run -m localhost:8081 \
 ### Example command for FIT-Data
 ```bash
 flink run -m localhost:8081 \
-    ./pred/build/PredJob.jar \
+    ./pred/build/FlinkJob.jar \
     --databaseUrl=mongodb://adminuser:password123@$(
         kubectl get nodes -o \
             jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' \

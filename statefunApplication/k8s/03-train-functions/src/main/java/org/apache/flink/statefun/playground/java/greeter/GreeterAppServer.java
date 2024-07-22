@@ -26,6 +26,9 @@ import org.apache.flink.statefun.sdk.java.StatefulFunctions;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public final class GreeterAppServer {
@@ -46,6 +49,11 @@ public final class GreeterAppServer {
         System.out.println(ipAddress);
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
+
+        ZoneId viennaZone = ZoneId.of("Europe/Vienna");
+        ZonedDateTime viennaTime = ZonedDateTime.now(viennaZone);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        System.out.println("Run-TRAIN: " + viennaTime.format(formatter));
 
         final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
         final Undertow httpServer =

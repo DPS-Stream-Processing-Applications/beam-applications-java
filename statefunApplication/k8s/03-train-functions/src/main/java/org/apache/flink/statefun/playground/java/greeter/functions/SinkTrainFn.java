@@ -32,7 +32,7 @@ public class SinkTrainFn implements StatefulFunction {
         initLogger(LoggerFactory.getLogger("APP"));
         MqttPublishEntry mqttPublishEntry = message.as(MqttPublish_ENTRY_JSON_TYPE);
         long latency = System.currentTimeMillis()-mqttPublishEntry.getArrivalTime();
-        l.info("Latency: "+ latency);
+        l. warn("Latency: "+ latency);
         return context.done();
     }
 }

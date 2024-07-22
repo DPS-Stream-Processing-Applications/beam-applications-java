@@ -32,6 +32,7 @@ spec:
       containers:
         - name: functions 
           image: jungerindy/statefun_train:latest
+          #image: train-functions
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -40,7 +41,7 @@ spec:
             - name: MONGO_DB_ADDRESS
               value: "mongodb://adminuser:password123@192.168.58.2:32000/"
             - name: DATASET
-              value: "TAXI"
+              value: "FIT"
           livenessProbe:
             tcpSocket:
               port: 8000

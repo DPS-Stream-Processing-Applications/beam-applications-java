@@ -20,19 +20,18 @@ public class SinkTrainFn implements StatefulFunction {
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(SinkTrainFn::new)
                     .build();
+    private static Logger l;
 
     public static void initLogger(Logger l_) {
         l = l_;
     }
 
-    private static Logger l;
-
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         initLogger(LoggerFactory.getLogger("APP"));
         MqttPublishEntry mqttPublishEntry = message.as(MqttPublish_ENTRY_JSON_TYPE);
-        long latency = System.currentTimeMillis()-mqttPublishEntry.getArrivalTime();
-        l. warn("Latency: "+ latency);
+        long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
+        l.warn("Latency: " + latency);
         return context.done();
     }
 }

@@ -50,7 +50,7 @@ public class WriteToDatabase implements Serializable {
 
     public void prepareDataBaseForApplication() {
         saveFileIntoDb(
-                "resources/DecisionTreeClassify-SYS.arff",
+                "/resources/DecisionTreeClassify-SYS.arff",
                 "DecisionTreeClassify-SYS_arff");
     }
 }

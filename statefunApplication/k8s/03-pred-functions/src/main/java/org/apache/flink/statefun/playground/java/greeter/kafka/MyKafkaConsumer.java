@@ -35,8 +35,6 @@ public class MyKafkaConsumer extends AbstractTask<String, String>
     }
 
     public void run() {
-        System.out.println("Running consumer");
-
         // Create a Kafka consumer instance
         // This consumer receives messages from the Kafka topic asynchronously
         try (KafkaConsumer consumer = createKafkaConsumer()) {

@@ -52,7 +52,6 @@ public final class GreeterAppServer {
         functions.withStatefulFunction(MqttPublishFn.SPEC);
 
         String ipAddress = System.getenv("MONGO_DB_ADDRESS");
-        System.out.println(ipAddress);
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
 
@@ -69,7 +68,6 @@ public final class GreeterAppServer {
         try {
             httpServer.start();
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("Server start: " + e);
         }
     }

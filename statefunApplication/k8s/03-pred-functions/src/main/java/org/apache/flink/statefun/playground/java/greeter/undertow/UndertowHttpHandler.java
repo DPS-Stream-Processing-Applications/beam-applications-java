@@ -74,7 +74,6 @@ public final class UndertowHttpHandler implements HttpHandler {
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
             exchange.getResponseSender().send(responseBytes.asReadOnlyByteBuffer());
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("onComplete: " + e);
         }
 

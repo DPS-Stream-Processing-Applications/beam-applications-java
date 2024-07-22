@@ -52,8 +52,8 @@ public class LinearRegressionTrainFn implements StatefulFunction {
         }
         this.dataSetType = dataSetType;
         initLogger(LoggerFactory.getLogger("APP"));
-        linearRegressionTrainBatched = new LinearRegressionTrainBatched();
-        linearRegressionTrainBatched.setup(l, p);
+        linearRegressionTrainBatched = new LinearRegressionTrainBatched(System.getenv("MONGO_DB_ADDRESS"));
+        linearRegressionTrainBatched.setup(l, p, dataSetType);
     }
 
 

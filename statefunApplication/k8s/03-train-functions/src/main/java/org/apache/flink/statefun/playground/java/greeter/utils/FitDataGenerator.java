@@ -77,25 +77,6 @@ public class FitDataGenerator {
                     Measurement measurement = gson.fromJson(json, Measurement.class);
 
                     for (SensorData entry : measurement.getSensorDataList()) {
-
-                        if (Objects.equals(entry.getN(), "acc_ankle_x")) {
-                            fitData.setAcc_ankle_x(entry.getV());
-                        }
-                        if (Objects.equals(entry.getN(), "acc_ankle_y")) {
-                            fitData.setAcc_ankle_y(entry.getV());
-                        }
-                        if (Objects.equals(entry.getN(), "acc_ankle_z")) {
-                            fitData.setAcc_ankle_z(entry.getV());
-                        }
-                        if (Objects.equals(entry.getN(), "acc_arm_x")) {
-                            fitData.setAcc_arm_x(entry.getV());
-                        }
-                        if (Objects.equals(entry.getN(), "acc_arm_y")) {
-                            fitData.setAcc_arm_y(entry.getV());
-                        }
-                        if (Objects.equals(entry.getN(), "acc_arm_z")) {
-                            fitData.setAcc_arm_z(entry.getV());
-                        }
                         if (Objects.equals(entry.getN(), "acc_chest_x")) {
                             fitData.setAcc_chest_x(entry.getV());
                         }
@@ -108,6 +89,68 @@ public class FitDataGenerator {
                         if (Objects.equals(entry.getN(), "ecg_lead_1")) {
                             fitData.setEcg_lead_1(entry.getV());
                         }
+                        if (Objects.equals(entry.getN(), "ecg_lead_2")) {
+                            fitData.setEcg_lead_2(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_ankle_x")) {
+                            fitData.setAcc_ankle_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_ankle_y")) {
+                            fitData.setAcc_ankle_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_ankle_z")) {
+                            fitData.setAcc_ankle_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_ankle_x")) {
+                            fitData.setGyro_ankle_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_ankle_y")) {
+                            fitData.setGyro_ankle_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_ankle_z")) {
+                            fitData.setGyro_ankle_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_ankle_x")) {
+                            fitData.setMagnetometer_ankle_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_ankle_y")) {
+                            fitData.setMagnetometer_ankle_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_ankle_z")) {
+                            fitData.setMagnetometer_ankle_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_x")) {
+                            fitData.setAcc_arm_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_y")) {
+                            fitData.setAcc_arm_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "acc_arm_z")) {
+                            fitData.setAcc_arm_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_arm_x")) {
+                            fitData.setGyro_arm_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_arm_y")) {
+                            fitData.setGyro_arm_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "gyro_arm_z")) {
+                            fitData.setGyro_arm_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_arm_x")) {
+                            fitData.setMagnetometer_arm_x(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_arm_y")) {
+                            fitData.setMagnetometer_arm_y(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "magnetometer_arm_z")) {
+                            fitData.setMagnetometer_arm_z(entry.getV());
+                        }
+                        if (Objects.equals(entry.getN(), "label")) {
+                            fitData.setLabel(entry.getV());
+                        }
+
+
                     }
                 }
             } else {

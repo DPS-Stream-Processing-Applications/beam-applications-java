@@ -26,4 +26,4 @@ WORKDIR /
 COPY resources resources/
 COPY --from=builder /usr/src/app/target/pred-statefun*jar-with-dependencies.jar  pred-statefun.jar
 EXPOSE 8000
-CMD java -jar pred-statefun.jar
+CMD ["java", "-jar", "pred-statefun.jar"]

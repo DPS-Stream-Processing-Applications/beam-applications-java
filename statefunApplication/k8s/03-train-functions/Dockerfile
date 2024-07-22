@@ -26,4 +26,4 @@ WORKDIR /
 COPY resources resources/
 COPY --from=builder /usr/src/app/target/train-statefun*jar-with-dependencies.jar  train-statefun.jar
 EXPOSE 8000
-CMD java -jar train-statefun.jar
+CMD ["java", "-jar", "train-statefun.jar"]

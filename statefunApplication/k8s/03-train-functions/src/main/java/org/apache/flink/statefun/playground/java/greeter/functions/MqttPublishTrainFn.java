@@ -49,7 +49,7 @@ public class MqttPublishTrainFn implements StatefulFunction {
             throw new RuntimeException(e);
         }
         this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
-        this.topic = "train-topic-2";
+        this.topic = "train-publish";
         initLogger(LoggerFactory.getLogger("APP"));
         myKafkaProducer = new MyKafkaProducer(server, topic, p);
         myKafkaProducer.setup(l, p);

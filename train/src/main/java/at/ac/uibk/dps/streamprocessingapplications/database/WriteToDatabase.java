@@ -28,8 +28,8 @@ public class WriteToDatabase implements Serializable {
       byte[] pdfData;
 
       try (InputStream inputStream = FlinkJob.class.getResourceAsStream(path)) {
-          assert inputStream != null;
-          pdfData = inputStream.readAllBytes();
+        assert inputStream != null;
+        pdfData = inputStream.readAllBytes();
       } catch (Exception e) {
         throw new RuntimeException("Exception when trying to save files into db");
       }

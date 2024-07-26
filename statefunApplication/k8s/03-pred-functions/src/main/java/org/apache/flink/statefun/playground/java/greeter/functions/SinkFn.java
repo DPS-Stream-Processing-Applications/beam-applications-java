@@ -33,6 +33,7 @@ public class SinkFn implements StatefulFunction {
         if (mqttPublishEntry.getArrivalTime() != 0L) {
             long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
             l.warn("Latency: " + latency);
+            System.out.println("Latency: " + latency);
         }
         return context.done();
     }

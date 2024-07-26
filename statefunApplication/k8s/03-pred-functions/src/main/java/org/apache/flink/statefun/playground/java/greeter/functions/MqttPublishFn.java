@@ -51,13 +51,14 @@ public class MqttPublishFn implements StatefulFunction {
         }
         this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
         this.topic = "pred-publish";
-        myKafkaProducer = new MyKafkaProducer(server, topic, p);
-        myKafkaProducer.setup(l, p);
+        //myKafkaProducer = new MyKafkaProducer(server, topic, p);
+        //myKafkaProducer.setup(l, p);
 
     }
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
+
         setup();
         try {
             if (message.is(DECISION_TREE_ENTRY_JSON_TYPE)) {
@@ -86,7 +87,7 @@ public class MqttPublishFn implements StatefulFunction {
 
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-                myKafkaProducer.doTask(map);
+                //myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, decisionTreeEntry.getDataSetType());
                 mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
                 context.send(
@@ -121,7 +122,7 @@ public class MqttPublishFn implements StatefulFunction {
 
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-                myKafkaProducer.doTask(map);
+                //myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, errorEstimateEntry.getDataSetType());
                 mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(

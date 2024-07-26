@@ -1,9 +1,17 @@
 package org.apache.flink.statefun.playground.java.greeter.tasks;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
+import org.bson.Document;
+import org.bson.types.Binary;
 
 import java.io.*;
 import java.util.HashMap;
@@ -53,10 +61,21 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "%header format";
     private static Instances instanceHeader;
 
-    private ReadFromDatabaseTask readFromDatabaseTask;
+    //private ReadFromDatabaseTask readFromDatabaseTask;
+
+    private  MongoClient mongoClient;
+    private  MongoDatabase database;
 
     public LinearRegressionPredictor(String databaseUrl, String databaseName) {
-        readFromDatabaseTask = new ReadFromDatabaseTask(databaseUrl, databaseName);
+        //readFromDatabaseTask = new ReadFromDatabaseTask(databaseUrl, databaseName);
+        /*
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString(databaseUrl))
+                .build();
+
+         */
+        //this.mongoClient = MongoClients.create(settings);
+        //this.database = mongoClient.getDatabase(databaseName);
     }
 
     /**
@@ -74,15 +93,36 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
 
                 // modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
                 modelFilePath = "LR-TAXI-Numeric_model";
-                readFromDatabaseTask.setup(l, p_);
+                //readFromDatabaseTask.setup(l, p_);
                 HashMap<String, String> map = new HashMap<>();
                 map.put("fileName", modelFilePath);
+                /*
                 synchronized (DATABASE_LOCK) {
                     readFromDatabaseTask.doTask(map);
                 }
                 byte[] csvContent = readFromDatabaseTask.getLastResult();
-                if (csvContent == null) {
-                    throw new RuntimeException("csvContent is null");
+
+                 */
+                byte[] csvContent;
+                try {
+                    MongoCollection<Document> collection = database.getCollection("pdfCollection");
+
+                    Document query = new Document(modelFilePath, new Document("$exists", true));
+                    Document projection = new Document(modelFilePath, 1).append("_id", 0);
+
+                    byte[] pdfData = null;
+                    for (Document document : collection.find(query).projection(projection)) {
+                        Binary pdfBinary = (Binary) document.get(modelFilePath);
+                        pdfData = pdfBinary.getData();
+                    }
+                    csvContent = pdfData;
+                    if (pdfData == null) {
+                        throw new RuntimeException("null content in db");
+                    }
+
+                } catch (Exception e) {
+                    l.error("Error in read from db", e);
+                    throw new RuntimeException(e);
                 }
 
                 try {
@@ -159,8 +199,8 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 throw new RuntimeException("lr is null");
 
             }
-            int prediction = (int) lr.classifyInstance(testInstance);
-            // int prediction = 1;
+            //int prediction = (int) lr.classifyInstance(testInstance);
+             int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);

@@ -54,7 +54,7 @@ public final class GreeterAppServer {
         String ipAddress = System.getenv("MONGO_DB_ADDRESS");
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
-        System.out.println(System.getenv("DATASET"));
+        System.out.println("PRED-"+System.getenv("DATASET"));
 
 
         final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();

@@ -64,7 +64,6 @@ public class DecisionTreeFn implements StatefulFunction {
             if (message.is(SENML_ENTRY_JSON_TYPE)) {
 
                 SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
-                arrivalTime = senMlEntry.getArrivalTime();
                 setup(senMlEntry.getDataSetType());
                 String sensorMeta = senMlEntry.getMeta();
 
@@ -82,6 +81,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", senMlEntry.getDataSetType());
+                        decisionTreeEntry.setArrivalTime(senMlEntry.getArrivalTime());
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)

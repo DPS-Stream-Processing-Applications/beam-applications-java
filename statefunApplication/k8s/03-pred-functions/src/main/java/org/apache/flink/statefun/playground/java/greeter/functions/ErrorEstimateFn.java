@@ -57,7 +57,6 @@ public class ErrorEstimateFn implements StatefulFunction {
             if (message.is(LINEAR_REGRESSION_ENTRY_JSON_TYPE)) {
                 LinearRegressionEntry linearRegressionEntry = message.as(LINEAR_REGRESSION_ENTRY_JSON_TYPE);
                 setup(linearRegressionEntry.getDataSetType());
-                arrivalTime = linearRegressionEntry.getArrivalTime();
                 String msgId = linearRegressionEntry.getMsgid();
                 String analyticsType = linearRegressionEntry.getAnalyticType();
 
@@ -93,6 +92,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                         errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
                     }
                     ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, linearRegressionEntry.getDataSetType());
+                    errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
                     context.send(
                             MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
                                     .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)

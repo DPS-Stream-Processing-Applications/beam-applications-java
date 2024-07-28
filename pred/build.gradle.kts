@@ -21,9 +21,10 @@ dependencies {
   implementation("org.apache.beam:beam-runners-direct-java:2.54.0")
   implementation("org.apache.beam:beam-runners-flink-1.16:2.54.0")
   implementation("org.apache.beam:beam-sdks-java-io-kafka:2.54.0")
-  implementation("org.slf4j:slf4j-jdk14:1.7.32")
-  implementation("ch.qos.logback:logback-classic:1.3.11")
-  implementation("org.apache.logging.log4j:log4j-core:2.23.1")
+  // implementation("org.slf4j:slf4j-jdk14:1.7.32")
+  // implementation("org.slf4j:slf4j-jdk11:1.7.32")
+  // implementation("ch.qos.logback:logback-classic:1.3.11")
+  implementation("org.apache.logging.log4j:log4j-core:2.17.1")
   implementation("org.json:json:20240205")
   implementation("com.microsoft.azure:azure-storage:4.0.0")
   implementation("nz.ac.waikato.cms.weka:weka-stable:3.6.6")
@@ -62,7 +63,8 @@ tasks.named<Jar>("jar") {
   exclude("META-INF/*.RSA")
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-  from("src/main/resources/logback.xml")
-  from("\"src/main/resources/log4j2.xml")
+  // from("src/main/resources/logback.xml")
+  // from("src/main/resources/log4j2.xml")
+  from("src/main/resources/log4j.properties")
   isZip64 = true
 }

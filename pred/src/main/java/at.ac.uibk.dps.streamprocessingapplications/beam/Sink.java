@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Sink extends DoFn<MqttPublishEntry, String> {
-  private static final Logger LOG = LoggerFactory.getLogger("APP");
+  private static final Logger LOG = LoggerFactory.getLogger(Sink.class);
 
   private final Gauge gauge;
 
@@ -23,7 +23,9 @@ public class Sink extends DoFn<MqttPublishEntry, String> {
     if (input.getArrivalTime() != 0L) {
       long latency = System.currentTimeMillis() - input.getArrivalTime();
       gauge.set(latency);
+      LOG.warn("Lat: " + latency);
     }
+    System.out.println("test " + input.getMsgid());
     out.output(msgId);
   }
 }

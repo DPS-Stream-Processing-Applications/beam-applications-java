@@ -31,7 +31,7 @@ kubectl create -f 01-minio -n statefun
 ## Create the function:
 
 Ensure to modify the environment variables in the `functions-service.yaml` file located in the `03-train-functions` folder and `03-pred-functions` folder.
-This file exists in each folder, depending on whether you want to use ``TAXI` or `FIT`.
+This file exists in each folder, depending on whether you want to use ``TAXI``, ``SYS`` or ``FIT``.
 ### For the train application
 
 ```
@@ -69,15 +69,6 @@ kubectl create -f 04-statefun -n statefun
 Now you can explore Apache Flink's WEB interface:
 
 [http://localhost:8081/#/overview](http://localhost:8081/#/overview)
-
-## Start the nkafkaProducer
-
-Make sure to forward the kafka port via kubernetes
-
-For the pred application
-```bash
-../gradlew run --args $(pwd)/test.csv
-```
 
 ## Teardown
 

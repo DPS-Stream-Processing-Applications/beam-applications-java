@@ -82,7 +82,7 @@ public class XMLParse extends AbstractTask {
         String m = (String) map.get(AbstractTask.DEFAULT_KEY);
         // for now code is independent of incoming message
         int tot_length = doXMLparseOp(xmlFileAsString, l);
-        return Float.valueOf(tot_length);
+        return (float) tot_length;
     }
 
     public static final class StudentRecordHandler extends DefaultHandler {
@@ -120,7 +120,7 @@ public class XMLParse extends AbstractTask {
         }
 
         @Override
-        public void characters(char ch[], int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length) throws SAXException {
             if (bFirstName) {
                 valueLength += length + 1;
                 bFirstName = false;

@@ -51,8 +51,8 @@ public class MqttPublishFn implements StatefulFunction {
         }
         this.server = "kafka-cluster-kafka-bootstrap.default.svc:9092";
         this.topic = "pred-publish";
-        //myKafkaProducer = new MyKafkaProducer(server, topic, p);
-        //myKafkaProducer.setup(l, p);
+        myKafkaProducer = new MyKafkaProducer(server, topic, p);
+        myKafkaProducer.setup(l, p);
 
     }
 
@@ -87,7 +87,7 @@ public class MqttPublishFn implements StatefulFunction {
 
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-                //myKafkaProducer.doTask(map);
+                myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, decisionTreeEntry.getDataSetType());
                 mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
                 context.send(
@@ -122,7 +122,7 @@ public class MqttPublishFn implements StatefulFunction {
 
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-                //myKafkaProducer.doTask(map);
+                myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, errorEstimateEntry.getDataSetType());
                 mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(

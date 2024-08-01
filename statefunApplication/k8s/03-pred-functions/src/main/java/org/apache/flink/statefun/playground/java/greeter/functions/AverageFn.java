@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static org.apache.flink.statefun.playground.java.greeter.types.Types.AVERAGE_ENTRY_JSON_TYPE;
@@ -55,9 +52,7 @@ public class AverageFn implements StatefulFunction {
         String useMsgField = p.getProperty("AGGREGATE.BLOCK_AVERAGE.USE_MSG_FIELD");
         String[] msgField = useMsgField.split(",");
         useMsgList = new ArrayList<>();
-        for (String s : msgField) {
-            useMsgList.add(s);
-        }
+        Collections.addAll(useMsgList, msgField);
         initLogger(l);
     }
 

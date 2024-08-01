@@ -63,9 +63,8 @@ public class MqttPublishTrainFn implements StatefulFunction {
         String msgId = blobUploadEntry.getMsgid();
         String filename = blobUploadEntry.getFileName();
 
-        HashMap<String, String> map = new HashMap();
+        HashMap<String, String> map = new HashMap<>();
         map.put(AbstractTask.DEFAULT_KEY, filename);
-        Float res = 93f;
         myKafkaProducer.doTask(map);
         MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId);
         mqttPublishEntry.setArrivalTime(blobUploadEntry.getArrivalTime());

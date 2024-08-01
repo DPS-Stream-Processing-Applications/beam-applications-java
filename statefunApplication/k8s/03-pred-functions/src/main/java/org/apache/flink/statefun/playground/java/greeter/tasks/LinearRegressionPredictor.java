@@ -6,12 +6,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.types.Binary;
 import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
-import org.bson.Document;
-import org.bson.types.Binary;
 
 import java.io.*;
 import java.util.HashMap;
@@ -61,21 +61,15 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "%header format";
     private static Instances instanceHeader;
 
-    //private ReadFromDatabaseTask readFromDatabaseTask;
-
-    private  MongoClient mongoClient;
-    private  MongoDatabase database;
+    private MongoClient mongoClient;
+    private MongoDatabase database;
 
     public LinearRegressionPredictor(String databaseUrl, String databaseName) {
-        //readFromDatabaseTask = new ReadFromDatabaseTask(databaseUrl, databaseName);
-        /*
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(databaseUrl))
                 .build();
-
-         */
-        //this.mongoClient = MongoClients.create(settings);
-        //this.database = mongoClient.getDatabase(databaseName);
+        this.mongoClient = MongoClients.create(settings);
+        this.database = mongoClient.getDatabase(databaseName);
     }
 
     /**
@@ -91,7 +85,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 useMsgField =
                         Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
 
-                // modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
+                //modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
                 modelFilePath = "LR-TAXI-Numeric_model";
                 //readFromDatabaseTask.setup(l, p_);
                 HashMap<String, String> map = new HashMap<>();
@@ -199,8 +193,8 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 throw new RuntimeException("lr is null");
 
             }
-            //int prediction = (int) lr.classifyInstance(testInstance);
-             int prediction = 1;
+            int prediction = (int) lr.classifyInstance(testInstance);
+            //int prediction = 1;
             if (l.isInfoEnabled()) {
                 l.info(" ----------------------------------------- ");
                 l.info("Test data               : {}", testInstance);

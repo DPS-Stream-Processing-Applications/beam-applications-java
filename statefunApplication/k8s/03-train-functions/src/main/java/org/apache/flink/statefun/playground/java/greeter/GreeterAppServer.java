@@ -25,13 +25,10 @@ import org.apache.flink.statefun.playground.java.greeter.undertow.UndertowHttpHa
 import org.apache.flink.statefun.sdk.java.StatefulFunctions;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 
-import java.io.IOException;
-
-
 public final class GreeterAppServer {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         final StatefulFunctions functions = new StatefulFunctions();
         functions.withStatefulFunction(TimerSourceFn.SPEC);
         functions.withStatefulFunction(AnnotateFn.SPEC);
@@ -45,7 +42,7 @@ public final class GreeterAppServer {
         String ipAddress = System.getenv("MONGO_DB_ADDRESS");
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
-        System.out.println("TRAIN-"+System.getenv("DATASET"));
+        System.out.println("TRAIN-" + System.getenv("DATASET"));
 
         final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
         final Undertow httpServer =

@@ -32,6 +32,7 @@ data:
     metrics.reporter.prom.port: 9999
     # Added for latency tracking
     taskmanager.latency-tracking-interval: 30000  # 30000 milliseconds (30 seconds)
+    metrics.latency.interval: 30000
 
   log4j-console.properties: |+
           monitorInterval=30

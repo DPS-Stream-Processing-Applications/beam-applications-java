@@ -41,7 +41,7 @@ spec:
             - name: MONGO_DB_ADDRESS
               value: "mongodb://adminuser:password123@192.168.58.2:32000/"
             - name: DATASET
-              value: "TAXI"
+              value: "FIT"
           livenessProbe:
             tcpSocket:
               port: 8000

@@ -33,6 +33,8 @@ data:
     # Added for latency tracking
     taskmanager.latency-tracking-interval: 30000  # 30000 milliseconds (30 seconds)
     metrics.latency.interval: 30000
+    taskmanager.network.memory.buffer-debloat.enabled: true
+
 
   log4j-console.properties: |+
           monitorInterval=30

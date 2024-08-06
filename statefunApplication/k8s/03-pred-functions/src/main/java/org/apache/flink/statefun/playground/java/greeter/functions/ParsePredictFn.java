@@ -135,7 +135,7 @@ public class ParsePredictFn implements StatefulFunction {
                             obsVal.toString(),
                             "MSGTYPE",
                             "DumbType", sourceEntry.getDataSetType());
-            senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
+            //senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(senMlEntry.getMsgid()))

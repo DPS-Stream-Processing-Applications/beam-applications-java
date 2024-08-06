@@ -92,7 +92,7 @@ public class LinearRegressionFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", senMlEntry.getDataSetType());
-                        linearRegressionEntry.setArrivalTime(arrivalTime);
+                        //linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
                                         .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
@@ -154,7 +154,7 @@ public class LinearRegressionFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", blobReadEntry.getDataSetType());
-                        linearRegressionEntry.setArrivalTime(arrivalTime);
+                        //linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
                                         .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)

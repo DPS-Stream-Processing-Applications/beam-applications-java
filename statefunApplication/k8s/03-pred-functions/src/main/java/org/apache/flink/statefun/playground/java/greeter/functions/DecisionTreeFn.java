@@ -81,7 +81,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", senMlEntry.getDataSetType());
-                        decisionTreeEntry.setArrivalTime(senMlEntry.getArrivalTime());
+                        //decisionTreeEntry.setArrivalTime(senMlEntry.getArrivalTime());
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)
@@ -129,7 +129,7 @@ public class DecisionTreeFn implements StatefulFunction {
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
                         DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", blobReadEntry.getDataSetType());
-                        decisionTreeEntry.setArrivalTime(arrivalTime);
+                        //decisionTreeEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
                                         .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)

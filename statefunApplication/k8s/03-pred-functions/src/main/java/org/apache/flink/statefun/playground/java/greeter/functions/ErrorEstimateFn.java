@@ -92,7 +92,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                         errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
                     }
                     ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, linearRegressionEntry.getDataSetType());
-                    errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
+                    //errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
                     context.send(
                             MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
                                     .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)
@@ -130,7 +130,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                     }
                     if (l.isInfoEnabled()) l.info(("errval -" + errval));
                     ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, averageEntry.getDataSetType());
-                    errorEstimateEntry.setArrivalTime(arrivalTime);
+                    //errorEstimateEntry.setArrivalTime(arrivalTime);
                     context.send(
                             MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
                                     .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)

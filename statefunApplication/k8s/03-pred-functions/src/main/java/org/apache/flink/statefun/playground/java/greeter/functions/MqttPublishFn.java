@@ -89,7 +89,7 @@ public class MqttPublishFn implements StatefulFunction {
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
                 myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, decisionTreeEntry.getDataSetType());
-                mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
+                //mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
                                 .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)
@@ -124,7 +124,7 @@ public class MqttPublishFn implements StatefulFunction {
                 map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
                 myKafkaProducer.doTask(map);
                 MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, errorEstimateEntry.getDataSetType());
-                mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
+                //mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
                                 .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)

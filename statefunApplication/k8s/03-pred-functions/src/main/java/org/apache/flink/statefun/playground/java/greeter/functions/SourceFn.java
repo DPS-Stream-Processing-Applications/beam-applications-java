@@ -144,9 +144,11 @@ public final class SourceFn implements StatefulFunction {
 
             msgId += 1;
             context.storage().set(MSGID_COUNT, msgId);
+            /*
             if (msgId % 100 == 0) {
                 sourceEntry.setArrivalTime(System.currentTimeMillis());
             }
+             */
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(sourceEntry.getMsgid()))

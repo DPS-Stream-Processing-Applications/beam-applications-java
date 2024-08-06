@@ -201,14 +201,12 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 l.info("Test data prediction result {}", prediction);
             }
 
-            // set parent to have the actual predictions
             return super.setLastResult((float) prediction);
 
         } catch (Exception e) {
             l.warn("error with classification of testInstance: " + testInstance, e);
-            // set parent to have the actual predictions
-            throw new RuntimeException("Exception in doTaskLogic of Linear_Reg_Pred " + e);
-            // return super.setLastResult(Float.MIN_VALUE);
+            //throw new RuntimeException("Exception in doTaskLogic of Linear_Reg_Pred " + e);
+            return super.setLastResult(Float.MIN_VALUE);
         }
     }
 }

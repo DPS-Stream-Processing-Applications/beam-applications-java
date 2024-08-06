@@ -63,7 +63,7 @@ public final class GreeterAppServer {
                         .addHttpListener(8000, "0.0.0.0")
                         .setHandler(new UndertowHttpHandler(requestReplyHandler))
                         .setWorkerThreads(1000)
-                        .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 100 * 1000)   // 60 seconds no request timeout
+                        .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 300 * 1000)
                         .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                         .build();
         try {

@@ -41,6 +41,7 @@ dependencies {
     implementation("org.apache.beam:beam-sdks-java-io-kafka")
     implementation("org.apache.beam:beam-sdks-java-io-mongodb")
     implementation("org.apache.beam:beam-runners-flink-$flinkVersion")
+    implementation("org.apache.beam:beam-runners-direct-java")
 
     implementation("org.slf4j:slf4j-jdk14:$slf4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")

@@ -1,10 +1,5 @@
 plugins {
     id("java")
-    /* NOTE:
-     * Using the Java `toolchain` a specific java version and implementation can be specified.
-     * the following resolver allows gradle to install this java version if it is not available on the build machine.
-     */
-    // id("org.gradle.toolchains.foojay-resolver-convention")
 }
 
 repositories {
@@ -31,11 +26,18 @@ val junitJupiterVersion = "5.10.3"
 val hamcrestVersion = "2.2"
 
 dependencies {
-    implementation("org.apache.beam:beam-sdks-java-core:$beamVersion")
-    implementation("org.apache.beam:beam-runners-direct-java:$beamVersion")
-    implementation("org.apache.beam:beam-runners-flink-$flinkVersion:$beamVersion")
-    implementation("org.apache.beam:beam-sdks-java-io-kafka:$beamVersion")
-    implementation("org.apache.beam:beam-sdks-java-io-mongodb:$beamVersion")
+    implementation(platform("org.apache.beam:beam-sdks-java-google-cloud-platform-bom:$beamVersion"))
+    /* INFO:
+     * The Bill Of Materials (BOM) handles the suggested versions for all the Beam dependencies.
+     * No additional versions need to be specified.
+     */
+    implementation("org.apache.beam:beam-sdks-java-core")
+    // implementation("org.apache.beam:beam-runners-direct-java")
+    implementation("org.apache.beam:beam-sdks-java-io-kafka")
+    implementation("org.apache.beam:beam-sdks-java-io-mongodb")
+    implementation("org.apache.beam:beam-runners-flink-$flinkVersion")
+    implementation("org.apache.beam:beam-runners-direct-java")
+
     implementation("org.slf4j:slf4j-jdk14:$slf4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaClientsVersion")

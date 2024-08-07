@@ -2,6 +2,7 @@ plugins {
   id("java")
   // INFO: This plugin is in `buildSrc` and manages shared dependencies.
   id("flink-job-conventions")
+  id ("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories { mavenCentral() }
@@ -10,6 +11,11 @@ dependencies {
   implementation("org.json:json:20240205")
   implementation(project(":shared"))
   implementation("commons-cli:commons-cli:1.8.0")
+}
+
+tasks.shadowJar {
+  setProperty("zip64", true)
+  mergeServiceFiles()
 }
 
 tasks.named<Jar>("jar") {

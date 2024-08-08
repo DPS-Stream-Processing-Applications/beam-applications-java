@@ -44,6 +44,7 @@ tasks {
   }
 
   shadowJar {
+    from("src/main/resources") { into("resources") }
     archiveBaseName = jar.get().archiveBaseName
     archiveClassifier = jar.get().archiveClassifier
     destinationDirectory = jar.get().destinationDirectory

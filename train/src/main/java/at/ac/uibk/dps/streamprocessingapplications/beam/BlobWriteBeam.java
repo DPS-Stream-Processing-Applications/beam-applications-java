@@ -55,7 +55,9 @@ public class BlobWriteBeam extends DoFn<TrainEntry, BlobUploadEntry> {
 
     if (res != null) {
       if (blobRes != Float.MIN_VALUE) {
-        out.output(new BlobUploadEntry(msgId, fileName));
+        BlobUploadEntry blobUploadEntry = new BlobUploadEntry(msgId, fileName);
+        blobUploadEntry.setArrivalTime(input.getArrivalTime());
+        out.output(blobUploadEntry);
       } else {
         if (l.isWarnEnabled()) l.warn("Error in AzureBlobUploadTaskBolt");
         throw new RuntimeException();

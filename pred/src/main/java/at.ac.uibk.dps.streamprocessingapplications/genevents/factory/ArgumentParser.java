@@ -29,7 +29,7 @@ public class ArgumentParser {
       argumentClass.setTopoName("IdentityTopology");
       argumentClass.setTasksName("bench");
       argumentClass.setBootStrapServerKafka("kafka-cluster-kafka-bootstrap:9092");
-      argumentClass.setKafkaTopic("senml-source");
+      argumentClass.setKafkaTopic("senml-cleaned");
       return argumentClass;
     }
   }

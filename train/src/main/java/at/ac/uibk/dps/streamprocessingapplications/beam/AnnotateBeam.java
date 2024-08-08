@@ -46,6 +46,7 @@ public class AnnotateBeam extends DoFn<DbEntry, AnnotateEntry> {
     String annotData = annotateDTClass.getLastResult();
 
     AnnotateEntry entry = new AnnotateEntry(msgId, annotData, rowkeyend);
+    entry.setArrivalTime(input.getArrivalTime());
     out.output(entry);
   }
 }

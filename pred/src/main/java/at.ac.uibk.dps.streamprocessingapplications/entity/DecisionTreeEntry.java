@@ -9,6 +9,7 @@ public class DecisionTreeEntry implements Serializable, MqttPublishInput {
   private String msgid;
   private String res;
   private String analyticType;
+  private long arrivalTime;
 
   public DecisionTreeEntry(
       String meta, String obsval, String msgid, String res, String analyticType) {
@@ -57,6 +58,14 @@ public class DecisionTreeEntry implements Serializable, MqttPublishInput {
 
   public void setAnalyticType(String analyticType) {
     this.analyticType = analyticType;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

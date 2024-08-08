@@ -56,6 +56,6 @@ public class MqttPublishBeam extends DoFn<BlobUploadEntry, MqttPublishEntry> {
     }
 
      */
-    out.output(new MqttPublishEntry(msgId));
+    out.output(new MqttPublishEntry(msgId, input.getArrivalTime()));
   }
 }

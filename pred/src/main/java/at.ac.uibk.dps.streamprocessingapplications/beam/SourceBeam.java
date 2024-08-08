@@ -18,17 +18,12 @@ import org.slf4j.LoggerFactory;
 public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticEventGen {
 
   private static Logger l;
-
+  private final String datasetType;
   BlockingQueue<List<String>> eventQueue;
   String csvFileName;
   String outSpoutCSVLogFileName;
   String experiRunId;
   long msgId;
-  private final String datasetType;
-
-  public static void initLogger(Logger l_) {
-    l = l_;
-  }
 
   public SourceBeam(
       String csvFileName, String outSpoutCSVLogFileName, String experiRunId, String datasetType) {
@@ -40,6 +35,10 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
 
   public SourceBeam(String csvFileName, String outSpoutCSVLogFileName, String datasetType) {
     this(csvFileName, outSpoutCSVLogFileName, "", datasetType);
+  }
+
+  public static void initLogger(Logger l_) {
+    l = l_;
   }
 
   private long extractTimeStamp(String row) {
@@ -104,6 +103,10 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
       l.info(newRow);
       values.setMsgid(Long.toString(msgId));
       values.setPayLoad(newRow);
+      if (msgId % 100 == 0) {
+        values.setArrivalTime(System.currentTimeMillis());
+      }
+
       out.output(values);
       msgId++;
     } catch (Exception e) {

@@ -93,7 +93,9 @@ public class DecisionTreeBeam extends DoFn<AnnotateEntry, TrainEntry> {
 
     if (res != null) {
       if (res != Float.MIN_VALUE) {
-        out.output(new TrainEntry("model", msgid, rowKeyEnd, "MLR", filename));
+        TrainEntry trainEntry = new TrainEntry("model", msgid, rowKeyEnd, "MLR", filename);
+        trainEntry.setArrivalTime(input.getArrivalTime());
+        out.output(trainEntry);
 
       } else {
         if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBeam");

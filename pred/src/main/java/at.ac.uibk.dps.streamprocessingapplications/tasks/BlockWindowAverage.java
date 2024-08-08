@@ -28,10 +28,7 @@ public class BlockWindowAverage extends AbstractTask<String, Float> {
     super.setup(l_, p_);
     synchronized (SETUP_LOCK) { // for static fields
       if (!doneSetup) { // Do setup only once static objects for this task
-        aggCountWindowSize =
-            Integer.parseInt(p_.getProperty("AGGREGATE.BLOCK_COUNT.WINDOW_SIZE")); // TODO: Later,
-        // rename to
-        // BLOCK_AVG
+        aggCountWindowSize = Integer.parseInt(p_.getProperty("AGGREGATE.BLOCK_COUNT.WINDOW_SIZE"));
         useMsgField = Integer.parseInt(p_.getProperty("AGGREGATE.BLOCK_COUNT.USE_MSG_FIELD"));
         doneSetup = true;
       }

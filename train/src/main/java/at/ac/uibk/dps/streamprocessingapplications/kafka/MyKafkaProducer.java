@@ -14,12 +14,10 @@ import org.apache.kafka.common.serialization.LongSerializer;
 
 public class MyKafkaProducer extends AbstractTask<String, String>
     implements Callback, Serializable {
+  private static int useMsgField;
+  protected AtomicLong messageCount = new AtomicLong(0);
   private String bootstrapServer;
   private String topic;
-
-  private static int useMsgField;
-
-  protected AtomicLong messageCount = new AtomicLong(0);
 
   public MyKafkaProducer(String BOOTSTRAP_SERVERS, String topic, Properties p_) {
     this.bootstrapServer = BOOTSTRAP_SERVERS;

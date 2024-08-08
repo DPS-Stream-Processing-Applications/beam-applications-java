@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
 
   private static final Object SETUP_LOCK = new Object();
-  // TODO: remove init values after config.properties has been initialized
   private static String storageConnStr;
   private static String tableName;
   private static String partitionKey;
@@ -129,13 +128,9 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
     super.setup(l_, p_);
     synchronized (SETUP_LOCK) {
       if (!doneSetup) { // Do setup only once for this task
-        storageConnStr =
-            p_.getProperty("IO.AZURE_STORAGE_CONN_STR"); // TODO: add to config.property file
-        tableName =
-            p_.getProperty("IO.AZURE_TABLE.TABLE_NAME"); // TODO: pass table with TaxiDropoff
-        // Entity
-        partitionKey = p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY"); // TODO: pass partition with
-        // TaxiDropoff Entity
+        storageConnStr = p_.getProperty("IO.AZURE_STORAGE_CONN_STR");
+        tableName = p_.getProperty("IO.AZURE_TABLE.TABLE_NAME");
+        partitionKey = p_.getProperty("IO.AZURE_TABLE.PARTITION_KEY");
         useMsgField =
             Integer.parseInt(
                 p_.getProperty(
@@ -145,7 +140,6 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
         startRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.START_ROW_KEY"));
         endRowKey = Integer.parseInt(p_.getProperty("IO.AZURE_TABLE.END_ROW_KEY"));
 
-        // FIXME! Here could be the full dataset
         rn = new Random();
         doneSetup = true;
       }
@@ -157,8 +151,6 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
     String rowKeyStart, rowKeyEnd;
     CloudTable cloudTbl = connectToAzTable(storageConnStr, tableName, l);
     if (l.isInfoEnabled()) l.info("Table name is - " + cloudTbl.getName());
-    // FIXME: How do you advance the rowkey. Have a start and end for row key as input property?
-    //		String rowKeyStart,rowKeyEnd;
     if (useMsgField > 0) {
       //			rowKey = m.split(",")[useMsgField - 1];
       rowKeyStart = (String) map.get("ROWKEYSTART");
@@ -208,9 +200,7 @@ public class AzureTableRangeQueryTaskTAXI extends AbstractTask {
    *
    */
 
-  //	public static  final class TaxiDropoffEntity extends TableServiceEntity { // FIXME: This is
-  // specific to the input data in table
-  //
+  //	public static  final class TaxiDropoffEntity extends TableServiceEntity {
   //		public TaxiDropoffEntity(){}
   //
   //		String Dropoff_datetime;

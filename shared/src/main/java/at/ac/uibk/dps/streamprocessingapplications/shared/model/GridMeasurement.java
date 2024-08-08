@@ -25,9 +25,7 @@ public class GridMeasurement implements Serializable {
   }
 
   public GridMeasurement(
-      SenMLRecordDouble id,
-      SenMLRecordDouble measurement,
-      SenMLRecordDouble timestamp) {
+      SenMLRecordDouble id, SenMLRecordDouble measurement, SenMLRecordDouble timestamp) {
     this();
     this.id = id;
     this.measurement = measurement;

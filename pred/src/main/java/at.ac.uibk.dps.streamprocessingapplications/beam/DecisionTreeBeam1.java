@@ -65,10 +65,6 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
       // do nothing for now
       //            byte[] blobModelObjects = input.getBinaryByField("BlobModelObject");
       //            p.setProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH")
-
-      // TODO:  1- Either write model file to local disk - no task code change
-      // TODO:  2- Pass it as bytestream , update the code for task
-      // TODO:  3- confirm, once this j48tree object will be updated dor not
       try {
 
         DecisionTreeClassify.j48tree = (J48) SerializationHelper.read(bytesInputStream);
@@ -95,9 +91,12 @@ public class DecisionTreeBeam1 extends DoFn<BlobReadEntry, DecisionTreeEntry> {
 
     Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
     if (res != null) {
-      if (res != Float.MIN_VALUE)
-        out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));
-      else {
+      if (res != Float.MIN_VALUE) {
+        DecisionTreeEntry decisionTreeEntry =
+            new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC");
+        decisionTreeEntry.setArrivalTime(input.getArrivalTime());
+        out.output(decisionTreeEntry);
+      } else {
         if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBolt");
         throw new RuntimeException("Error when classifying");
       }

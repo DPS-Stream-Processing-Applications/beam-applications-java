@@ -14,6 +14,7 @@ public class SenMlEntry implements Serializable {
   private String msgtype;
 
   private String analyticType;
+  private long arrivalTime;
 
   public SenMlEntry(
       String msgid,
@@ -86,6 +87,14 @@ public class SenMlEntry implements Serializable {
 
   public void setObsVal(String obsVal) {
     this.obsVal = obsVal;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

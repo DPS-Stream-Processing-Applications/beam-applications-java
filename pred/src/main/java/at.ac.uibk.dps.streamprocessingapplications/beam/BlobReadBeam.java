@@ -39,7 +39,7 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
       throws IOException {
     // path for both model files
     String BlobModelPath = input.getBlobModelPath();
-    String analyticsType = input.getAnalaytictype();
+    String analyticsType = input.getAnalyticType();
 
     String msgId = input.getMsgid();
 
@@ -53,7 +53,9 @@ public class BlobReadBeam extends DoFn<MqttSubscribeEntry, BlobReadEntry> {
     if (l.isInfoEnabled())
       l.info("downloaded updated model file {} with size {}", BlobModelPath, 23);
 
-    // FIXME: read and emit model for DTC
-    out.output(new BlobReadEntry(BlobModelObject, msgId, "modelupdate", analyticsType, "meta"));
+    BlobReadEntry blobReadEntry =
+        new BlobReadEntry(BlobModelObject, msgId, "modelupdate", analyticsType, "meta");
+    blobReadEntry.setArrivalTime(input.getArrivalTime());
+    out.output(blobReadEntry);
   }
 }

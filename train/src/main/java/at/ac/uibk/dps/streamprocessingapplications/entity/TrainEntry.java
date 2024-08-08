@@ -8,6 +8,7 @@ public class TrainEntry implements Serializable {
   private String rowKeyEnd;
   private String analyticType;
   private String fileName;
+  private long arrivalTime;
 
   public TrainEntry(
       String model, String msgid, String rowKeyEnd, String analyticType, String fileName) {
@@ -58,6 +59,14 @@ public class TrainEntry implements Serializable {
 
   public void setFileName(String fileName) {
     this.fileName = fileName;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

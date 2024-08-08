@@ -158,6 +158,7 @@ public class TableReadBeam extends DoFn<SourceEntry, DbEntry> {
     entry.setMgsid(msgId);
     entry.setTrainData(bf.toString());
     entry.setRowKeyEnd(ROWKEYEND);
+    entry.setArrivalTime(input.getArrivalTime());
     out.output(entry);
   }
 }

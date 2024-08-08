@@ -130,7 +130,8 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
       }
       obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
       // obsVal.substring(0, obsVal.length() - 1);
-      out.output(
+
+      SenMlEntry senMlEntry =
           new SenMlEntry(
               msgId,
               resultMap.get(idField),
@@ -138,7 +139,9 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
               "dummyobsType",
               obsVal.toString(),
               "MSGTYPE",
-              "DumbType"));
+              "DumbType");
+      senMlEntry.setArrivalTime(input.getArrivalTime());
+      out.output(senMlEntry);
 
     } catch (Exception e) {
       e.printStackTrace();

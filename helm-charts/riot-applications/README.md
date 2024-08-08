@@ -12,7 +12,7 @@ helm install riot-applications .
 Install the certificate manager first:
 
 ```bash
-kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
 ```
 
 # Flink
@@ -21,7 +21,11 @@ Installing the `Flink` operator and deploying a session cluster:
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
 helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
+# INFO: If the cert-manager installation failed, use --set webhook.create=false
+helm install  flink-operator flink-operator-repo/flink-kubernetes-operator --set webhook.create=false
+```
 
+```bash
 kubectl apply -f templates/flink-session-cluster-deployment.yaml
 ```
 # Kafka
@@ -30,9 +34,13 @@ Installing the kafka operator as well as setting up the topics:
 helm repo add strimzi https://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
 
-kubectl apply -f templates/kafka-cluster.yaml 
+kubectl apply -f templates/kafka-cluster.yaml
 kubectl apply -f templates/kafka-topic-senml-source.yaml 
-kubectl apply -f templates/kafka-topic-senml-cleaned.yaml 
+kubectl apply -f templates/kafka-topic-senml-cleaned.yaml  
+kubectl apply -f templates/kafka-topic-pred-model.yaml
+kubectl apply -f templates/kafka-topic-pred-publish.yaml
+kubectl apply -f templates/kafka-topic-train-publish.yaml
+kubectl apply -f templates/kafka-topic-train-source.yaml
 ```
 
 For `Kafka` external `NodePorts` are configured on port `9093` with the `kafka-cluster.yaml`.
@@ -81,7 +89,7 @@ kubectl apply -f templates/mongodb-pv.yaml
 kubectl apply -f templates/mongodb-pvc.yaml
 kubectl apply -f templates/mongodb-secret.yaml
 ```
-After the cluster is configured Flink jobs can be deployed normally through `flink run <path_to_jar>`.
+After the cluster is configured, Flink jobs can be deployed through `flink run`.
 
 # Prometheus Stack
 Install the Prometheus stack before installing this projects custom helm-chart.

@@ -19,13 +19,12 @@ class FitConverter:
                 escapechar=None,
                 quotechar=" ",
             )
+
             for chunk in pd.read_csv(
                 input_file,
                 chunksize=chunk_size,
                 sep="\t",
                 names=[
-                    "subjectId",
-                    "timestamp",
                     "acc_chest_x",
                     "acc_chest_y",
                     "acc_chest_z",
@@ -96,5 +95,5 @@ class FitConverter:
                     # a 2ms offset is added to each event resulting in a one second offset every 500 events.
                     self.relative_elapsed_time += 2
 
-        # File completely read reading potentially next subject file
-        self.subject_id += 1
+            # File completely read reading potentially next subject file
+            self.subject_id += 1

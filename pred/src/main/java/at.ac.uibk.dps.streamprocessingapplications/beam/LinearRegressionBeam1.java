@@ -19,9 +19,9 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
   LinearRegressionPredictor linearRegressionPredictor;
   private Properties p;
 
-  private String databaseUrl;
+  private final String databaseUrl;
 
-  private String databaseName;
+  private final String databaseName;
 
   public LinearRegressionBeam1(
       Properties p_, String dataSetType, String databaseUrl, String databaseName) {
@@ -47,8 +47,7 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
       throws IOException {
 
     String sensorMeta = input.getMeta();
-    String msgtype = input.getMsgtype();
-    String analyticsType = input.getAnalyticType();
+    String msgType = input.getMsgtype();
 
     String obsVal = "";
 
@@ -60,22 +59,25 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
     String msgId = "0";
 
-    if (!msgtype.equals("modelupdate")) {
+    if (!msgType.equals("modelupdate")) {
       obsVal = input.getObsVal();
       msgId = input.getMsgid();
 
       if (l.isInfoEnabled()) l.info("modelupdate obsVal-" + obsVal);
     }
 
-    HashMap<String, String> map = new HashMap();
+    HashMap<String, String> map = new HashMap<>();
     map.put(AbstractTask.DEFAULT_KEY, obsVal);
     Float res = linearRegressionPredictor.doTask(map);
     if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
     if (res != null) {
-      if (res != Float.MIN_VALUE)
-        out.output(new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR"));
-      else {
+      if (res != Float.MIN_VALUE) {
+        LinearRegressionEntry linearRegressionEntry =
+            new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR");
+        linearRegressionEntry.setArrivalTime(input.getArrivalTime());
+        out.output(linearRegressionEntry);
+      } else {
         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
         throw new RuntimeException("Res is null or float.min");
       }

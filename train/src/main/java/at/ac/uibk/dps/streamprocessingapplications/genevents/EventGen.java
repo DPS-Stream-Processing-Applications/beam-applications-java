@@ -140,7 +140,6 @@ public class EventGen {
       }
       sem2.release(numThreads);
     } catch (IOException | InterruptedException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       throw new RuntimeException(e);
     }
@@ -169,7 +168,6 @@ class SubEventGen implements Runnable {
     try {
       sem2.acquire();
     } catch (InterruptedException e1) {
-      // TODO Auto-generated catch block
       e1.printStackTrace();
       throw new RuntimeException(e1);
     }

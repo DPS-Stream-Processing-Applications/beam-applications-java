@@ -122,6 +122,7 @@ public class TimerSourceBeam extends DoFn<String, SourceEntry> {
       values.setMsgid(Long.toString(msgId));
       values.setRowKeyStart(ROWKEYSTART);
       values.setRowKeyEnd(ROWKEYEND);
+      values.setArrivalTime(System.currentTimeMillis());
       out.output(values);
     } catch (Exception e) {
       System.err.println(e.getMessage());

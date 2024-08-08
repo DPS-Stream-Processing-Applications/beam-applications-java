@@ -6,6 +6,7 @@ import java.util.Objects;
 public class SourceEntry implements Serializable {
   private String msgid;
   private String payLoad;
+  private long arrivalTime;
 
   public SourceEntry(String msgid, String payLoad) {
     this.msgid = msgid;
@@ -28,6 +29,14 @@ public class SourceEntry implements Serializable {
 
   public void setPayLoad(String payLoad) {
     this.payLoad = payLoad;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

@@ -78,10 +78,7 @@ public class MQTTSubscribeTask extends AbstractTask implements MqttCallback {
   public void connectionLost(Throwable arg0) {}
 
   @Override
-  public void deliveryComplete(IMqttDeliveryToken arg0) {
-    // TODO Auto-generated method stub
-
-  }
+  public void deliveryComplete(IMqttDeliveryToken arg0) {}
 
   @Override
   public void messageArrived(String arg0, MqttMessage arg1) throws Exception {

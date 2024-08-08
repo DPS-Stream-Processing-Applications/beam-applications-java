@@ -1,5 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.tasks;
 
+import at.ac.uibk.dps.streamprocessingapplications.FlinkJob;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
@@ -13,7 +15,7 @@ import weka.core.Instances;
  *
  * @author shukla, simmhan
  */
-public class DecisionTreeClassify extends AbstractTask {
+public class DecisionTreeClassify extends AbstractTask<String, String> {
 
   private static final Object SETUP_LOCK = new Object();
   // Sample data, assuming arff file has headers for Sense-Your-City dataset
@@ -53,7 +55,7 @@ public class DecisionTreeClassify extends AbstractTask {
   //	// Sample data, assuming arff file has headers for TAXI dataset
   private static int useMsgField;
   private static Instances instanceHeader;
-  private static int resultAttrNdx; // Index of result attribute in arff file
+  private static int resultAttrNdx;
   private final String dataSetType;
 
   public DecisionTreeClassify(String dataSetType) {
@@ -98,12 +100,20 @@ public class DecisionTreeClassify extends AbstractTask {
           throw new RuntimeException("Exception when setting up decisionTree " + e);
         }
         try {
-          // j48tree = (J48) weka.core.SerializationHelper.read(modelFilePath);
-          // if (l.isInfoEnabled()) l.info("Model is {}", j48tree);
-
-          // SAMPLE_HEADER=p_.getProperty("CLASSIFICATION.DECISION_TREE.SAMPLE_HEADER");
-          instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
-          if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
+          if (dataSetType.equals("TAXI")) {
+            InputStream inputStream =
+                FlinkJob.class.getResourceAsStream(
+                    "/resources/datasets/DecisionTreeClassify-TAXI-withVeryGood.model");
+            j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
+            instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
+          }
+          if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+            InputStream inputStream =
+                FlinkJob.class.getResourceAsStream(
+                    "/resources/datasets/DecisionTreeClassify-SYS-withExcellent.model");
+            j48tree = (J48) weka.core.SerializationHelper.read(inputStream);
+            instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(sampleHeader), l);
+          }
 
           doneSetup = true;
         } catch (Exception e) {
@@ -116,16 +126,16 @@ public class DecisionTreeClassify extends AbstractTask {
   }
 
   @Override
-  protected Float doTaskLogic(Map map) {
-    String m = (String) map.get(AbstractTask.DEFAULT_KEY);
+  protected Float doTaskLogic(Map<String, String> map) {
+    String m = map.get(AbstractTask.DEFAULT_KEY);
     Instance testInstance = null;
     try {
       String[] testTuple = null;
-      if (useMsgField > 0) { // useMsgField is used as flag
+      boolean isCityOrFit = dataSetType.equals("SYS") | dataSetType.equals("FIT");
+      if (useMsgField > 0) {
         testTuple = m.split(",");
       } else {
-        //				System.out.println("TestS : in do task" );
-        if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+        if (isCityOrFit) {
           testTuple = SAMPLE_INPUT_SYS.split(",");
         }
         if (dataSetType.equals("TAXI")) {
@@ -135,27 +145,23 @@ public class DecisionTreeClassify extends AbstractTask {
       if (dataSetType.equals("TAXI")) {
         instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_TAXI), l);
       }
-      if (dataSetType.equals("SYS") | dataSetType.equals("FIT")) {
+      if (isCityOrFit) {
         instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER_SYS), l);
       }
       testInstance = WekaUtil.prepareInstance(instanceHeader, testTuple, l);
+      l.debug("test {}", testInstance);
+      System.out.println("Instance: " + testInstance);
+      l.warn("test{}", testInstance);
 
-      // int classification = (int) j48tree.classifyInstance(testInstance);
-      int classification = 2;
-      // int classification = 2;
-      // String result = instanceHeader.attribute(resultAttrNdx - 1).value(classification);
-
-      // System.out.println("DT result from task  " + result);
-      if (l.isInfoEnabled()) {
-        l.info(" ----------------------------------------- ");
-        l.info("Test data               : {}", testInstance);
-        // l.info("Test data classification result {}, {}", result, classification);
+      if (j48tree == null) {
+        throw new RuntimeException("tree is null");
       }
-      return Float.valueOf(classification);
+
+      int classification = (int) j48tree.classifyInstance(testInstance);
+      return (float) classification;
     } catch (Exception e) {
       l.warn("error with classification of testInstance: " + testInstance, e);
       throw new RuntimeException(e);
-      // return Float.valueOf(Float.MIN_VALUE);
     }
   }
 }

@@ -62,7 +62,10 @@ public class ErrorEstimateBeam2 extends DoFn<AverageEntry, ErrorEstimateEntry> {
         errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
       }
       if (l.isInfoEnabled()) l.info(("errval -" + errval));
-      out.output(new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal));
+      ErrorEstimateEntry errorEstimateEntry =
+          new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal);
+      errorEstimateEntry.setArrivalTime(input.getArrivalTime());
+      out.output(errorEstimateEntry);
     }
   }
 }

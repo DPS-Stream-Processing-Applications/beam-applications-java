@@ -11,6 +11,7 @@ public class BlobReadEntry implements Serializable {
   private String msgType;
   private String analyticType;
   private String meta;
+  private long arrivalTime;
 
   public BlobReadEntry(
       byte[] blobModelObject, String msgid, String msgType, String analyticType, String meta) {
@@ -59,6 +60,14 @@ public class BlobReadEntry implements Serializable {
 
   public void setMeta(String meta) {
     this.meta = meta;
+  }
+
+  public long getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(long arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 
   @Override

@@ -115,14 +115,14 @@ public class FlinkJob {
     options.setRunner(FlinkRunner.class);
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
-    options.setJobName("predjob");
+    options.setJobName("TRAIN");
 
     // PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);
 
     String kafkaBootstrapServers = argumentClass.getBootStrapServerKafka();
 
-    PCollection<String> inputFile = p.apply(new ReadSenMLSource("senml-source"));
+    PCollection<String> inputFile = p.apply(new ReadSenMLSource(argumentClass.getKafkaTopic()));
 
     PCollection<SourceEntry> timerSource =
         inputFile.apply(
@@ -138,7 +138,8 @@ public class FlinkJob {
 
     PCollection<TrainEntry> linearRegressionTrain =
         dataFromAzureDB.apply(
-            "Multi Var Linear Regression", ParDo.of(new LinearRegressionBeam(p_, dataSetType)));
+            "Multi Var Linear Regression",
+            ParDo.of(new LinearRegressionBeam(p_, dataSetType, databaseUrl)));
 
     PCollection<AnnotateEntry> annotatedData =
         dataFromAzureDB.apply("Annotation", ParDo.of(new AnnotateBeam(p_)));
@@ -158,7 +159,7 @@ public class FlinkJob {
     PCollection<MqttPublishEntry> mqttPublish =
         blobUpload.apply(
             "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-sub-task")));
+            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-publish")));
 
     mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
     p.run();

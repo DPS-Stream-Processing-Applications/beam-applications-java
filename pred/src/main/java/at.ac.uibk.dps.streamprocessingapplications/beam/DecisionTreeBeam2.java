@@ -66,9 +66,12 @@ public class DecisionTreeBeam2 extends DoFn<SenMlEntry, DecisionTreeEntry> {
     map.put(AbstractTask.DEFAULT_KEY, obsVal);
     Float res = decisionTreeClassify.doTask(map); // index of result-class/enum as return
     if (res != null) {
-      if (res != Float.MIN_VALUE)
-        out.output(new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC"));
-      else {
+      if (res != Float.MIN_VALUE) {
+        DecisionTreeEntry decisionTreeEntry =
+            new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC");
+        decisionTreeEntry.setArrivalTime(input.getArrivalTime());
+        out.output(decisionTreeEntry);
+      } else {
         if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBolt");
         throw new RuntimeException();
       }

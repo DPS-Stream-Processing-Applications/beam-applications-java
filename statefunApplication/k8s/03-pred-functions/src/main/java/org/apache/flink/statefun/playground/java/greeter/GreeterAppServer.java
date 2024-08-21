@@ -62,8 +62,8 @@ public final class GreeterAppServer {
                 Undertow.builder()
                         .addHttpListener(8000, "0.0.0.0")
                         .setHandler(new UndertowHttpHandler(requestReplyHandler))
-                        .setWorkerThreads(1000)
-                        .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 300 * 1000)
+                        //.setWorkerThreads(1000)
+                        //.setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 300 * 1000)
                         .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                         .build();
         try {

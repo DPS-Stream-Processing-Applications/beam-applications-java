@@ -27,7 +27,7 @@ tasks {
        */
       val mainClass =
           project.findProperty("mainClass")?.toString()
-              ?: "at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJob"
+              ?: "at.ac.uibk.dps.streamprocessingapplications.stats.FlinkJob"
       attributes(
           "Main-Class" to mainClass,
       )

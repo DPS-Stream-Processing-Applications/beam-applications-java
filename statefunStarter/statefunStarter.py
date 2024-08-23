@@ -6,7 +6,11 @@ from os import path
 
 
 consumer = KafkaConsumer("topicA", bootstrap_servers=["localhost:9093"])
-producer = KafkaProducer(bootstrap_servers=["localhost:9093"])
+producer = KafkaProducer(
+    bootstrap_servers=["localhost:9093"],
+    key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
+    value_serializer=lambda v: v.encode("utf-8") if isinstance(v, str) else v,
+)
 
 
 def is_pod_running(k8s_core_v1, pod_name, namespace="statefun"):
@@ -52,10 +56,11 @@ def wait_for_deployment_and_service(
     )
     return False
 
+
 def read_manifest(path_manifest):
-    with open(path_manifest, 'r') as f:
+    with open(path_manifest, "r") as f:
         return list(yaml.safe_load_all(f))
-    
+
 
 def start_deployment_and_service(message, path_manifest):
     print("Starting deployment and service")
@@ -85,7 +90,7 @@ def start_deployment_and_service(message, path_manifest):
         if wait_for_deployment_and_service(
             k8s_apps_v1, k8s_core_v1, deployment_name, service_name
         ):
-            producer.send("topicB", value=message)
+            producer.send("senml-source", value=message)
         else:
             print("Deployment or Service did not become ready in time.")
     else:
@@ -112,10 +117,7 @@ def terminate_deployment_and_service(manifest_docs):
             print(f"Service '{name}' deleted")
 
 
-def main():
-    # FIXME: pass path as argument
-    path_manifest = "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml"
-    manifest_docs = read_manifest(path_manifest)
+def main(manifest_docs):
     while True:
         for message in consumer:
             start_deployment_and_service(message.value, manifest_docs)
@@ -125,9 +127,13 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        # FIXME: pass path as argument
+        path_manifest = "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml"
+        manifest_docs = read_manifest(path_manifest)
+        main(manifest_docs)
     except KeyboardInterrupt:
         print("Shutting down")
     finally:
         consumer.close()
         producer.close()
+        terminate_deployment_and_service(manifest_docs)

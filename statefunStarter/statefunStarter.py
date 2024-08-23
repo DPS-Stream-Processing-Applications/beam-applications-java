@@ -9,98 +9,118 @@ consumer = KafkaConsumer("topicA", bootstrap_servers=["localhost:9093"])
 producer = KafkaProducer(bootstrap_servers=["localhost:9093"])
 
 
-def is_pod_running(k8s_core_v1, pod_name, namespace="default"):
+def is_pod_running(k8s_core_v1, pod_name, namespace="statefun"):
     pod = k8s_core_v1.read_namespaced_pod(name=pod_name, namespace=namespace)
     return pod.status.phase == "Running"
 
 
-def is_service_ready(k8s_core_v1, service_name, namespace="default"):
+def is_deployment_ready(k8s_apps_v1, deployment_name, namespace="statefun"):
+    deployment = k8s_apps_v1.read_namespaced_deployment(
+        name=deployment_name, namespace=namespace
+    )
+    return deployment.status.ready_replicas == deployment.spec.replicas
+
+
+def is_service_ready(k8s_core_v1, service_name, namespace="statefun"):
     endpoints = k8s_core_v1.read_namespaced_endpoints(
         name=service_name, namespace=namespace
     )
     return len(endpoints.subsets) > 0
 
 
-def wait_for_pod_and_service(
-    k8s_core_v1, pod_name, service_name, namespace="default", timeout=300, interval=5
+def wait_for_deployment_and_service(
+    k8s_apps_v1,
+    k8s_core_v1,
+    deployment_name,
+    service_name,
+    namespace="statefun",
+    timeout=300,
+    interval=5,
 ):
     start_time = time.time()
-
     while time.time() - start_time < timeout:
-        if is_pod_running(k8s_core_v1, pod_name, namespace) and is_service_ready(
-            k8s_core_v1, service_name, namespace
-        ):
-            print(f"Pod '{pod_name}' is running and Service '{service_name}' is ready.")
+        if is_deployment_ready(
+            k8s_apps_v1, deployment_name, namespace
+        ) and is_service_ready(k8s_core_v1, service_name, namespace):
+            print(
+                f"Deployment '{deployment_name}' is ready and Service '{service_name}' is ready."
+            )
             return True
         time.sleep(interval)
-
-    print(f"Timeout reached. Pod '{pod_name}' or Service '{service_name}' not ready.")
+    print(
+        f"Timeout reached. Deployment '{deployment_name}' or Service '{service_name}' not ready."
+    )
     return False
 
+def read_manifest(path_manifest):
+    with open(path_manifest, 'r') as f:
+        return list(yaml.safe_load_all(f))
+    
 
-def start_pods(message, path_manifest):
-    print("started functions pod")
+def start_deployment_and_service(message, path_manifest):
+    print("Starting deployment and service")
     config.load_kube_config()
-    print(path_manifest)
-    with open(path_manifest) as f:
-        docs = yaml.safe_load_all(f)
-        k8s_core_v1 = client.CoreV1Api()
-        for doc in docs:
-            kind = doc.get("kind")
-            metadata = doc.get("metadata", {})
-            name = metadata.get("name")
+    k8s_core_v1 = client.CoreV1Api()
+    k8s_apps_v1 = client.AppsV1Api()
+    deployment_name = None
+    service_name = None
+    for doc in path_manifest:
+        kind = doc.get("kind")
+        metadata = doc.get("metadata", {})
+        name = metadata.get("name")
+        if kind == "Deployment":
+            deployment_name = name
+            resp = k8s_apps_v1.create_namespaced_deployment(
+                body=doc, namespace="statefun"
+            )
+            print(
+                f"Deployment '{deployment_name}' created. Status='{resp.metadata.name}'"
+            )
+        elif kind == "Service":
+            service_name = name
+            resp = k8s_core_v1.create_namespaced_service(body=doc, namespace="statefun")
+            print(f"Service '{service_name}' created. Status='{resp.metadata.name}'")
 
-            if kind == "Pod":
-                pod_name = name
-                resp = k8s_core_v1.create_namespaced_pod(body=doc, namespace="default")
-                print(f"Pod '{pod_name}' created. Status='{resp.metadata.name}'")
-            elif kind == "Service":
-                service_name = name
-                resp = k8s_core_v1.create_namespaced_service(
-                    body=doc, namespace="default"
-                )
-                print(
-                    f"Service '{service_name}' created. Status='{resp.metadata.name}'"
-                )
-
-    if pod_name and service_name:
-        if wait_for_pod_and_service(k8s_core_v1, pod_name, service_name):
+    if deployment_name and service_name:
+        if wait_for_deployment_and_service(
+            k8s_apps_v1, k8s_core_v1, deployment_name, service_name
+        ):
             producer.send("topicB", value=message)
         else:
-            print("Pod or Service did not become ready in time.")
+            print("Deployment or Service did not become ready in time.")
     else:
-        print("Pod or Service name not found in manifest.")
+        print("Deployment or Service name not found in manifest.")
 
 
-def terminate_pods(path_manifest):
+def terminate_deployment_and_service(manifest_docs):
     config.load_kube_config()
-    print(path_manifest)
-
-    with open(path_manifest) as f:
-        docs = yaml.safe_load_all(f)
-        k8s_core_v1 = client.CoreV1Api()
-        for doc in docs:
-            kind = doc.get("kind")
-            metadata = doc.get("metadata", {})
-            name = metadata.get("name")
-
-            if kind == "Pod":
-                resp = k8s_core_v1.delete_namespaced_pod(name=name, namespace="default")
-                print(f"Pod '{name}' deleted")
-            elif kind == "Service":
-                resp = k8s_core_v1.delete_namespaced_service(
-                    name=name, namespace="default"
-                )
-                print(f"Service '{name}' deleted")
+    k8s_core_v1 = client.CoreV1Api()
+    k8s_apps_v1 = client.AppsV1Api()
+    for doc in manifest_docs:
+        kind = doc.get("kind")
+        metadata = doc.get("metadata", {})
+        name = metadata.get("name")
+        if kind == "Deployment":
+            resp = k8s_apps_v1.delete_namespaced_deployment(
+                name=name, namespace="statefun"
+            )
+            print(f"Deployment '{name}' deleted")
+        elif kind == "Service":
+            resp = k8s_core_v1.delete_namespaced_service(
+                name=name, namespace="statefun"
+            )
+            print(f"Service '{name}' deleted")
 
 
 def main():
-    path_manifest = path.join(path.dirname(__file__), "nginx.yaml")
+    # FIXME: pass path as argument
+    path_manifest = "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml"
+    manifest_docs = read_manifest(path_manifest)
     while True:
         for message in consumer:
-            start_pods(message.value, path_manifest)
+            start_deployment_and_service(message.value, manifest_docs)
             time.sleep(60)
-            terminate_pods(path_manifest)
+            terminate_deployment_and_service(manifest_docs)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-producer-2
+spec:
+  containers:
+  - name: kafka-producer-2
+    image: jungerindy/statefunstarter:latest
+    #image: starter
+  restartPolicy: Never

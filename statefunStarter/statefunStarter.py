@@ -90,7 +90,11 @@ def start_deployment_and_service(message, path_manifest):
         if wait_for_deployment_and_service(
             k8s_apps_v1, k8s_core_v1, deployment_name, service_name
         ):
-            producer.send("senml-source", value=message)
+            producer.send(
+                "senml-source",
+                key=str(int(time.time() * 1000)).encode("utf-8"),
+                value=message.decode(),
+            )
         else:
             print("Deployment or Service did not become ready in time.")
     else:
@@ -118,6 +122,8 @@ def terminate_deployment_and_service(manifest_docs):
 
 
 def main(manifest_docs):
+    last_message_time = time.time()
+    is_deployed = False
     while True:
         for message in consumer:
             start_deployment_and_service(message.value, manifest_docs)

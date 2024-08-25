@@ -2,8 +2,9 @@ from kafka import KafkaConsumer, KafkaProducer
 from kubernetes import client, config
 import time
 import yaml
-from os import path
+import os
 
+#FIXME add function to read from prometheus to check numRecordsIn==numRecordsOut
 
 consumer = KafkaConsumer("topicA", bootstrap_servers=["localhost:9093"])
 producer = KafkaProducer(
@@ -122,19 +123,34 @@ def terminate_deployment_and_service(manifest_docs):
 
 
 def main(manifest_docs):
-    last_message_time = time.time()
     is_deployed = False
+    inactivity_timeout = 60
     while True:
-        for message in consumer:
-            start_deployment_and_service(message.value, manifest_docs)
-            time.sleep(60)
+        message = consumer.poll(timeout_ms=5000)
+        if message:
+            for tp, messages in message.items():
+                for msg in messages:
+                    if not is_deployed:
+                        start_deployment_and_service(msg.value, manifest_docs)
+                        is_deployed = True
+                    else:
+                        producer.send(
+                            "senml-source",
+                            key=str(int(time.time() * 1000)).encode("utf-8"),
+                            value=msg.value.decode(),
+                        )
+                    last_message_time = time.time()
+        if is_deployed and time.time() - last_message_time > inactivity_timeout:
             terminate_deployment_and_service(manifest_docs)
+            is_deployed = False
 
 
 if __name__ == "__main__":
     try:
-        # FIXME: pass path as argument
-        path_manifest = "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml"
+        path_manifest = os.getenv(
+            "MANIFEST_PATH",
+            "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml",
+        )
         manifest_docs = read_manifest(path_manifest)
         main(manifest_docs)
     except KeyboardInterrupt:

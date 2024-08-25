@@ -1,10 +1,30 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: kafka-producer-2
+  name: statefun-starter-deployment
+  labels:
+    app: statefun-starter
 spec:
-  containers:
-  - name: kafka-producer-2
-    image: jungerindy/statefunstarter:latest
-    #image: starter
-  restartPolicy: Never
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statefun-starter
+  template:
+    metadata:
+      labels:
+        app: statefun-starter
+    spec:
+      containers:
+      - name: statefun-starter
+        image: jungerindy/statefunstarter:latest
+        imagePullPolicy: Always
+        env:
+        - name: MANIFEST_PATH
+          value: "/home/cc/"
+        ports:
+        - containerPort: 9093
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "0.5"
+      restartPolicy: Never

@@ -3,8 +3,8 @@ from kubernetes import client, config
 import time
 import yaml
 import os
+import requests
 
-#FIXME add function to read from prometheus to check numRecordsIn==numRecordsOut
 
 consumer = KafkaConsumer("topicA", bootstrap_servers=["localhost:9093"])
 producer = KafkaProducer(
@@ -12,6 +12,30 @@ producer = KafkaProducer(
     key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
     value_serializer=lambda v: v.encode("utf-8") if isinstance(v, str) else v,
 )
+
+
+def read_metric_from_prometheus(metric_name):
+    prometheus_url = "http://localhost:9090"
+    response = requests.get(
+        f"{prometheus_url}/api/v1/query",
+        params={"query": "flink_taskmanager_Status_JVM_CPU_Time"},
+    )
+    data = response.json()
+    print(data.get("data", {}).get("result", [])[0].get("value"))
+    # FIXME decide which metric
+    return None
+
+
+# FIXME
+def check_if_pod_is_idle(metric_name, num_records_in, application):
+    if application.equals("PRED"):
+        pass
+        # return num_records_in ==3*read_metric_from_prometheus(metric_name)
+
+    if application.equals("TRAIN"):
+        pass
+        # return num_records_in ==2*read_metric_from_prometheus(metric_name)
+    return True
 
 
 def is_pod_running(k8s_core_v1, pod_name, namespace="statefun"):
@@ -122,9 +146,10 @@ def terminate_deployment_and_service(manifest_docs):
             print(f"Service '{name}' deleted")
 
 
-def main(manifest_docs):
+def main(manifest_docs, metric_name, application):
     is_deployed = False
     inactivity_timeout = 60
+    number_sent_messages = 0
     while True:
         message = consumer.poll(timeout_ms=5000)
         if message:
@@ -140,7 +165,13 @@ def main(manifest_docs):
                             value=msg.value.decode(),
                         )
                     last_message_time = time.time()
-        if is_deployed and time.time() - last_message_time > inactivity_timeout:
+                    number_sent_messages = number_sent_messages + 1
+        # FIXME add check for numRecordsIN==numRecordsOut
+        if (
+            is_deployed
+            and (time.time() - last_message_time > inactivity_timeout)
+            and check_if_pod_is_idle(metric_name, number_sent_messages, application)
+        ):
             terminate_deployment_and_service(manifest_docs)
             is_deployed = False
 
@@ -151,11 +182,25 @@ if __name__ == "__main__":
             "MANIFEST_PATH",
             "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml",
         )
+        metric_name = None
+        application = None
+        if "train" in path_manifest:
+            # FIXME
+            metric_name = ""
+            application = "TRAIN"
+        if "pred" in path_manifest:
+            # FIXME
+            metric_name = ""
+            application = "PRED"
+
         manifest_docs = read_manifest(path_manifest)
-        main(manifest_docs)
+        main(manifest_docs, metric_name, application)
     except KeyboardInterrupt:
         print("Shutting down")
     finally:
         consumer.close()
         producer.close()
-        terminate_deployment_and_service(manifest_docs)
+        try:
+            terminate_deployment_and_service(manifest_docs)
+        except:
+            print("functions pod was already down")

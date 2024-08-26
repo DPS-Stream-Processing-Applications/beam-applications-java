@@ -30,11 +30,11 @@ def read_metric_from_prometheus(metric_name):
 def check_if_pod_is_idle(metric_name, num_records_in, application):
     if application.equals("PRED"):
         pass
-        # return num_records_in ==3*read_metric_from_prometheus(metric_name)
+        # return 3*num_records_in ==read_metric_from_prometheus(metric_name)
 
     if application.equals("TRAIN"):
         pass
-        # return num_records_in ==2*read_metric_from_prometheus(metric_name)
+        # return 2*num_records_in ==read_metric_from_prometheus(metric_name)
     return True
 
 

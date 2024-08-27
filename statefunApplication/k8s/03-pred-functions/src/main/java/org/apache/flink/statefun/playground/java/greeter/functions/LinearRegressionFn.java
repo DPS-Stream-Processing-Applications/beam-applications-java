@@ -51,15 +51,12 @@ public class LinearRegressionFn implements StatefulFunction {
             throw new RuntimeException(e);
         }
         this.dataSetType = datasetType;
-        /*
         if (linearRegressionPredictor == null) {
             String ipAddress = System.getenv("MONGO_DB_ADDRESS");
             linearRegressionPredictor = new LinearRegressionPredictor(ipAddress, "mydb");
             initLogger(LoggerFactory.getLogger("APP"));
             linearRegressionPredictor.setup(l, p);
         }
-
-         */
     }
 
 
@@ -87,8 +84,8 @@ public class LinearRegressionFn implements StatefulFunction {
 
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, obsVal);
-                //Float res = linearRegressionPredictor.doTask(map);
-                Float res = 2.0f;
+                Float res = linearRegressionPredictor.doTask(map);
+                //Float res = 2.0f;
 
                 if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
@@ -100,6 +97,7 @@ public class LinearRegressionFn implements StatefulFunction {
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
                                         .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
                                         .build());
+
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
                         throw new RuntimeException("Res is null or float.min");

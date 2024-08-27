@@ -2,6 +2,7 @@ package org.apache.flink.statefun.playground.java.greeter.tasks;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -13,8 +14,9 @@ import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import java.io.*;
-import java.util.HashMap;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
 
@@ -32,7 +34,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
     private static final String SAMPLE_INPUT = "420,1.95,8.00";
     public static LinearRegression lr;
     // static fields common to all threads
-    private static boolean doneSetup = false;
+    private static volatile boolean doneSetup = false;
     // private static final String SAMPLE_INPUT = "-71.10,42.37,10.1,65.3,0";
     private static int useMsgField;
 
@@ -61,112 +63,84 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                     + "%header format";
     private static Instances instanceHeader;
 
-    private MongoClient mongoClient;
-    private MongoDatabase database;
+    private String databaseUrl;
+
+    private String databaseName;
 
     public LinearRegressionPredictor(String databaseUrl, String databaseName) {
-        MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(databaseUrl))
-                .build();
-        this.mongoClient = MongoClients.create(settings);
-        this.database = mongoClient.getDatabase(databaseName);
+        this.databaseUrl = databaseUrl;
+        this.databaseName = databaseName;
     }
 
-    /**
-     * @param l_
-     * @param p_
-     */
     public void setup(Logger l_, Properties p_) {
         super.setup(l_, p_);
-        synchronized (SETUP_LOCK) {
-            if (!doneSetup) { // Do setup only once for this task
-                // If positive use actual input for prediction else use
-                // dummyInputConst
-                useMsgField =
-                        Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
+        if (doneSetup) {
+            System.out.println("doneSetup is True");
+        }
+        if (!doneSetup) {
+            synchronized (this) {
+                if (!doneSetup) {
+                    try {
+                        useMsgField = Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
+                        modelFilePath = "LR-TAXI-Numeric_model";
+                        byte[] pdfData = null;
 
-                //modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
-                modelFilePath = "LR-TAXI-Numeric_model";
-                //readFromDatabaseTask.setup(l, p_);
-                HashMap<String, String> map = new HashMap<>();
-                map.put("fileName", modelFilePath);
-                /*
-                synchronized (DATABASE_LOCK) {
-                    readFromDatabaseTask.doTask(map);
-                }
-                byte[] csvContent = readFromDatabaseTask.getLastResult();
+                        MongoClientSettings settings = MongoClientSettings.builder()
+                                .applyConnectionString(new ConnectionString(databaseUrl))
+                                .build();
+                        try (MongoClient mongoClient = MongoClients.create(settings)) {
+                            MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+                            MongoCollection<Document> collection = mongoDatabase.getCollection("pdfCollection");
 
-                 */
-                byte[] csvContent;
-                try {
-                    MongoCollection<Document> collection = database.getCollection("pdfCollection");
+                            Document query = new Document(modelFilePath, new Document("$exists", true));
+                            Document projection = new Document(modelFilePath, 1).append("_id", 0);
 
-                    Document query = new Document(modelFilePath, new Document("$exists", true));
-                    Document projection = new Document(modelFilePath, 1).append("_id", 0);
+                            for (Document document : collection.find(query).projection(projection)) {
+                                Binary pdfBinary = (Binary) document.get(modelFilePath);
+                                pdfData = pdfBinary.getData();
+                            }
+                            if (pdfData == null) {
+                                throw new RuntimeException("null content in db");
+                            }
+                        } catch (MongoException e) {
+                            System.err.println(e);
+                        }
 
-                    byte[] pdfData = null;
-                    for (Document document : collection.find(query).projection(projection)) {
-                        Binary pdfBinary = (Binary) document.get(modelFilePath);
-                        pdfData = pdfBinary.getData();
+                        // Model deserialization
+                        byte[] csvContent = pdfData;
+                        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
+                             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+                            lr = (LinearRegression) objectInputStream.readObject();
+
+                            if (lr == null) {
+                                throw new RuntimeException("lr is null");
+                            }
+                            if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
+
+                            instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
+                            if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
+                            if (instanceHeader == null) {
+                                throw new RuntimeException("instanceHeader is null");
+                            }
+
+                            doneSetup = true;
+                        } catch (Exception e) {
+                            l.warn("error loading decision tree model from file: " + modelFilePath, e);
+                            doneSetup = false;
+                            throw new RuntimeException("Error loading decision tree model from file", e);
+                        }
+                    } catch (Exception e) {
+                        l.error("Error in read from db", e);
+                        throw new RuntimeException(e);
                     }
-                    csvContent = pdfData;
-                    if (pdfData == null) {
-                        throw new RuntimeException("null content in db");
-                    }
-
-                } catch (Exception e) {
-                    l.error("Error in read from db", e);
-                    throw new RuntimeException(e);
-                }
-
-                try {
-                    ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
-                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                    lr = (LinearRegression) objectInputStream.readObject();
-
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-                    StringBuilder modelContent = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        modelContent.append(line).append("\n");
-                    }
-
-          /*
-          lr = (LinearRegression) SerializationHelper.read(inputStream);
-          inputStream.close();
-
-           */
-
-                    if (lr == null) {
-                        throw new RuntimeException("lr is null");
-                    }
-                    if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
-
-                    // SAMPLE_HEADER = p_.getProperty("PREDICT.LINEAR_REGRESSION.SAMPLE_HEADER");
-
-                    if (SAMPLE_HEADER == null) {
-                        throw new RuntimeException("sample_header null");
-                    }
-
-                    instanceHeader = WekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
-                    if (l.isInfoEnabled()) l.info("Header is {}", instanceHeader);
-                    if (instanceHeader == null) {
-                        throw new RuntimeException("instanceHeader is null");
-                    }
-                    doneSetup = true;
-                } catch (Exception e) {
-                    l.warn("error loading decision tree model from file: " + modelFilePath, e);
-                    doneSetup = false;
-                    throw new RuntimeException("Error loading decision tree model from file " + e);
                 }
             }
         }
     }
 
     @Override
-    protected Float doTaskLogic(Map map) {
-        String m = (String) map.get(AbstractTask.DEFAULT_KEY);
+    protected Float doTaskLogic(Map<String, String> map) {
+        String m = map.get(AbstractTask.DEFAULT_KEY);
         Instance testInstance = null;
 
         try {

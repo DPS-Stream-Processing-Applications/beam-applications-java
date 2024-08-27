@@ -16,9 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyKafkaProducer extends AbstractTask<String, String>
         implements Callback, Serializable {
     private static int useMsgField;
+    private final String bootstrapServer;
+    private final String topic;
     protected AtomicLong messageCount = new AtomicLong(0);
-    private String bootstrapServer;
-    private String topic;
 
     public MyKafkaProducer(String BOOTSTRAP_SERVERS, String topic, Properties p_) {
         this.bootstrapServer = BOOTSTRAP_SERVERS;
@@ -37,14 +37,8 @@ public class MyKafkaProducer extends AbstractTask<String, String>
         return new KafkaProducer<>(props);
     }
 
-    private boolean retriable(Exception e) {
-        if (e instanceof IllegalArgumentException
-                || e instanceof UnsupportedOperationException
-                || !(e instanceof RetriableException)) {
-            return false;
-        } else {
-            return true;
-        }
+    private boolean retrievable(Exception e) {
+        return e instanceof RetriableException;
     }
 
     @Override
@@ -52,7 +46,7 @@ public class MyKafkaProducer extends AbstractTask<String, String>
         if (e != null) {
             System.err.println(e.getMessage());
 
-            if (!retriable(e)) {
+            if (!retrievable(e)) {
                 e.printStackTrace();
                 System.exit(1);
             }

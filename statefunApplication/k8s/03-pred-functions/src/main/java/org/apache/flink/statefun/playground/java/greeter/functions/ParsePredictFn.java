@@ -34,6 +34,8 @@ public class ParsePredictFn implements StatefulFunction {
     static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
     static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
+
+    static final TypeName INBOX_D = TypeName.typeNameFromString("pred/mqttPublish");
     private static Logger l;
     SenMlParse senMLParseTask;
     private Properties p;
@@ -137,18 +139,31 @@ public class ParsePredictFn implements StatefulFunction {
                             "DumbType", sourceEntry.getDataSetType());
             //senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
 
+
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(senMlEntry.getMsgid()))
                             .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
+
             context.send(
                     MessageBuilder.forAddress(INBOX_2, String.valueOf(senMlEntry.getMsgid()))
                             .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
+
+
             context.send(
                     MessageBuilder.forAddress(INBOX_3, String.valueOf(senMlEntry.getMsgid()))
                             .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
+
+            /*
+            ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry("test", 0.5f, msgId, "test", "test", sourceEntry.getDataSetType());
+            context.send(
+                    MessageBuilder.forAddress(INBOX_D, String.valueOf(errorEstimateEntry.getMsgid()))
+                            .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)
+                            .build());
+
+             */
 
         } catch (Exception e) {
             e.printStackTrace();

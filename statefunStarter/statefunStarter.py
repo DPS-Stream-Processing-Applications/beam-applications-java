@@ -18,24 +18,19 @@ def read_metric_from_prometheus(metric_name):
     prometheus_url = "http://localhost:9090"
     response = requests.get(
         f"{prometheus_url}/api/v1/query",
-        params={"query": "flink_taskmanager_Status_JVM_CPU_Time"},
+        params={"query": metric_name},
     )
     data = response.json()
-    print(data.get("data", {}).get("result", [])[0].get("value"))
-    # FIXME decide which metric
-    return None
+    value = data["data"]["result"][0]["value"][1]
+    return int(value)
 
 
-# FIXME
 def check_if_pod_is_idle(metric_name, num_records_in, application):
-    if application.equals("PRED"):
-        pass
-        # return 3*num_records_in ==read_metric_from_prometheus(metric_name)
+    if application == "PRED":
+        return 2 * num_records_in <= read_metric_from_prometheus(metric_name)
 
-    if application.equals("TRAIN"):
-        pass
-        # return 2*num_records_in ==read_metric_from_prometheus(metric_name)
-    return True
+    if application == "TRAIN":
+        return 2 * num_records_in <= read_metric_from_prometheus(metric_name)
 
 
 def is_pod_running(k8s_core_v1, pod_name, namespace="statefun"):
@@ -166,7 +161,6 @@ def main(manifest_docs, metric_name, application):
                         )
                     last_message_time = time.time()
                     number_sent_messages = number_sent_messages + 1
-        # FIXME add check for numRecordsIN==numRecordsOut
         if (
             is_deployed
             and (time.time() - last_message_time > inactivity_timeout)
@@ -185,14 +179,11 @@ if __name__ == "__main__":
         metric_name = None
         application = None
         if "train" in path_manifest:
-            # FIXME
-            metric_name = ""
+            metric_name = "flink_taskmanager_job_task_operator_functions_pred_mqttPublishTrain_outEgress"
             application = "TRAIN"
         if "pred" in path_manifest:
-            # FIXME
-            metric_name = ""
+            metric_name = "flink_taskmanager_job_task_operator_functions_pred_mqttPublish_outEgress"
             application = "PRED"
-
         manifest_docs = read_manifest(path_manifest)
         main(manifest_docs, metric_name, application)
     except KeyboardInterrupt:

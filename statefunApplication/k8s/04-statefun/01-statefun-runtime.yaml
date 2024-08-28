@@ -130,12 +130,10 @@ spec:
               value: master
             - name: MASTER_HOST
               value: statefun-master
-          #resources:
-              #requests:
-                #Changed from 0.5Gi to 1Gi to 2048m
-                #memory: "7Gi"
-                #Change from 2 to 1
-                #cpu: "1"
+          resources:
+              requests:
+                memory: "2Gi"
+                cpu: "1"
           ports:
             - containerPort: 6123
               name: rpc
@@ -201,11 +199,10 @@ spec:
               value: worker
             - name: MASTER_HOST
               value: statefun-master
-          #resources:
-            #requests:
-              #Changed from 0.5Gi to 1Gi to 2048m
-              #memory: "7Gi"
-              #cpu: "1"
+          resources:
+              requests:
+                memory: "2Gi"
+                cpu: "1"
           ports:
             - containerPort: 6122
               name: rpc

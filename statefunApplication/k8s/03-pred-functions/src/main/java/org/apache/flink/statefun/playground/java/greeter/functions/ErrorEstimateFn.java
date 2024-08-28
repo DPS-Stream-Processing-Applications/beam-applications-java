@@ -66,8 +66,6 @@ public class ErrorEstimateFn implements StatefulFunction {
                     Res = linearRegressionEntry.getRes();
                 }
 
-                if (l.isInfoEnabled()) l.info("analyticsType:{},Res:{},avgRes:{}", analyticsType, Res, avgRes);
-
                 if (analyticsType.equals("MLR")) {
                     float errval = 0;
                     String fareString;

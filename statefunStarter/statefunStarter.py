@@ -1,17 +1,30 @@
 from kafka import KafkaConsumer, KafkaProducer
 from kubernetes import client, config
+from kubernetes.client.exceptions import ApiException
 import time
 import yaml
 import os
 import requests
 
 
-consumer = KafkaConsumer("topicA", bootstrap_servers=["localhost:9093"])
+consumer = KafkaConsumer(
+    "topicA", bootstrap_servers=["kafka-cluster-kafka-bootstrap.default.svc:9092"]
+)
 producer = KafkaProducer(
-    bootstrap_servers=["localhost:9093"],
+    bootstrap_servers=["kafka-cluster-kafka-bootstrap.default.svc:9092"],
     key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
     value_serializer=lambda v: v.encode("utf-8") if isinstance(v, str) else v,
 )
+
+
+def check_if_service_is_already_running(name):
+    k8s_core_v1 = client.CoreV1Api()
+    try:
+        k8s_core_v1.read_namespaced_service(name=name, namespace="statefun")
+        print(f"Service '{name}' already exists. Skipping creation.")
+    except ApiException as e:
+        if e.status == 404:
+            print(f"Service '{name}'. is new")
 
 
 def read_metric_from_prometheus(metric_name):
@@ -77,14 +90,23 @@ def wait_for_deployment_and_service(
     return False
 
 
-def read_manifest(path_manifest):
+def read_manifest(path_manifest, mongodb_address):
     with open(path_manifest, "r") as f:
-        return list(yaml.safe_load_all(f))
+        manifest = list(yaml.safe_load_all(f))
+    for item in manifest:
+        if item["kind"] == "Deployment":
+            containers = item["spec"]["template"]["spec"]["containers"]
+            for container in containers:
+                env_vars = container.get("env", [])
+                for env in env_vars:
+                    if env["name"] == "MONGO_DB_ADDRESS":
+                        env["value"] = mongodb_address
+    return manifest
 
 
 def start_deployment_and_service(message, path_manifest):
     print("Starting deployment and service")
-    config.load_kube_config()
+    config.load_incluster_config()
     k8s_core_v1 = client.CoreV1Api()
     k8s_apps_v1 = client.AppsV1Api()
     deployment_name = None
@@ -103,7 +125,9 @@ def start_deployment_and_service(message, path_manifest):
             )
         elif kind == "Service":
             service_name = name
-            resp = k8s_core_v1.create_namespaced_service(body=doc, namespace="statefun")
+            resp = k8s_core_v1.create_namespaced_service(
+                body=doc, namespace="statefun", pretty="true"
+            )
             print(f"Service '{service_name}' created. Status='{resp.metadata.name}'")
 
     if deployment_name and service_name:
@@ -122,7 +146,7 @@ def start_deployment_and_service(message, path_manifest):
 
 
 def terminate_deployment_and_service(manifest_docs):
-    config.load_kube_config()
+    config.load_incluster_config()
     k8s_core_v1 = client.CoreV1Api()
     k8s_apps_v1 = client.AppsV1Api()
     for doc in manifest_docs:
@@ -172,19 +196,16 @@ def main(manifest_docs, metric_name, application):
 
 if __name__ == "__main__":
     try:
-        path_manifest = os.getenv(
-            "MANIFEST_PATH",
-            "/home/jona/Documents/Bachelor_thesis/repos/official_repo/beam-applications-java/statefunApplication/k8s/03-train-functions/functions-service.yaml",
-        )
+        application = os.getenv("APPLICATION")
+        mongodb_address = os.getenv("MONGODB")
         metric_name = None
-        application = None
-        if "train" in path_manifest:
+        if application == "TRAIN":
             metric_name = "flink_taskmanager_job_task_operator_functions_pred_mqttPublishTrain_outEgress"
-            application = "TRAIN"
-        if "pred" in path_manifest:
+            path_manifest = "/app/train/functions-service.yaml"
+        if application == "PRED":
             metric_name = "flink_taskmanager_job_task_operator_functions_pred_mqttPublish_outEgress"
-            application = "PRED"
-        manifest_docs = read_manifest(path_manifest)
+            path_manifest = "/app/pred/functions-service.yaml"
+        manifest_docs = read_manifest(path_manifest, mongodb_address)
         main(manifest_docs, metric_name, application)
     except KeyboardInterrupt:
         print("Shutting down")

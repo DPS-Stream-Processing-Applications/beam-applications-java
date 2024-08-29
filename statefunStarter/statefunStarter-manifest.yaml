@@ -14,17 +14,20 @@ spec:
       labels:
         app: statefun-starter
     spec:
+      serviceAccountName: service-creator-account
       containers:
       - name: statefun-starter
         image: jungerindy/statefunstarter:latest
         imagePullPolicy: Always
         env:
-        - name: MANIFEST_PATH
-          value: "/home/cc/"
+        - name: APPLICATION
+          value: "PRED"
+        - name: MONGODB 
+          value: "mongodb://adminuser:password123@10.52.2.218:32000/"
         ports:
         - containerPort: 9093
         resources:
           requests:
-            memory: "64Mi"
+            memory: "2Gi"
             cpu: "0.5"
-      restartPolicy: Never
+      restartPolicy: Always

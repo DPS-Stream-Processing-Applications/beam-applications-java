@@ -24,6 +24,8 @@ spec:
           value: "PRED"
         - name: MONGODB 
           value: "mongodb://adminuser:password123@10.52.2.218:32000/"
+        - name: DATASET
+          value: "SYS"
         ports:
         - containerPort: 9093
         resources:

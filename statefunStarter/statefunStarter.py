@@ -53,7 +53,7 @@ def check_if_service_is_already_running(name):
 
 
 def read_metric_from_prometheus(metric_name):
-    prometheus_url = "http://localhost:9090"
+    prometheus_url = "http://prometheus-operated.default.svc.cluster.local:9090"
     try:
         response = requests.get(
             f"{prometheus_url}/api/v1/query",

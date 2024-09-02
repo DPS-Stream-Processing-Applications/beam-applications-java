@@ -6,7 +6,7 @@ The Kafkaproducer sends records to a topic (statefun-starter-input), and these r
 ## Setup steps
 
 >[!WARNING]
-> Make sure to adapt the values ``Dataset`` and ``MONGODB_ADDRESS`` in the ``statefunStarter-manifest.yaml``
+> Make sure to adapt the values ``Dataset`` and ``MONGODB_ADDRESS`` in the ``statefunStarter-manifest.yaml`` before deploying
 
 
 
@@ -15,11 +15,11 @@ kubectl apply -f service-account.yaml
 ```
 
 ```bash
-kubectl apply -f updated-role.yaml
+kubectl apply -f role.yaml
 ```
 
 ```bash
-kubectl apply -f updated-rolebinding.yaml
+kubectl apply -f rolebinding.yaml
 ```
 
 ```bash

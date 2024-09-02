@@ -126,6 +126,7 @@ def read_manifest(path_manifest, mongodb_address, dataset):
         if item["kind"] == "Deployment":
             containers = item["spec"]["template"]["spec"]["containers"]
             for container in containers:
+                container["imagePullPolicy"] = "Always"
                 env_vars = container.get("env", [])
                 for env in env_vars:
                     if env["name"] == "MONGO_DB_ADDRESS":

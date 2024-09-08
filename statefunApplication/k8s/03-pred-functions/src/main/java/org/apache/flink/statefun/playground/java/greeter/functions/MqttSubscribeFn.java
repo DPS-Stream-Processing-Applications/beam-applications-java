@@ -29,14 +29,6 @@ public class MqttSubscribeFn implements StatefulFunction {
                     .withSupplier(MqttSubscribeFn::new)
                     .build();
 
-    private static Logger l;
-
-    Properties p;
-
-    public static void initLogger(Logger l_) {
-        l = l_;
-    }
-
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) {

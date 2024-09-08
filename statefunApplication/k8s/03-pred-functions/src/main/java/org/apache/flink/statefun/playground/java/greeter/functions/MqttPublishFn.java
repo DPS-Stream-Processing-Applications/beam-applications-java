@@ -26,11 +26,11 @@ public class MqttPublishFn implements StatefulFunction {
     static final TypeName INBOX = TypeName.typeNameFromString("pred/sink");
 
     static final TypeName KAFKA_EGRESS = TypeName.typeNameFromString("pred/publish");
-    private static Logger l;
+    private  Logger l;
 
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     @Override

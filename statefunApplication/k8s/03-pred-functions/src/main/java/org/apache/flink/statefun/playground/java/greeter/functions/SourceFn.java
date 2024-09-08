@@ -24,10 +24,8 @@ import com.google.gson.JsonObject;
 import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.Message;
+
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_JSON_TYPE;
@@ -45,45 +42,23 @@ public final class SourceFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/source");
     static final TypeName INBOX = TypeName.typeNameFromString("pred/senmlParse");
+
+
     private static final ValueSpec<Long> MSGID_COUNT = ValueSpec
             .named("message_counter")
             .withLongType();
+
     public static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPENAME)
                     .withValueSpec(MSGID_COUNT)
                     .withSupplier(SourceFn::new)
                     .build();
-    private static Logger l;
+    private Logger l;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public void initLogger(Logger l_) {
+        this.l = l_;
     }
 
-    protected static String checkDataSetType(String input) {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject;
-        JSONArray jsonArr;
-        try {
-            jsonObject = (JSONObject) jsonParser.parse(input);
-            jsonArr = (JSONArray) jsonObject.get("e");
-        } catch (org.json.simple.parser.ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        String n;
-        for (int j = 0; j < jsonArr.size(); j++) {
-            jsonObject = (JSONObject) jsonArr.get(j);
-
-            n = (jsonObject.get("n") == null) ? "empty" : (String) jsonObject.get("n");
-
-            if (n.equals("taxi_identifier")) {
-                return "TAXI";
-            }
-
-
-        }
-        return null;
-    }
 
     private long extractTimeStamp(String row) {
         Gson gson = new Gson();
@@ -97,7 +72,8 @@ public final class SourceFn implements StatefulFunction {
                 break;
             }
         }
-
+        jsonArray=null;
+        gson=null;
         return convertToUnixTimeStamp(pickupDatetime);
     }
 
@@ -117,7 +93,6 @@ public final class SourceFn implements StatefulFunction {
     }
 
     public void setup() {
-        Random r = new Random();
         initLogger(LoggerFactory.getLogger("APP"));
     }
 
@@ -138,23 +113,25 @@ public final class SourceFn implements StatefulFunction {
             } else {
                 newRow = "{\"e\":" + rowString + ",\"bt\":1358101800000}";
             }
-            long msgId = context.storage().get(MSGID_COUNT).orElse(1L);
 
-            final SourceEntry sourceEntry = new SourceEntry(msgId, newRow, datasetType);
+            long msgId = context.storage().get(MSGID_COUNT).orElse(1L);
+            SourceEntry sourceEntry = new SourceEntry(msgId, newRow, datasetType);
+
 
             msgId += 1;
             context.storage().set(MSGID_COUNT, msgId);
+
             /*
             if (msgId % 100 == 0) {
                 sourceEntry.setArrivalTime(System.currentTimeMillis());
             }
              */
 
+
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(sourceEntry.getMsgid()))
                             .withCustomType(SOURCE_ENTRY_JSON_TYPE, sourceEntry)
                             .build());
-
         } catch (Exception e) {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);

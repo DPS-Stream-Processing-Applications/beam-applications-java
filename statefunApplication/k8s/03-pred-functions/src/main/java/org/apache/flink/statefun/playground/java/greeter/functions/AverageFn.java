@@ -30,14 +30,14 @@ public class AverageFn implements StatefulFunction {
                     .withSupplier(AverageFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-    private static Logger l;
+    private Logger l;
     Map<String, BlockWindowAverage> blockWindowAverageMap;
     private String dataSetType;
     private Properties p;
     private ArrayList<String> useMsgList;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     public void setup(String dataSetType) {
@@ -122,6 +122,7 @@ public class AverageFn implements StatefulFunction {
                     throw new RuntimeException();
                 }
             }
+            blockWindowAverage.tearDown();
         }
         return context.done();
     }

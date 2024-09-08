@@ -35,12 +35,12 @@ public class LinearRegressionFn implements StatefulFunction {
                     .withSupplier(LinearRegressionFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-    private static Logger l;
+    private Logger l;
     LinearRegressionPredictor linearRegressionPredictor = null;
     private String dataSetType;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     public void setup(String datasetType) {
@@ -85,7 +85,6 @@ public class LinearRegressionFn implements StatefulFunction {
                 HashMap<String, String> map = new HashMap<>();
                 map.put(AbstractTask.DEFAULT_KEY, obsVal);
                 Float res = linearRegressionPredictor.doTask(map);
-                //Float res = 2.0f;
 
                 if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
@@ -100,7 +99,12 @@ public class LinearRegressionFn implements StatefulFunction {
 
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
-                        throw new RuntimeException("Res is null or float.min");
+                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, "0", "MLR", senMlEntry.getDataSetType());
+                        //linearRegressionEntry.setArrivalTime(arrivalTime);
+                        context.send(
+                                MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
+                                        .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
+                                        .build());
                     }
                 }
 
@@ -130,14 +134,11 @@ public class LinearRegressionFn implements StatefulFunction {
                     InputStream bytesInputStream = new ByteArrayInputStream(BlobModelObject);
 
                     try {
-                        LinearRegressionPredictor.lr =
-                                (LinearRegression) SerializationHelper.read(bytesInputStream);
+                        linearRegressionPredictor.setLr(
+                                (LinearRegression) SerializationHelper.read(bytesInputStream));
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new RuntimeException("Error, when reading BlobObject " + e);
-                    }
-                    if (this.l.isInfoEnabled()) {
-                        this.l.info("Model is updated MLR {} ", LinearRegressionPredictor.lr.toString());
                     }
                 }
 
@@ -169,7 +170,7 @@ public class LinearRegressionFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
+        linearRegressionPredictor.tearDown();
         return context.done();
     }
 }

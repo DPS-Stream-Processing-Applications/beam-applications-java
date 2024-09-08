@@ -27,14 +27,14 @@ public class ErrorEstimateFn implements StatefulFunction {
                     .withSupplier(ErrorEstimateFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
-    private static Logger l;
+    private  Logger l;
     private String dataSetType;
     private Properties p;
     private String Res = "0";
     private String avgRes = "0";
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public  void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     public void setup(String dataSetType) {
@@ -138,6 +138,7 @@ public class ErrorEstimateFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         return context.done();
     }
 }

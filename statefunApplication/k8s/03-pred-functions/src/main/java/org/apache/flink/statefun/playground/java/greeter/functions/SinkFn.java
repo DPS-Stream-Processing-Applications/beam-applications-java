@@ -20,10 +20,10 @@ public class SinkFn implements StatefulFunction {
             StatefulFunctionSpec.builder(TYPENAME)
                     .withSupplier(SinkFn::new)
                     .build();
-    private static Logger l;
+    private  Logger l;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public  void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     @Override

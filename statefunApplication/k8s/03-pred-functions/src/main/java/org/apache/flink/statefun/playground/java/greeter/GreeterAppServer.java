@@ -55,8 +55,7 @@ public final class GreeterAppServer {
         WriteToDatabase writeToDatabase = new WriteToDatabase(ipAddress, "mydb");
         writeToDatabase.prepareDataBaseForApplication();
         System.out.println("PRED-" + System.getenv("DATASET"));
-
-
+        
         final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
         final Undertow httpServer =
                 Undertow.builder()

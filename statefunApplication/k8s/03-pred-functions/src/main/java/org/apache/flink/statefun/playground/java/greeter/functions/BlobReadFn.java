@@ -53,12 +53,12 @@ public final class BlobReadFn implements StatefulFunction {
             StatefulFunctionSpec.builder(TYPENAME).withSupplier(BlobReadFn::new).build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
-    private static Logger l;
+    private  Logger l;
     Properties p;
     AzureBlobDownloadTask azureBlobDownloadTask;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public  void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     public void prepare() {
@@ -108,6 +108,7 @@ public final class BlobReadFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        azureBlobDownloadTask.tearDown();
         return context.done();
     }
 

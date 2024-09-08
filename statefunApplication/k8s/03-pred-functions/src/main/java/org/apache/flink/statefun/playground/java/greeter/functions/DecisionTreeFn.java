@@ -34,12 +34,12 @@ public class DecisionTreeFn implements StatefulFunction {
                     .withSupplier(DecisionTreeFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
-    private static Logger l;
+    private  Logger l;
     DecisionTreeClassify decisionTreeClassify;
     private String dataSetType;
 
-    public static void initLogger(Logger l_) {
-        l = l_;
+    public  void initLogger(Logger l_) {
+        this.l = l_;
     }
 
     public void setup(String dataSetType) {
@@ -114,9 +114,7 @@ public class DecisionTreeFn implements StatefulFunction {
                     byte[] BlobModelObject = blobReadEntry.getBlobModelObject();
                     InputStream bytesInputStream = new ByteArrayInputStream(BlobModelObject);
                     try {
-
-                        DecisionTreeClassify.j48tree = (J48) SerializationHelper.read(bytesInputStream);
-                        if (l.isInfoEnabled()) l.info("Model is updated DTC {}", DecisionTreeClassify.j48tree);
+                        decisionTreeClassify.j48tree = (J48) SerializationHelper.read(bytesInputStream);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -144,7 +142,7 @@ public class DecisionTreeFn implements StatefulFunction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
+        decisionTreeClassify.tearDown();
         return context.done();
 
     }

@@ -10,16 +10,12 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
 
     public static final String DEFAULT_KEY = "D";
     protected Logger l;
-    protected StopWatch sw;
     protected int counter;
     private U lastResult = null;
 
     @Override
     public void setup(Logger l_, Properties p_) {
         l = l_;
-        sw = new StopWatch();
-        sw.start();
-        sw.suspend();
         counter = 0;
         l.debug("finished task setup");
     }
@@ -31,11 +27,9 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
      */
     @Override
     public Float doTask(Map<String, T> map) {
-        sw.resume();
         ////////////////////////
         Float result = doTaskLogic(map);
         ////////////////////////
-        sw.suspend();
         assert result >= 0;
         counter++;
         return result;
@@ -72,8 +66,6 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
 
     @Override
     public float tearDown() {
-        sw.stop();
-        l.debug("finished task tearDown");
-        return sw.getTime() / counter;
+        return 1.0f;
     }
 }

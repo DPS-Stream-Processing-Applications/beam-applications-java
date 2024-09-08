@@ -18,12 +18,11 @@ import java.util.Properties;
  */
 public class SenMlParse extends AbstractTask<String, Map> {
 
-    private static final Object SETUP_LOCK = new Object();
+    private  final Object SETUP_LOCK = new Object();
     // static fields common to all threads
-    private static boolean doneSetup = false;
-    private static int useMsgField;
+    private  boolean doneSetup = false;
+    private  int useMsgField;
     private final String dataSetType;
-    private ArrayList<String> senMLlist;
     private String sampledata;
 
     private boolean isJson;
@@ -33,14 +32,14 @@ public class SenMlParse extends AbstractTask<String, Map> {
         this.isJson = isJson;
     }
 
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
+    public void setup(Logger l_, String sampledata, int useMsgField) {
+        //super.setup(l_, p_);
         synchronized (SETUP_LOCK) {
             if (!doneSetup) {
-                useMsgField = Integer.parseInt(p_.getProperty("PARSE.SENML.USE_MSG_FIELD", "0"));
+                this.useMsgField = useMsgField;
                 doneSetup = true;
             }
-            sampledata = p_.getProperty("PARSE.SENML.SAMPLEDATA");
+            this.sampledata = sampledata;
         }
     }
 
@@ -71,10 +70,10 @@ public class SenMlParse extends AbstractTask<String, Map> {
             String baseUnit = (String) ((jsonObject.get("bu") == null) ? null : jsonObject.get("bu"));
             String baseName = (String) ((jsonObject.get("bn") == null) ? null : jsonObject.get("bn"));
             JSONArray jsonArr = (JSONArray) jsonObject.get("e");
-            Object v;
+            String v;
             String n, u;
             long t;
-            HashMap mapkeyValues = new HashMap<String, String>();
+            HashMap<String, String> mapkeyValues = new HashMap<>();
             mapkeyValues.put("timestamp", String.valueOf(baseTime));
             for (int j = 0; j < jsonArr.size(); j++) {
                 jsonObject = (JSONObject) jsonArr.get(j);

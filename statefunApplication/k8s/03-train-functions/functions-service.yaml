@@ -33,7 +33,7 @@ spec:
         - name: functions 
           image: jungerindy/statefun_train:latest
           #image: train-functions
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
               name: endpoint
@@ -47,4 +47,11 @@ spec:
               port: 8000
             initialDelaySeconds: 30
             periodSeconds: 60
+          resources:
+            requests:
+              memory: "5Gi"
+              cpu: "1"
+            limits:
+              memory: "5Gi"
+              cpu: "1"
 

@@ -1,31 +1,15 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
-import org.apache.beam.sdk.metrics.Gauge;
-import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Sink extends DoFn<MqttPublishEntry, String> {
+public class Sink extends DoFn<String, String> {
   private static final Logger LOG = LoggerFactory.getLogger(Sink.class);
 
-  private final Gauge gauge;
-
-  public Sink() {
-    this.gauge = Metrics.gauge(Sink.class, "Custom_End_to_End_Latency");
-  }
-
   @ProcessElement
-  public void processElement(@Element MqttPublishEntry input, OutputReceiver<String> out) {
-    String msgId = input.getMsgid();
-    LOG.info("In sink: " + msgId);
-    if (input.getArrivalTime() != 0L) {
-      long latency = System.currentTimeMillis() - input.getArrivalTime();
-      gauge.set(latency);
-      LOG.warn("Lat: " + latency);
-    }
-    System.out.println("test " + input.getMsgid());
-    out.output(msgId);
+  public void processElement(@Element String input, OutputReceiver<String> out) {
+    LOG.info("In sink: " + input);
+    out.output(input);
   }
 }

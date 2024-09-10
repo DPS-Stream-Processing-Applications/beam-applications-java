@@ -14,9 +14,11 @@ import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
+import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class FlinkJob {
 
@@ -147,19 +149,22 @@ public class FlinkJob {
             .and(errorEstimate2)
             .apply("Merge PCollections", Flatten.pCollections());
 
-    PCollection<MqttPublishEntry> publish1 =
+    PCollection<String> publish1 =
         errorEstimate.apply(
-            "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
-
-    PCollection<MqttPublishEntry> publish2 =
+            "Format ErrorEstimateEntry to String",
+            MapElements.into(TypeDescriptors.strings())
+                .via((MqttPublishInput input) -> input.getMsgid()));
+    PCollection<String> publish2 =
         decisionTree.apply(
-            "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "pred-publish")));
-    PCollection<MqttPublishEntry> publish =
+            "Format ErrorEstimateEntry to String",
+            MapElements.into(TypeDescriptors.strings())
+                .via((MqttPublishInput input) -> input.getMsgid()));
+    PCollection<String> publish =
         PCollectionList.of(publish1)
             .and(publish2)
             .apply("Merge PCollections", Flatten.pCollections());
+
+    publish.apply(new WriteStringSink("pred-publish"));
 
     PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink()));
     p.run();

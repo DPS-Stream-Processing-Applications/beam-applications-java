@@ -16,9 +16,11 @@ import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
+import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class FlinkJob {
 
@@ -156,12 +158,14 @@ public class FlinkJob {
     PCollection<BlobUploadEntry> blobUpload =
         totalTrainData.apply("Blob Write", ParDo.of(new BlobWriteBeam(p_)));
 
-    PCollection<MqttPublishEntry> mqttPublish =
+    PCollection<String> publish =
         blobUpload.apply(
-            "MQTT Publish",
-            ParDo.of(new KafkaPublishBeam(p_, kafkaBootstrapServers, "train-publish")));
+            "Format ErrorEstimateEntry to String",
+            MapElements.into(TypeDescriptors.strings())
+                .via((BlobUploadEntry input) -> input.getFileName()));
 
-    mqttPublish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
+    publish.apply(new WriteStringSink("train-publish"));
+    publish.apply("Sink", ParDo.of(new Sink(sinkLogFileName)));
     p.run();
   }
 }

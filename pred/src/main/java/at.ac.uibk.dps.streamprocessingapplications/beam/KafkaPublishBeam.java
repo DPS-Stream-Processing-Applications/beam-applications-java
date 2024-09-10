@@ -63,7 +63,7 @@ public class KafkaPublishBeam extends DoFn<MqttPublishInput, MqttPublishEntry> {
 
     if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
 
-    HashMap<String, String> map = new HashMap();
+    HashMap<String, String> map = new HashMap<>();
     map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
     myKafkaProducer.doTask(map);
     MqttPublishEntry publishEntry = new MqttPublishEntry(msgId, meta, obsVal);

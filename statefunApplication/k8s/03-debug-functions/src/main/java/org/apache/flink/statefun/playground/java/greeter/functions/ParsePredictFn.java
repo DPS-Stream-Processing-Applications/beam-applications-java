@@ -35,6 +35,8 @@ public class ParsePredictFn implements StatefulFunction {
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
     static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
 
+    private boolean doneSetup=false;
+
 
 
 
@@ -60,11 +62,14 @@ public class ParsePredictFn implements StatefulFunction {
         }
         return true;
     }
+    private void setup(){
+        doneSetup=true;
+    }
 
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
-
+        setup();
         try {
             SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
             String msg = sourceEntry.getPayload();

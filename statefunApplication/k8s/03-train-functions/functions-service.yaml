@@ -51,7 +51,4 @@ spec:
             requests:
               memory: "5Gi"
               cpu: "1"
-            limits:
-              memory: "5Gi"
-              cpu: "1"
 

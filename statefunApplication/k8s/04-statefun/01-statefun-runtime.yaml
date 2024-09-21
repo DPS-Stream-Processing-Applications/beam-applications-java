@@ -26,8 +26,8 @@ data:
     s3.path-style-access: true
 
     #Flink memory management
-    jobmanager.memory.process.size: 2048m
-    taskmanager.memory.process.size: 2048m
+    jobmanager.memory.process.size: 2g
+    taskmanager.memory.process.size: 2g
 
     #Monitoring
     metrics.reporters: prom

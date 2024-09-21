@@ -15,10 +15,12 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This task is thread-safe, and can be run from multiple threads.
@@ -53,128 +55,93 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
         this.databaseName = databaseName;
     }
 
+    public void setup(Logger l_, Properties p_) {
+        super.setup(l_, p_);
+    }
+
     public void setLr(LinearRegression lr) {
         this.lr = lr;
     }
 
-    public void setup(Logger l_, Properties p_) {
-        super.setup(l_, p_);
-        synchronized (this) {
-            if (!doneSetup) {
-                try {
-                    useMsgField = Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
-                    // private static String SAMPLE_HEADER = "";
-                    //			"@RELATION city_data\n" +
-                    //			"\n" +
-                    ////			"@ATTRIBUTE Longi            NUMERIC\n" +
-                    ////			"@ATTRIBUTE Lat              NUMERIC\n" +
-                    //			"@ATTRIBUTE Temp             NUMERIC\n" +
-                    //			"@ATTRIBUTE Humid            NUMERIC\n" +
-                    //			"@ATTRIBUTE Light            NUMERIC\n" +
-                    //			"@ATTRIBUTE Dust             NUMERIC\n" +
-                    //			"@ATTRIBUTE airquality           NUMERIC\n" +
-                    //			"\n" +
-                    //			"@DATA\n" +
-                    //			"%header format";
-                    String modelFilePath = "LR-TAXI-Numeric_model";
-                    byte[] pdfData = null;
-
-                    MongoClientSettings settings = MongoClientSettings.builder()
-                            .applyConnectionString(new ConnectionString(databaseUrl))
-                            .build();
-                    try (MongoClient mongoClient = MongoClients.create(settings)) {
-                        MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
-                        MongoCollection<Document> collection = mongoDatabase.getCollection("pdfCollection");
-
-                        Document query = new Document(modelFilePath, new Document("$exists", true));
-                        Document projection = new Document(modelFilePath, 1).append("_id", 0);
-
-                        for (Document document : collection.find(query).projection(projection)) {
-                            Binary pdfBinary = (Binary) document.get(modelFilePath);
-                            pdfData = pdfBinary.getData();
-                        }
-                        if (pdfData == null) {
-                            throw new RuntimeException("null content in db");
-                        }
-                    } catch (MongoException e) {
-                        System.err.println(e);
-                        l.error("MongoDb-error: " + e);
-                        throw new RuntimeException(e);
-                    }
-
-                    // Model deserialization
-                    byte[] csvContent = pdfData;
-                    try {
-                        assert csvContent != null;
-                        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(csvContent);
-                             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
-                            lr = (LinearRegression) objectInputStream.readObject();
-                            if (lr == null) {
-                                throw new RuntimeException("lr is null");
-                            }
-                            if (l.isInfoEnabled()) l.info("Model is {} ", lr.toString());
-                            doneSetup = true;
-                        }
-                    } catch (Exception e) {
-                        l.warn("error loading decision tree model from file: " + modelFilePath, e);
-                        doneSetup = false;
-                        throw new RuntimeException("Error loading decision tree model from file", e);
-                    }
-                } catch (Exception e) {
-                    l.error("Error in read from db", e);
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
-
     @Override
     protected Float doTaskLogic(Map<String, String> map) {
-        String m = map.get(AbstractTask.DEFAULT_KEY);
-        Instance testInstance = null;
-        String[] testTuple;
-        Instances instanceHeader = null;
-        int prediction;
-        if (useMsgField > 0) {
-            testTuple = m.split(",");
-        } else {
-            testTuple = SAMPLE_INPUT.split(",");
-        }
-        //testTuple="22.7,49.3,0,1955.22,27".split(","); //dummy
-        WekaUtil wekaUtil = new WekaUtil();
-        try {
-            instanceHeader = wekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
-        } catch (Exception e) {
-            l.warn("error with loading dataset instances " + instanceHeader, e);
-            return super.setLastResult(Float.MIN_VALUE);
-        }
+        // Asynchronous DB access to fetch model
+        CompletableFuture<LinearRegression> futureModel = fetchModelFromMongoDB();
 
-        try {
-            testInstance = wekaUtil.prepareInstance(instanceHeader, testTuple, l);
+        // When model is retrieved, make predictions
+        return futureModel.thenApply(lr -> {
+            if (lr == null) {
+                l.warn("Linear regression model is null");
+                return super.setLastResult(Float.MIN_VALUE);
+            }
 
-        } catch (Exception e) {
-            l.warn("error when preparing instances " + testInstance, e);
-            return super.setLastResult(Float.MIN_VALUE);
-        }
+            String m = map.get(AbstractTask.DEFAULT_KEY);
+            Instance testInstance = null;
+            String[] testTuple;
+            Instances instanceHeader = null;
+            int prediction;
+            if (useMsgField > 0) {
+                testTuple = m.split(",");
+            } else {
+                testTuple = SAMPLE_INPUT.split(",");
+            }
+            //testTuple="22.7,49.3,0,1955.22,27".split(",");
+            try {
+                WekaUtil wekaUtil = new WekaUtil();
+                instanceHeader = wekaUtil.loadDatasetInstances(new StringReader(SAMPLE_HEADER), l);
+                testInstance = wekaUtil.prepareInstance(instanceHeader, testTuple, l);
+            } catch (Exception e) {
+                l.warn("Error preparing test instance", e);
+                return super.setLastResult(Float.MIN_VALUE);
+            }
 
-        if (lr == null) {
-            return super.setLastResult(Float.MIN_VALUE);
-        }
-        try {
-            prediction = (int) lr.classifyInstance(testInstance);
-        } catch (Exception e) {
-            l.warn("error when making prediction " + lr, e);
-            lr = null;
-            return super.setLastResult(Float.MIN_VALUE);
-        }
-        if (l.isInfoEnabled()) {
-            l.info(" ----------------------------------------- ");
-            l.info("Test data               : {}", testInstance);
-            l.info("Test data prediction result {}", prediction);
-        }
-        lr = null;
-        return super.setLastResult((float) prediction);
+            try {
+                prediction = (int) lr.classifyInstance(testInstance);
+            } catch (Exception e) {
+                l.warn("Error during model prediction", e);
+                return super.setLastResult(Float.MIN_VALUE);
+            }
 
+            return  super.setLastResult((float) prediction);
+        }).exceptionally(ex -> {
+            l.error("Error fetching model or making prediction", ex);
+            return super.setLastResult(Float.MIN_VALUE);
+        }).join();
+    }
+
+
+    private CompletableFuture<LinearRegression> fetchModelFromMongoDB() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                MongoClientSettings settings = MongoClientSettings.builder()
+                        .applyConnectionString(new ConnectionString(databaseUrl))
+                        .build();
+                try (MongoClient mongoClient = MongoClients.create(settings)) {
+                    MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+                    MongoCollection<Document> collection = mongoDatabase.getCollection("pdfCollection");
+
+                    String modelFilePath = "LR-TAXI-Numeric_model";
+                    Document query = new Document(modelFilePath, new Document("$exists", true));
+                    Document projection = new Document(modelFilePath, 1).append("_id", 0);
+
+                    Binary pdfBinary = null;
+                    for (Document document : collection.find(query).projection(projection)) {
+                        pdfBinary = (Binary) document.get(modelFilePath);
+                    }
+
+                    if (pdfBinary == null) {
+                        throw new RuntimeException("Model data is null in MongoDB");
+                    }
+
+                    // Deserialize the model
+                    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(pdfBinary.getData());
+                         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+                        return (LinearRegression) objectInputStream.readObject();
+                    }
+                }
+            } catch (RuntimeException | ClassNotFoundException | IOException e) {
+                throw new RuntimeException("Error fetching or deserializing model from MongoDB", e);
+            }
+        });
     }
 }
-

@@ -29,6 +29,11 @@ spec:
               port: 9000
             initialDelaySeconds: 30
             periodSeconds: 60
+
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service

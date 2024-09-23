@@ -7,7 +7,7 @@ import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
 import java.util.concurrent.CompletableFuture;
-
+/*
 public class ReadDatabaseFn implements StatefulFunction {
 
     static final TypeName TYPENAME = TypeName.typeNameFromString("pred/readDatabase");
@@ -24,3 +24,4 @@ public class ReadDatabaseFn implements StatefulFunction {
         return context.done();
     }
 }
+ */

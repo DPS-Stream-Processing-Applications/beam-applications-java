@@ -2,8 +2,8 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.SenMlParse;
-import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.generated.SourceEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SENML_ENTRY_JSON_TYPE;
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SEN_ML_ENTRY_PROTOBUF_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_PROTOBUF_TYPE;
 
 public class ParsePredictFn implements StatefulFunction {
 
@@ -115,7 +115,7 @@ public class ParsePredictFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
 
         try {
-            SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
+            SourceEntry sourceEntry = message.as(SOURCE_ENTRY_PROTOBUF_TYPE);
             setup(sourceEntry.getDataSetType());
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
@@ -139,15 +139,19 @@ public class ParsePredictFn implements StatefulFunction {
             }
             obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
 
-            SenMlEntry senMlEntry =
-                    new SenMlEntry(
-                            msgId,
-                            resultMap.get(idField),
-                            meta.toString(),
-                            "dummyobsType",
-                            obsVal.toString(),
-                            "MSGTYPE",
-                            "DumbType", sourceEntry.getDataSetType());
+
+
+            final SenMlEntry senMlEntry =
+                    SenMlEntry.newBuilder()
+                            .setMsgid(msgId)
+                            .setSensorID(resultMap.get(idField))
+                            .setMeta(meta.toString())
+                            .setObsType("dummyobsType")
+                            .setObsVal(String.valueOf(obsVal))
+                            .setMsgtype("MSGTYPE")
+                            .setAnalyticType("DumbType")
+                            .setDataSetType(sourceEntry.getDataSetType()).build();
+
 
 
             meta=null;
@@ -157,13 +161,13 @@ public class ParsePredictFn implements StatefulFunction {
 
             context.send(
                     MessageBuilder.forAddress(INBOX_2, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
+                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
                             .build());
 
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
+                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
                             .build());
 
 
@@ -171,7 +175,7 @@ public class ParsePredictFn implements StatefulFunction {
 
             context.send(
                     MessageBuilder.forAddress(INBOX_3, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
+                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
                             .build());
 
         } catch (Exception e) {

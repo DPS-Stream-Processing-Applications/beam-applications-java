@@ -47,7 +47,7 @@ public final class GreeterAppServer {
         functions.withStatefulFunction(ErrorEstimateFn.SPEC);
         functions.withStatefulFunction(LinearRegressionFn.SPEC);
         functions.withStatefulFunction(ParsePredictFn.SPEC);
-        functions.withStatefulFunction(ReadDatabaseFn.SPEC);
+        //functions.withStatefulFunction(ReadDatabaseFn.SPEC);
         functions.withStatefulFunction(SinkFn.SPEC);
         functions.withStatefulFunction(MqttPublishFn.SPEC);
 

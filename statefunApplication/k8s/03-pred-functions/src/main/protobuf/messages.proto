@@ -29,3 +29,94 @@ message UserProfile {
     string login_location = 3;
     int32 seen_count = 4;
 }
+
+message AverageEntry {
+  string meta = 1;
+  string sensorId = 2;
+  string obsType = 3;
+  string avGres = 4;
+  string obsVal = 5;
+  string msgid = 6;
+  string analyticType = 7;
+  string dataSetType = 8;
+  int64 arrivalTime = 9;
+}
+
+message BlobReadEntry {
+  bytes blobModelObject = 1;
+  string msgid = 2;
+  string msgType = 3;
+  string analyticType = 4;
+  string meta = 5;
+  string dataSetType = 6;
+  int64 arrivalTime = 7;
+}
+
+message DecisionTreeEntry {
+  string meta = 1;
+  string obsval = 2;
+  string msgid = 3;
+  string res = 4;
+  string analyticType = 5;
+  string dataSetType = 6;
+  int64 arrivalTime = 7;
+}
+
+message ErrorEstimateEntry {
+  string meta = 1;
+  float error = 2;
+  string msgid = 3;
+  string analyticType = 4;
+  string obsval = 5;
+  string dataSetType = 6;
+  int64 arrivalTime = 7;
+}
+
+message LinearRegressionEntry {
+  string meta = 1;
+  string obsval = 2;
+  string msgid = 3;
+  string res = 4;
+  string analyticType = 5;
+  string dataSetType = 6;
+  int64 arrivalTime = 7;
+}
+
+message MqttPublishEntry {
+  string msgid = 1;
+  string meta = 2;
+  string obsval = 3;
+  string dataSetType = 4;
+  int64 arrivalTime = 5;
+}
+
+message MqttSubscribeEntry {
+  string analaytictype = 1;
+  string blobModelPath = 2;
+  string msgid = 3;
+  string dataSetType = 4;
+  int64 arrivalTime = 5;
+}
+
+message SenMlEntry {
+  string msgid = 1;
+  string sensorID = 2;
+  string meta = 3;
+  string obsType = 4;
+  string obsVal = 5;
+  string msgtype = 6;
+  string analyticType = 7;
+  string dataSetType = 8;
+  int64 arrivalTime = 9;
+}
+
+message SourceEntry {
+  int64 msgid = 1;
+  string payload = 2;
+  string dataSetType = 3;
+  int64 arrivalTime = 4;
+}
+
+
+
+

@@ -1,16 +1,14 @@
 package org.apache.flink.statefun.playground.java.greeter.functions;
 
-import org.apache.flink.statefun.playground.java.greeter.types.MqttSubscribeEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.generated.MqttSubscribeEntry;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
-import org.slf4j.Logger;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.MQTT_SUBSCRIBE_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.MQTT_SUBSCRIBE_ENTRY_PROTOBUF_TYPE;
 
 public class MqttSubscribeFn implements StatefulFunction {
 
@@ -35,12 +33,17 @@ public class MqttSubscribeFn implements StatefulFunction {
         long msgId = context.storage().get(MSGID_COUNT).orElse(1L);
         String rowString = new String(message.rawValue().toByteArray(), StandardCharsets.UTF_8);
 
-        MqttSubscribeEntry mqttSubscribeEntry = new MqttSubscribeEntry(rowString.split("-")[1], rowString, Long.toString(msgId), "TAXI");
+        MqttSubscribeEntry mqttSubscribeEntry =
+                MqttSubscribeEntry.newBuilder()
+                        .setAnalaytictype(rowString.split("-")[1])
+                        .setBlobModelPath(rowString)
+                        .setMsgid(Long.toString(msgId))
+                        .setDataSetType("TAXI").build();
         msgId += 1;
         context.storage().set(MSGID_COUNT, msgId);
         context.send(
                 MessageBuilder.forAddress(INBOX, String.valueOf(mqttSubscribeEntry.getMsgid()))
-                        .withCustomType(MQTT_SUBSCRIBE_ENTRY_JSON_TYPE, mqttSubscribeEntry)
+                        .withCustomType(MQTT_SUBSCRIBE_ENTRY_PROTOBUF_TYPE, mqttSubscribeEntry)
                         .build());
 
         return context.done();

@@ -21,10 +21,9 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.generated.SourceEntry;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.Message;
-
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_PROTOBUF_TYPE;
 
 
 public final class SourceFn implements StatefulFunction {
@@ -72,8 +71,8 @@ public final class SourceFn implements StatefulFunction {
                 break;
             }
         }
-        jsonArray=null;
-        gson=null;
+        jsonArray = null;
+        gson = null;
         return convertToUnixTimeStamp(pickupDatetime);
     }
 
@@ -115,7 +114,11 @@ public final class SourceFn implements StatefulFunction {
             }
 
             long msgId = context.storage().get(MSGID_COUNT).orElse(1L);
-            SourceEntry sourceEntry = new SourceEntry(msgId, newRow, datasetType);
+            final SourceEntry sourceEntry =
+                    SourceEntry.newBuilder()
+                            .setMsgid(msgId)
+                            .setPayload(newRow)
+                            .setDataSetType(datasetType).build();
 
 
             msgId += 1;
@@ -127,10 +130,10 @@ public final class SourceFn implements StatefulFunction {
             }
              */
 
-
+            System.out.println("Source msgid: "+sourceEntry.getMsgid());
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(sourceEntry.getMsgid()))
-                            .withCustomType(SOURCE_ENTRY_JSON_TYPE, sourceEntry)
+                            .withCustomType(SOURCE_ENTRY_PROTOBUF_TYPE, sourceEntry)
                             .build());
         } catch (Exception e) {
             System.err.println(e.getMessage());

@@ -7,8 +7,8 @@ import os
 import requests
 import logging
 import sys
+import struct
 import signal
-import subprocess
 from kubernetes.stream import portforward
 
 
@@ -41,11 +41,19 @@ def cleanup():
     try:
         consumer.close()
         producer.close()
-        terminate_flink_deployment(manifest_docs)
-        stop_port_forward(forwarder)
+        global is_serverful_framework_used
+        if is_serverful_framework_used:
+            path_manifest_flink_session_cluster = (
+                "/app/flink-session-cluster-deployment.yaml"
+            )
+            manifest_docs_flink_session_cluster = read_manifest(
+                path_manifest_flink_session_cluster
+            )
+            terminate_serverful_framework(manifest_docs_flink_session_cluster)
+        else:
+            terminate_serverless_framework()
     except Exception as e:
-        logging.info(f"Cleanup error: {e}")
-        logging.info("functions pod was already down")
+        logging.error(f"Cleanup error: {e}")
 
 
 def port_forward_service(service_name, namespace, local_port, service_port):
@@ -219,23 +227,22 @@ def submit_flink_job(job_jar_path, job_manager_host, database_url, experiment_ru
         raise Exception(f"Failed to upload JAR file: {response.text}")
 
     jar_id = response.json()["filename"].split("/")[-1]
-
     logging.info("Jar: id" + str(jar_id))
-
     submit_url = f"http://{job_manager_host}:8081/jars/{jar_id}/run"
     job_params = {
-        "programArgs": f"--databaseUrl={database_url} --experiRunId={experiment_run_id}"
+        "programArgs": f"--databaseUrl={database_url} --experiRunId={experiment_run_id} --streaming --operatorChaining=false"
     }
 
     response = requests.post(submit_url, json=job_params)
     logging.info(str(response.content))
+    # Otherwise there is an error about the detached mode
     """
     if response.status_code != 200:
         logging.error("Failed jar-submission: "+str(response.status_code))
         raise Exception(f"Failed to submit job: {response.text}")
 
     """
-    print(f"Job submitted successfully: {response.json()}")
+    logging.info(f"Job submitted successfully: {response.json()}")
 
 
 def get_jobid_of_running_job(job_manager_host):
@@ -248,10 +255,9 @@ def get_jobid_of_running_job(job_manager_host):
         for job in jobs_data["jobs"]:
             if job["status"] == "RUNNING":
                 running_jobs.append(job["id"])
-
         return running_jobs
     else:
-        print(f"Failed to fetch jobs. Status code: {response.status_code}")
+        logging.error(f"Failed to fetch jobs. Status code: {response.status_code}")
         return []
 
 
@@ -260,15 +266,15 @@ def stop_flink_job(job_manager_host, job_id):
 
     try:
         response = requests.get(url)
-
         if response.status_code == 200 or response.status_code == 202:
-            print("Job stopped successfully.")
+            logging.info("Job stopped successfully.")
         else:
-            print(f"Failed to stop the job. Status code: {response.status_code}")
-            print(f"Response: {response.text}")
-
+            logging.error(
+                f"Failed to stop the job. Status code: {response.status_code}"
+            )
+            logging.error(f"Response: {response.text}")
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        logging.error(f"An error occurred: {e}")
 
 
 def start_deployment_and_service(path_manifest, is_statefun_starter=False):
@@ -395,9 +401,12 @@ def create_statefun_environment():
     start_deployment_and_service(manifest_runtime)
 
 
-def create_statefun_starter():
-    # FIXME
-    manifest = read_manifest_statefun_starter("/app/statefunStarter-manifest.yaml", True)
+def create_statefun_starter(mongodb, dataset, application):
+    # FIXME for remote running
+    manifest = read_manifest_statefun_starter(
+        "/app/statefunStarter-manifest.yaml", mongodb, dataset, application, True
+    )
+    logging.info(f"StatefunStarter: {manifest} ")
     start_deployment_and_service(manifest, True)
 
 
@@ -424,10 +433,25 @@ def terminate_serverless_framework():
     delete_minio()
 
 
-def create_serverless_framework():
+def create_serverless_framework(mongodb, dataset, application):
     create_minio()
     create_statefun_environment()
-    create_statefun_starter()
+    create_statefun_starter(mongodb, dataset, application)
+
+
+def create_serverful_framework(dataset, path_manifest, mongodb_address, application):
+    start_flink_deployment(path_manifest)
+    submit_flink_job(
+        "/app/FlinkJob.jar",
+        "flink-session-cluster-rest",
+        mongodb_address,
+        dataset + "-120",
+    )
+
+
+def terminate_serverful_framework(manifest_docs):
+    delete_all_jobs_from_serverful_framework()
+    terminate_flink_deployment(manifest_docs)
 
 
 def terminate_deployment_and_service(manifest_docs):
@@ -455,7 +479,9 @@ def terminate_deployment_and_service(manifest_docs):
             logging.info(f"ConfigMap '{name}' deleted.")
 
 
-def read_manifest_statefun_starter(path_manifest, run_locally=False):
+def read_manifest_statefun_starter(
+    path_manifest, mongodb, dataset, application, run_locally=False
+):
     with open(path_manifest, "r") as f:
         manifest = list(yaml.safe_load_all(f))
     for item in manifest:
@@ -468,12 +494,12 @@ def read_manifest_statefun_starter(path_manifest, run_locally=False):
                     container["imagePullPolicy"] = "Always"
                 env_vars = container.get("env", [])
                 for env in env_vars:
-                    if env["name"] == "MONGO_DB_ADDRESS":
-                        env["value"] = os.getenv("MONGODB")
+                    if env["name"] == "MONGODB":
+                        env["value"] = mongodb
                     elif env["name"] == "DATASET":
-                        env["value"] = os.getenv("DATASET")
+                        env["value"] = dataset
                     elif env["name"] == "APPLICATION":
-                        env["value"] = os.getenv("APPLICATION")
+                        env["value"] = application
     return manifest
 
 
@@ -484,7 +510,7 @@ def delete_all_jobs_from_serverful_framework():
         logging.info(f"Deleted job {job}")
 
 
-def main(manifest_docs, application):
+def main(manifest_docs, application, dataset, mongodb):
     is_deployed = False
     number_sent_messages = 0
     while True:
@@ -500,26 +526,51 @@ def main(manifest_docs, application):
                     submit_flink_job(
                         "/app/FlinkJob.jar",
                         "flink-session-cluster-rest",
-                        os.getenv("MONGODB"),
-                        application + "-120",
+                        mongodb,
+                        dataset + "-120",
                     )
                     logging.info(f"Number of sent messages: {number_sent_messages}")
 
 
-def debug_main(manifest_docs, application, dataset):
-    """
-    submit_flink_job(
-        "/app/FlinkJob.jar",
-        "flink-session-cluster-rest",
-        os.getenv("MONGODB"),
-        dataset + "-120",
-    )
-    """
+def debug_main(manifest_docs, application, dataset, mongodb):
     is_deployed = False
     number_sent_messages = 0
-    if not is_deployed:
-        create_serverless_framework()
-        logging.info("Exiting debug_main")
+
+    #FIXME
+    global is_serverful_framework_used
+    is_serverful_framework_used = False
+
+    serverful_topic = "senml-cleaned"
+    if application == "TRAIN":
+        serverful_topic = "train-source"
+
+    while True:
+        if is_serverful_framework_used:
+            if not is_deployed:
+                create_serverful_framework(dataset, manifest_docs, mongodb, application)
+                is_deployed = True
+
+            test_string = '[{"u":"string","n":"source","vs":"ci4lrerertvs6496"},{"v":"64.57491754110376","u":"lon","n":"longitude"},{"v":"171.83173176418288","u":"lat","n":"latitude"},{"v":"67.7","u":"far","n":"temperature"},{"v":"76.6","u":"per","n":"humidity"},{"v":"1351","u":"per","n":"light"},{"v":"929.74","u":"per","n":"dust"},{"v":"26","u":"per","n":"airquality_raw"}]'
+            producer.send(
+                serverful_topic,
+                key=struct.pack(">Q", int(time.time() * 1000)),
+                value=test_string.encode("utf-8"),
+            )
+            logging.info("send message for serverful")
+        else:
+            if not is_deployed:
+                create_serverless_framework(mongodb, dataset, application)
+                is_deployed = True
+
+            test_string = '[{"u":"string","n":"source","vs":"ci4lrerertvs6496"},{"v":"64.57491754110376","u":"lon","n":"longitude"},{"v":"171.83173176418288","u":"lat","n":"latitude"},{"v":"67.7","u":"far","n":"temperature"},{"v":"76.6","u":"per","n":"humidity"},{"v":"1351","u":"per","n":"light"},{"v":"929.74","u":"per","n":"dust"},{"v":"26","u":"per","n":"airquality_raw"}]'
+            producer.send(
+                "statefun-starter-input",
+                key=str(int(time.time() * 1000)).encode("utf-8"),
+                value=test_string,
+            )
+            logging.info("send message for serverless")
+        time.sleep(60)
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, handle_sigterm)
@@ -529,20 +580,20 @@ if __name__ == "__main__":
         dataset = os.getenv("DATASET")
         if not (dataset == "FIT" or dataset == "SYS" or dataset == "TAXI"):
             raise Exception("Unsupported dataset argument")
-        path_manifest = "/app/flink-session-cluster-deployment.yaml"
-        manifest_docs = read_manifest(path_manifest)
+        path_manifest_flink_session_cluster = (
+            "/app/flink-session-cluster-deployment.yaml"
+        )
+        manifest_docs_flink_session_cluster = read_manifest(
+            path_manifest_flink_session_cluster
+        )
         # main(manifest_docs, application)
-        debug_main(manifest_docs, application, dataset)
+        debug_main(
+            manifest_docs_flink_session_cluster, application, dataset, mongodb_address
+        )
     except KeyboardInterrupt:
         logging.info("Shutting down")
     except Exception as e:
         logging.error(f"An error occurred: {e}")
 
     finally:
-        consumer.close()
-        producer.close()
-        try:
-            terminate_serverless_framework()
-            # terminate_deployment(manifest_docs)
-        except Exception as e:
-            logging.error(f"Exception when shutting down {e}")
+        cleanup()

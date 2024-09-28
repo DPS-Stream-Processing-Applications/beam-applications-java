@@ -406,7 +406,6 @@ def create_statefun_starter(mongodb, dataset, application):
     manifest = read_manifest_statefun_starter(
         "/app/statefunStarter-manifest.yaml", mongodb, dataset, application, True
     )
-    logging.info(f"StatefunStarter: {manifest} ")
     start_deployment_and_service(manifest, True)
 
 
@@ -512,31 +511,58 @@ def delete_all_jobs_from_serverful_framework():
 
 def main(manifest_docs, application, dataset, mongodb):
     is_deployed = False
-    number_sent_messages = 0
+    number_sent_messages_serverful = 0
+    number_sent_messages_serverless = 0
+    global is_serverful_framework_used
+    serverful_topic = "senml-cleaned"
+    if application == "TRAIN":
+        serverful_topic = "train-source"
+
     while True:
         message = consumer.poll(timeout_ms=5000)
         if message:
             for tp, messages in message.items():
                 for msg in messages:
                     if not is_deployed:
-                        start_flink_deployment(manifest_docs)
-                        is_deployed = True
-                    last_message_time = time.time()
-                    number_sent_messages = number_sent_messages + 1
-                    submit_flink_job(
-                        "/app/FlinkJob.jar",
-                        "flink-session-cluster-rest",
-                        mongodb,
-                        dataset + "-120",
-                    )
-                    logging.info(f"Number of sent messages: {number_sent_messages}")
+                        if is_serverful_framework_used:
+                            create_serverful_framework(
+                                dataset, manifest_docs, mongodb, application
+                            )
+                            is_deployed = True
+                        else:
+                            create_serverless_framework(mongodb, dataset, application)
+                            is_deployed = True
+
+                    if is_serverful_framework_used:
+                        producer.send(
+                            serverful_topic,
+                            key=struct.pack(">Q", int(time.time() * 1000)),
+                            value=msg.decode().encode("utf-8"),
+                        )
+                        number_sent_messages_serverful = (
+                            number_sent_messages_serverful + 1
+                        )
+                        logging.info(
+                            f"Number of sent messages serverful: {number_sent_messages_serverful}"
+                        )
+                    else:
+                        producer.send(
+                            "statefun-starter-input",
+                            key=str(int(time.time() * 1000)).encode("utf-8"),
+                            value=msg.decode(),
+                        )
+                        number_sent_messages_serverless = (
+                            number_sent_messages_serverless + 1
+                        )
+                        logging.info(
+                            f"Number of sent messages serverless: {number_sent_messages_serverless}"
+                        )
 
 
 def debug_main(manifest_docs, application, dataset, mongodb):
     is_deployed = False
     number_sent_messages = 0
 
-    #FIXME
     global is_serverful_framework_used
     is_serverful_framework_used = False
 

@@ -164,9 +164,26 @@ public class FlinkJob {
             .and(publish2)
             .apply("Merge PCollections", Flatten.pCollections());
 
+    PCollection<Long> latencies1 =
+        errorEstimate.apply(
+            "Format ErrorEstimateEntry to Arrival Time",
+            MapElements.into(TypeDescriptors.longs())
+                .via((MqttPublishInput input) -> input.getArrivalTime()));
+
+    PCollection<Long> latencies2 =
+        decisionTree.apply(
+            "Format ErrorEstimateEntry to Arrival Time",
+            MapElements.into(TypeDescriptors.longs())
+                .via((MqttPublishInput input) -> input.getArrivalTime()));
+
+    PCollection<Long> latency =
+        PCollectionList.of(latencies1)
+            .and(latencies2)
+            .apply("Merge PCollections", Flatten.pCollections());
+
     publish.apply(new WriteStringSink("pred-publish"));
 
-    PCollection<String> out = publish.apply("Sink", ParDo.of(new Sink()));
+    PCollection<Long> out = latency.apply("Sink", ParDo.of(new Sink()));
     p.run();
   }
 }

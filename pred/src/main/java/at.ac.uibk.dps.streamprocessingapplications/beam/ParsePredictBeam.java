@@ -148,9 +148,4 @@ public class ParsePredictBeam extends DoFn<SourceEntry, SenMlEntry> {
       throw new RuntimeException("Error in ParsePredictBeam " + e);
     }
   }
-
-  @Teardown
-  public void cleanup() {
-    // xmlParse.tearDown();
-  }
 }

@@ -103,7 +103,7 @@ public class SourceBeam extends DoFn<String, SourceEntry> implements ISyntheticE
       l.info(newRow);
       values.setMsgid(Long.toString(msgId));
       values.setPayLoad(newRow);
-      if (msgId % 100 == 0) {
+      if (msgId % 500 == 0) {
         values.setArrivalTime(System.currentTimeMillis());
       }
 

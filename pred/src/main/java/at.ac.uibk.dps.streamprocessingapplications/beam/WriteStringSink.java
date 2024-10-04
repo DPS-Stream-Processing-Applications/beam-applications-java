@@ -6,7 +6,6 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-
 public class WriteStringSink extends PTransform<PCollection<String>, PDone> {
 
   String topic;

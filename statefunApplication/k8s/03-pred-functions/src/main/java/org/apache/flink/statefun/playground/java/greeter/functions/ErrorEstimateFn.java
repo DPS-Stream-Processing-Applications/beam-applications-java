@@ -96,6 +96,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                                     .setMsgid(msgId)
                                     .setAnalyticType(analyticsType)
                                     .setObsval(obsVal)
+                                    .setArrivalTime(linearRegressionEntry.getArrivalTime())
                                     .setDataSetType(linearRegressionEntry.getDataSetType()).build();
 
                     //errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
@@ -142,6 +143,7 @@ public class ErrorEstimateFn implements StatefulFunction {
                                     .setMsgid(msgId)
                                     .setAnalyticType(analyticsType)
                                     .setObsval(obsVal)
+                                    .setArrivalTime(arrivalTime)
                                     .setDataSetType(averageEntry.getDataSetType()).build();
                     //errorEstimateEntry.setArrivalTime(arrivalTime);
                     context.send(

@@ -114,23 +114,21 @@ public final class SourceFn implements StatefulFunction {
             }
 
             long msgId = context.storage().get(MSGID_COUNT).orElse(1L);
-            final SourceEntry sourceEntry =
+            SourceEntry.Builder sourceEntryBuilder =
                     SourceEntry.newBuilder()
                             .setMsgid(msgId)
                             .setPayload(newRow)
-                            .setDataSetType(datasetType).build();
+                            .setDataSetType(datasetType);
 
 
             msgId += 1;
             context.storage().set(MSGID_COUNT, msgId);
 
-            /*
-            if (msgId % 100 == 0) {
-                sourceEntry.setArrivalTime(System.currentTimeMillis());
-            }
-             */
 
-            System.out.println("Source msgid: "+sourceEntry.getMsgid());
+            if (msgId % 500 == 0) {
+                sourceEntryBuilder.setArrivalTime(System.currentTimeMillis());
+            }
+            SourceEntry sourceEntry = sourceEntryBuilder.build();
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(sourceEntry.getMsgid()))
                             .withCustomType(SOURCE_ENTRY_PROTOBUF_TYPE, sourceEntry)

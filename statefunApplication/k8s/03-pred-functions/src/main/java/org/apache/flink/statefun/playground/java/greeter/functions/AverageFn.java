@@ -117,6 +117,7 @@ public class AverageFn implements StatefulFunction {
                                     .setObsVal(obsVal)
                                     .setMsgid(msgId)
                                     .setAnalyticType("AVG")
+                                    .setArrivalTime(senMlEntry.getArrivalTime())
                                     .setDataSetType(senMlEntry.getDataSetType()).build();
                     //averageEntry.setArrivalTime(senMlEntry.getArrivalTime());
 

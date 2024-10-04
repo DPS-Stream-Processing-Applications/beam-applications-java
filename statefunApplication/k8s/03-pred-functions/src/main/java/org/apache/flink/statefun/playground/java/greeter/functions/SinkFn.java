@@ -30,13 +30,11 @@ public class SinkFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         initLogger(LoggerFactory.getLogger("APP"));
         MqttPublishEntry mqttPublishEntry = message.as(MQTT_PUBLISH_ENTRY_PROTOBUF_TYPE);
-        /*
+
         if (mqttPublishEntry.getArrivalTime() != 0L) {
             long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
-            l.warn("Latency: " + latency);
+            System.out.println("Latency: " + latency);
         }
-         */
-        System.out.println(mqttPublishEntry.getMsgid());
         return context.done();
     }
 }

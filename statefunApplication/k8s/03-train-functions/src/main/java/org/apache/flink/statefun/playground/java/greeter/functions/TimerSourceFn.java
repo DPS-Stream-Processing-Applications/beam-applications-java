@@ -60,8 +60,7 @@ public final class TimerSourceFn implements StatefulFunction {
         values.setMsgid(Long.toString(msgId));
         msgId += 1;
         context.storage().set(MSGID_COUNT, msgId);
-
-
+        values.setArrivalTime(System.currentTimeMillis());
         values.setRowKeyStart(ROWKEYSTART);
         values.setRowKeyEnd(ROWKEYEND);
         values.setDataSetType(System.getenv("DATASET"));

@@ -97,6 +97,7 @@ public class LinearRegressionFn implements StatefulFunction {
                                         .setMsgid(msgId)
                                         .setRes(res.toString())
                                         .setAnalyticType("MLR")
+                                        .setArrivalTime(arrivalTime)
                                         .setDataSetType(senMlEntry.getDataSetType()).build();
                         //linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
@@ -113,6 +114,7 @@ public class LinearRegressionFn implements StatefulFunction {
                                         .setMsgid(msgId)
                                         .setRes("0")
                                         .setAnalyticType("MLR")
+                                        .setArrivalTime(arrivalTime)
                                         .setDataSetType(senMlEntry.getDataSetType()).build();
                         //linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
@@ -176,6 +178,7 @@ public class LinearRegressionFn implements StatefulFunction {
                                         .setMsgid(msgId)
                                         .setRes(res.toString())
                                         .setAnalyticType("MLR")
+                                        .setArrivalTime(arrivalTime)
                                         .setDataSetType(blobReadEntry.getDataSetType()).build();
                         //linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(

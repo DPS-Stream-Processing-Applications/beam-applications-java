@@ -108,6 +108,7 @@ public class MqttPublishFn implements StatefulFunction {
                                 .setMsgid(msgId)
                                 .setMeta(meta)
                                 .setObsval(obsVal)
+                                .setArrivalTime(errorEstimateEntry.getArrivalTime())
                                 .setDataSetType(errorEstimateEntry.getDataSetType()).build();
                 //mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(

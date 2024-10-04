@@ -150,6 +150,7 @@ public class ParsePredictFn implements StatefulFunction {
                             .setObsVal(String.valueOf(obsVal))
                             .setMsgtype("MSGTYPE")
                             .setAnalyticType("DumbType")
+                            .setArrivalTime(sourceEntry.getArrivalTime())
                             .setDataSetType(sourceEntry.getDataSetType()).build();
 
 

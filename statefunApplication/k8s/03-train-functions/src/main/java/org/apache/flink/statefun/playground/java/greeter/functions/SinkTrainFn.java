@@ -27,11 +27,11 @@ public class SinkTrainFn implements StatefulFunction {
     }
 
     @Override
-    public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
+    public CompletableFuture<Void> apply(Context context, Message message) {
         initLogger(LoggerFactory.getLogger("APP"));
         MqttPublishEntry mqttPublishEntry = message.as(MqttPublish_ENTRY_JSON_TYPE);
         long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
-        l.warn("Latency: " + latency);
+        System.out.println("Latency: " + latency);
         return context.done();
     }
 }

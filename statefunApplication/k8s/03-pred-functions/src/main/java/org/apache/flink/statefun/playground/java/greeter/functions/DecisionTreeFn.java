@@ -88,6 +88,7 @@ public class DecisionTreeFn implements StatefulFunction {
                                         .setMsgid(msgId)
                                         .setRes(res.toString())
                                         .setAnalyticType("DTC")
+                                        .setArrivalTime(senMlEntry.getArrivalTime())
                                         .setDataSetType(senMlEntry.getDataSetType()).build();
                         context.send(
                                 MessageBuilder.forAddress(INBOX, decisionTreeEntry.getMsgid())
@@ -141,6 +142,7 @@ public class DecisionTreeFn implements StatefulFunction {
                                         .setMsgid(msgId)
                                         .setRes(res.toString())
                                         .setAnalyticType("DTC")
+                                        .setArrivalTime(arrivalTime)
                                         .setDataSetType(blobReadEntry.getDataSetType()).build();
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))

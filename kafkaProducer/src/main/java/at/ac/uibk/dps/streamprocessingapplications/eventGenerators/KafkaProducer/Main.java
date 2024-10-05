@@ -39,7 +39,7 @@ public class Main {
                   unixStartTime,
                   FILE_PATH,
                   i,
-                  THREAD_COUNT,
+                  THREAD_COUNT - 1,
                   KAFKA_TOPIC,
                   kafkaProperties));
       threads.add(thread);

@@ -36,7 +36,6 @@ public class EventProducer implements Runnable {
     try {
       this.reader =
           new CSVReaderBuilder(new FileReader(filePath))
-              .withSkipLines(1)
               .withCSVParser(new CSVParserBuilder().withSeparator(SEPARATION_CHARACTER).build())
               .build();
 

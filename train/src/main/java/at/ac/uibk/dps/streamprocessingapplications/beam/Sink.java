@@ -6,18 +6,20 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Sink extends DoFn<String, String> {
+public class Sink extends DoFn<Long, Long> {
   private static final Logger LOG = LoggerFactory.getLogger("APP");
   private final Gauge gauge;
-  String csvFileNameOutSink;
 
-  public Sink(String csvFileNameOutSink) {
-    this.csvFileNameOutSink = csvFileNameOutSink;
-    this.gauge = Metrics.gauge(Sink.class, "Custom_End_to_End_Latency");
+  public Sink() {
+    this.gauge = Metrics.gauge(Sink.class, "custom_latency");
   }
 
   @ProcessElement
-  public void processElement(@Element String input, OutputReceiver<String> out) {
+  public void processElement(@Element Long input, OutputReceiver<Long> out) {
+    if (input != 0L) {
+      long latency = System.currentTimeMillis() - input;
+      gauge.set(latency);
+    }
     out.output(input);
   }
 }

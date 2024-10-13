@@ -8,21 +8,19 @@ import org.slf4j.Logger;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author simmhan, shilpa
  */
 public class SenMlParse extends AbstractTask<String, Map> {
 
-    private  final Object SETUP_LOCK = new Object();
-    // static fields common to all threads
-    private  boolean doneSetup = false;
-    private  int useMsgField;
+    private final Object SETUP_LOCK = new Object();
     private final String dataSetType;
+    // static fields common to all threads
+    private boolean doneSetup = false;
+    private int useMsgField;
     private String sampledata;
 
     private boolean isJson;

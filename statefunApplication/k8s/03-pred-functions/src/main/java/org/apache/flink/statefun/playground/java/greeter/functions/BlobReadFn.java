@@ -21,7 +21,7 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.AzureBlobDownloadTask;
 import org.apache.flink.statefun.playground.java.greeter.types.BlobReadEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.MqttSubscribeEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.MqttSubscribeEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -39,7 +39,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.*;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.BLOB_READ_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.MQTT_SUBSCRIBE_ENTRY_JSON_TYPE;
 
 /**
  * A simple function that computes personalized greetings messages based on a given.
@@ -52,11 +53,11 @@ public final class BlobReadFn implements StatefulFunction {
             StatefulFunctionSpec.builder(TYPENAME).withSupplier(BlobReadFn::new).build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
-    private  Logger l;
     Properties p;
     AzureBlobDownloadTask azureBlobDownloadTask;
+    private Logger l;
 
-    public  void initLogger(Logger l_) {
+    public void initLogger(Logger l_) {
         this.l = l_;
     }
 
@@ -77,7 +78,7 @@ public final class BlobReadFn implements StatefulFunction {
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) {
         try {
-            MqttSubscribeEntry mqttSubscribeEntry = message.as(MQTT_SUBSCRIBE_ENTRY_PROTOBUF_TYPE);
+            MqttSubscribeEntry mqttSubscribeEntry = message.as(MQTT_SUBSCRIBE_ENTRY_JSON_TYPE);
             String BlobModelPath = mqttSubscribeEntry.getBlobModelPath();
             String analyticsType = mqttSubscribeEntry.getAnalaytictype();
 

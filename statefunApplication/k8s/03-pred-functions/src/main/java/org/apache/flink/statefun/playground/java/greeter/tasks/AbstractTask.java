@@ -1,6 +1,5 @@
 package org.apache.flink.statefun.playground.java.greeter.tasks;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 
 import java.util.Map;

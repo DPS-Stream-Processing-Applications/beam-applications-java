@@ -4,8 +4,8 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.LinearRegressionPredictor;
 import org.apache.flink.statefun.playground.java.greeter.types.BlobReadEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.LinearRegressionEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.LinearRegressionEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -35,8 +35,8 @@ public class LinearRegressionFn implements StatefulFunction {
                     .withSupplier(LinearRegressionFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-    private Logger l;
     LinearRegressionPredictor linearRegressionPredictor = null;
+    private Logger l;
     private String dataSetType;
 
     public void initLogger(Logger l_) {
@@ -65,8 +65,8 @@ public class LinearRegressionFn implements StatefulFunction {
         initLogger(LoggerFactory.getLogger("APP"));
         try {
             long arrivalTime;
-            if (message.is(SEN_ML_ENTRY_PROTOBUF_TYPE)) {
-                SenMlEntry senMlEntry = message.as(SEN_ML_ENTRY_PROTOBUF_TYPE);
+            if (message.is(SENML_ENTRY_JSON_TYPE)) {
+                SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
                 setup(senMlEntry.getDataSetType());
                 arrivalTime = senMlEntry.getArrivalTime();
                 this.dataSetType = senMlEntry.getDataSetType();
@@ -90,36 +90,20 @@ public class LinearRegressionFn implements StatefulFunction {
 
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        final LinearRegressionEntry linearRegressionEntry =
-                                LinearRegressionEntry.newBuilder()
-                                        .setMeta(sensorMeta)
-                                        .setObsval(obsVal)
-                                        .setMsgid(msgId)
-                                        .setRes(res.toString())
-                                        .setAnalyticType("MLR")
-                                        .setArrivalTime(arrivalTime)
-                                        .setDataSetType(senMlEntry.getDataSetType()).build();
-                        //linearRegressionEntry.setArrivalTime(arrivalTime);
+                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", senMlEntry.getDataSetType());
+                        linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
-                                MessageBuilder.forAddress(INBOX, linearRegressionEntry.getMsgid())
-                                        .withCustomType(LINEAR_REGRESSION_ENTRY_PROTOBUF_TYPE, linearRegressionEntry)
+                                MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
+                                        .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
                                         .build());
 
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");
-                        final LinearRegressionEntry linearRegressionEntry =
-                                LinearRegressionEntry.newBuilder()
-                                        .setMeta(sensorMeta)
-                                        .setObsval(obsVal)
-                                        .setMsgid(msgId)
-                                        .setRes("0")
-                                        .setAnalyticType("MLR")
-                                        .setArrivalTime(arrivalTime)
-                                        .setDataSetType(senMlEntry.getDataSetType()).build();
-                        //linearRegressionEntry.setArrivalTime(arrivalTime);
+                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, "0", "MLR", senMlEntry.getDataSetType());
+                        linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, linearRegressionEntry.getMsgid())
-                                        .withCustomType(LINEAR_REGRESSION_ENTRY_PROTOBUF_TYPE, linearRegressionEntry)
+                                        .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
                                         .build());
                     }
                 }
@@ -171,19 +155,11 @@ public class LinearRegressionFn implements StatefulFunction {
 
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        final LinearRegressionEntry linearRegressionEntry =
-                                LinearRegressionEntry.newBuilder()
-                                        .setMeta(sensorMeta)
-                                        .setObsval(obsVal)
-                                        .setMsgid(msgId)
-                                        .setRes(res.toString())
-                                        .setAnalyticType("MLR")
-                                        .setArrivalTime(arrivalTime)
-                                        .setDataSetType(blobReadEntry.getDataSetType()).build();
-                        //linearRegressionEntry.setArrivalTime(arrivalTime);
+                        LinearRegressionEntry linearRegressionEntry = new LinearRegressionEntry(sensorMeta, obsVal, msgId, res.toString(), "MLR", blobReadEntry.getDataSetType());
+                        linearRegressionEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(linearRegressionEntry.getMsgid()))
-                                        .withCustomType(LINEAR_REGRESSION_ENTRY_PROTOBUF_TYPE, linearRegressionEntry)
+                                        .withCustomType(LINEAR_REGRESSION_ENTRY_JSON_TYPE, linearRegressionEntry)
                                         .build());
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in LinearRegressionPredictorBolt");

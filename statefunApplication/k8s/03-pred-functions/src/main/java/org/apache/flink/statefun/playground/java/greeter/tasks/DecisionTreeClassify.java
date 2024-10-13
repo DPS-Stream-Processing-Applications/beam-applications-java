@@ -6,7 +6,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.io.StringReader;
-import java.nio.file.WatchKey;
 import java.util.Map;
 import java.util.Properties;
 
@@ -17,12 +16,12 @@ import java.util.Properties;
  */
 public class DecisionTreeClassify extends AbstractTask {
 
-    private  final Object SETUP_LOCK = new Object();
+    private final Object SETUP_LOCK = new Object();
     // Sample data, assuming arff file has headers for Sense-Your-City dataset
-    private  final String SAMPLE_INPUT_SYS = "-71.10,42.37,10.1,65.3,0";
+    private final String SAMPLE_INPUT_SYS = "-71.10,42.37,10.1,65.3,0";
     // for taxi dataset
-    private  final String SAMPLE_INPUT_TAXI = "420,1.95,8.00";
-    private  final String SAMPLE_HEADER_SYS =
+    private final String SAMPLE_INPUT_TAXI = "420,1.95,8.00";
+    private final String SAMPLE_HEADER_SYS =
             "@RELATION SYS_data\n"
                     + "\n"
                     + "@ATTRIBUTE Longi            NUMERIC\n"
@@ -37,7 +36,7 @@ public class DecisionTreeClassify extends AbstractTask {
                     + "@DATA\n"
                     + "%header format";
     //	// Encode the arff header for SYS as a constant string
-    private  final String SAMPLE_HEADER_TAXI =
+    private final String SAMPLE_HEADER_TAXI =
             "@RELATION TAXI_data\n"
                     + "\n"
                     + "@ATTRIBUTE triptimeInSecs            NUMERIC\n"
@@ -47,18 +46,16 @@ public class DecisionTreeClassify extends AbstractTask {
                     + "\n"
                     + "@DATA\n"
                     + "%header format";
-    public  J48 j48tree;
+    private final String dataSetType;
+    public J48 j48tree;
     //	// Encode the arff header for SYS as a constant string
     // static fields common to all threads
-    private  boolean doneSetup = false;
-
+    private boolean doneSetup = false;
     //	// Sample data, assuming arff file has headers for TAXI dataset
-    private  int useMsgField;
-    private  Instances instanceHeader;
-    private  int resultAttrNdx;
-
+    private int useMsgField;
+    private Instances instanceHeader;
+    private int resultAttrNdx;
     private WekaUtil wekaUtil;
-    private final String dataSetType;
 
     public DecisionTreeClassify(String dataSetType) {
         this.dataSetType = dataSetType;

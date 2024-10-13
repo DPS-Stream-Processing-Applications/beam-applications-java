@@ -14,11 +14,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockWindowAverage extends AbstractTask<String, Float> {
 
     // static fields common to all threads
-    private  final Object SETUP_LOCK = new Object();
-    private  boolean doneSetup = false;
+    private final Object SETUP_LOCK = new Object();
+    private boolean doneSetup = false;
 
-    private  float aggCountWindowSize = 0;
-    private  int useMsgField;
+    private float aggCountWindowSize = 0;
+    private int useMsgField;
 
     // local fields assigned to each thread
     private float aggCount;

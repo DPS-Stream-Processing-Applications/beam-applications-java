@@ -2,8 +2,8 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.SenMlParse;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SourceEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.SourceEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SEN_ML_ENTRY_PROTOBUF_TYPE;
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_PROTOBUF_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SENML_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SOURCE_ENTRY_JSON_TYPE;
 
 public class ParsePredictFn implements StatefulFunction {
 
@@ -35,17 +35,14 @@ public class ParsePredictFn implements StatefulFunction {
     static final TypeName INBOX = TypeName.typeNameFromString("pred/decisionTree");
     static final TypeName INBOX_2 = TypeName.typeNameFromString("pred/linearRegression");
     static final TypeName INBOX_3 = TypeName.typeNameFromString("pred/average");
-
-
-    private  Logger l;
     SenMlParse senMLParseTask;
+    private Logger l;
     private ArrayList<String> observableFields;
     private String[] metaFields;
     private String idField;
 
 
-
-    public  void initLogger(Logger l_) {
+    public void initLogger(Logger l_) {
         this.l = l_;
     }
 
@@ -110,12 +107,11 @@ public class ParsePredictFn implements StatefulFunction {
     }
 
 
-
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
 
         try {
-            SourceEntry sourceEntry = message.as(SOURCE_ENTRY_PROTOBUF_TYPE);
+            SourceEntry sourceEntry = message.as(SOURCE_ENTRY_JSON_TYPE);
             setup(sourceEntry.getDataSetType());
             String msg = sourceEntry.getPayload();
             String msgId = String.valueOf(sourceEntry.getMsgid());
@@ -140,51 +136,45 @@ public class ParsePredictFn implements StatefulFunction {
             obsVal = obsVal.deleteCharAt(obsVal.lastIndexOf(","));
 
 
-
-            final SenMlEntry senMlEntry =
-                    SenMlEntry.newBuilder()
-                            .setMsgid(msgId)
-                            .setSensorID(resultMap.get(idField))
-                            .setMeta(meta.toString())
-                            .setObsType("dummyobsType")
-                            .setObsVal(String.valueOf(obsVal))
-                            .setMsgtype("MSGTYPE")
-                            .setAnalyticType("DumbType")
-                            .setArrivalTime(sourceEntry.getArrivalTime())
-                            .setDataSetType(sourceEntry.getDataSetType()).build();
+            SenMlEntry senMlEntry =
+                    new SenMlEntry(
+                            msgId,
+                            resultMap.get(idField),
+                            meta.toString(),
+                            "dummyobsType",
+                            obsVal.toString(),
+                            "MSGTYPE",
+                            "DumbType", sourceEntry.getDataSetType());
 
 
+            meta = null;
+            obsVal = null;
 
-            meta=null;
-            obsVal=null;
-
-            //senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
+            senMlEntry.setArrivalTime(sourceEntry.getArrivalTime());
 
             context.send(
                     MessageBuilder.forAddress(INBOX_2, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
+                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
 
 
             context.send(
                     MessageBuilder.forAddress(INBOX, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
+                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
-
-
 
 
             context.send(
                     MessageBuilder.forAddress(INBOX_3, String.valueOf(senMlEntry.getMsgid()))
-                            .withCustomType(SEN_ML_ENTRY_PROTOBUF_TYPE, senMlEntry)
+                            .withCustomType(SENML_ENTRY_JSON_TYPE, senMlEntry)
                             .build());
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error in ParsePredictBeam " + e);
         }
-        observableFields=null;
-        metaFields=null;
+        observableFields = null;
+        metaFields = null;
         senMLParseTask.tearDown();
         return context.done();
     }

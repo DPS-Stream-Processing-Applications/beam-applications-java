@@ -1,8 +1,8 @@
 package org.apache.flink.statefun.playground.java.greeter.functions;
 
-import org.apache.flink.statefun.playground.java.greeter.types.generated.AverageEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.ErrorEstimateEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.LinearRegressionEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.AverageEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.ErrorEstimateEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.LinearRegressionEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -54,8 +54,8 @@ public class ErrorEstimateFn implements StatefulFunction {
 
         try {
             long arrivalTime;
-            if (message.is(LINEAR_REGRESSION_ENTRY_PROTOBUF_TYPE)) {
-                LinearRegressionEntry linearRegressionEntry = message.as(LINEAR_REGRESSION_ENTRY_PROTOBUF_TYPE);
+            if (message.is(LINEAR_REGRESSION_ENTRY_JSON_TYPE)) {
+                LinearRegressionEntry linearRegressionEntry = message.as(LINEAR_REGRESSION_ENTRY_JSON_TYPE);
                 setup(linearRegressionEntry.getDataSetType());
                 String msgId = linearRegressionEntry.getMsgid();
                 String analyticsType = linearRegressionEntry.getAnalyticType();
@@ -89,25 +89,16 @@ public class ErrorEstimateFn implements StatefulFunction {
                         float fare_amount = Float.parseFloat((linearRegressionEntry.getObsval().split(",")[2]));
                         errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
                     }
-                    final ErrorEstimateEntry errorEstimateEntry =
-                            ErrorEstimateEntry.newBuilder()
-                                    .setMeta(sensorMeta)
-                                    .setError(errval)
-                                    .setMsgid(msgId)
-                                    .setAnalyticType(analyticsType)
-                                    .setObsval(obsVal)
-                                    .setArrivalTime(linearRegressionEntry.getArrivalTime())
-                                    .setDataSetType(linearRegressionEntry.getDataSetType()).build();
-
-                    //errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
+                    ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, linearRegressionEntry.getDataSetType());
+                    errorEstimateEntry.setArrivalTime(linearRegressionEntry.getArrivalTime());
                     context.send(
-                            MessageBuilder.forAddress(INBOX, errorEstimateEntry.getMsgid())
-                                    .withCustomType(ERROR_ESTIMATE_ENTRY_PROTOBUF_TYPE, errorEstimateEntry)
+                            MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
+                                    .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)
                                     .build());
 
                 }
-            } else if (message.is(AVERAGE_ENTRY_PROTOBUF_TYPE)) {
-                AverageEntry averageEntry = message.as(AVERAGE_ENTRY_PROTOBUF_TYPE);
+            } else if (message.is(AVERAGE_ENTRY_JSON_TYPE)) {
+                AverageEntry averageEntry = message.as(AVERAGE_ENTRY_JSON_TYPE);
                 setup(averageEntry.getDataSetType());
                 arrivalTime = averageEntry.getArrivalTime();
                 String msgId = averageEntry.getMsgid();
@@ -136,19 +127,11 @@ public class ErrorEstimateFn implements StatefulFunction {
                         errval = (fare_amount - Float.parseFloat(Res)) / Float.parseFloat(avgRes);
                     }
                     if (l.isInfoEnabled()) l.info(("errval -" + errval));
-                    final ErrorEstimateEntry errorEstimateEntry =
-                            ErrorEstimateEntry.newBuilder()
-                                    .setMeta(sensorMeta)
-                                    .setError(errval)
-                                    .setMsgid(msgId)
-                                    .setAnalyticType(analyticsType)
-                                    .setObsval(obsVal)
-                                    .setArrivalTime(arrivalTime)
-                                    .setDataSetType(averageEntry.getDataSetType()).build();
-                    //errorEstimateEntry.setArrivalTime(arrivalTime);
+                    ErrorEstimateEntry errorEstimateEntry = new ErrorEstimateEntry(sensorMeta, errval, msgId, analyticsType, obsVal, averageEntry.getDataSetType());
+                    errorEstimateEntry.setArrivalTime(arrivalTime);
                     context.send(
-                            MessageBuilder.forAddress(INBOX, errorEstimateEntry.getMsgid())
-                                    .withCustomType(ERROR_ESTIMATE_ENTRY_PROTOBUF_TYPE, errorEstimateEntry)
+                            MessageBuilder.forAddress(INBOX, String.valueOf(errorEstimateEntry.getMsgid()))
+                                    .withCustomType(ERROR_ESTIMATE_ENTRY_JSON_TYPE, errorEstimateEntry)
                                     .build());
                 }
             }

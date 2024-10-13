@@ -1,21 +1,9 @@
 package org.apache.flink.statefun.playground.java.greeter.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.UserProfile;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.AverageEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.BlobReadEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.DecisionTreeEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.ErrorEstimateEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.LinearRegressionEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.MqttPublishEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.MqttSubscribeEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SourceEntry;
-
 import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.types.SimpleType;
 import org.apache.flink.statefun.sdk.java.types.Type;
-
 
 
 public final class Types {
@@ -33,7 +21,7 @@ public final class Types {
                     TypeName.typeNameOf(TYPES_NAMESPACE, "UserLogin"),
                     JSON_OBJ_MAPPER::writeValueAsBytes,
                     bytes -> JSON_OBJ_MAPPER.readValue(bytes, UserLogin.class));
-    /*
+
     public static final Type<AverageEntry> AVERAGE_ENTRY_JSON_TYPE =
             SimpleType.simpleImmutableTypeFrom(
                     TypeName.typeNameOf(TYPES_NAMESPACE, "AverageEntry"),
@@ -87,13 +75,10 @@ public final class Types {
                     JSON_OBJ_MAPPER::writeValueAsBytes,
                     bytes -> JSON_OBJ_MAPPER.readValue(bytes, SenMlEntry.class));
 
-*/
 
-  public static final Type<BlobReadEntry> BLOB_READ_ENTRY_JSON_TYPE =
-          SimpleType.simpleImmutableTypeFrom(
-                  TypeName.typeNameOf(TYPES_NAMESPACE, "BlobReadEntry"),
-                  JSON_OBJ_MAPPER::writeValueAsBytes,
-                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, BlobReadEntry.class));
+
+
+/*
 
   public static final Type<UserProfile> USER_PROFILE_PROTOBUF_TYPE =
       SimpleType.simpleImmutableTypeFrom(
@@ -117,7 +102,7 @@ public final class Types {
                     BlobReadEntry::toByteArray,
                     BlobReadEntry::parseFrom);
 
-   */
+   
 
     // DecisionTreeEntry
     public static final Type<DecisionTreeEntry> DECISION_TREE_ENTRY_PROTOBUF_TYPE =
@@ -167,6 +152,7 @@ public final class Types {
                     TypeName.typeNameOf(TYPES_NAMESPACE, SourceEntry.getDescriptor().getFullName()),
                     SourceEntry::toByteArray,
                     SourceEntry::parseFrom);
+                    */
 
 
     private Types() {

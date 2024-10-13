@@ -2,8 +2,8 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.BlockWindowAverage;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.AverageEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.AverageEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -18,8 +18,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.AVERAGE_ENTRY_PROTOBUF_TYPE;
-import static org.apache.flink.statefun.playground.java.greeter.types.Types.SEN_ML_ENTRY_PROTOBUF_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.AVERAGE_ENTRY_JSON_TYPE;
+import static org.apache.flink.statefun.playground.java.greeter.types.Types.SENML_ENTRY_JSON_TYPE;
 
 
 public class AverageFn implements StatefulFunction {
@@ -30,8 +30,8 @@ public class AverageFn implements StatefulFunction {
                     .withSupplier(AverageFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/errorEstimate");
-    private Logger l;
     Map<String, BlockWindowAverage> blockWindowAverageMap;
+    private Logger l;
     private String dataSetType;
     private Properties p;
     private ArrayList<String> useMsgList;
@@ -58,7 +58,7 @@ public class AverageFn implements StatefulFunction {
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
-        SenMlEntry senMlEntry = message.as(SEN_ML_ENTRY_PROTOBUF_TYPE);
+        SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
         setup(senMlEntry.getDataSetType());
         String msgId = senMlEntry.getMsgid();
         String sensorMeta = senMlEntry.getMeta();
@@ -108,23 +108,14 @@ public class AverageFn implements StatefulFunction {
             if (avgres != null) {
                 if (avgres != Float.MIN_VALUE) {
                     if (l.isInfoEnabled()) l.info("avgres AVG:{}", avgres);
-                    final AverageEntry averageEntry =
-                            AverageEntry.newBuilder()
-                                    .setMeta(sensorMeta)
-                                    .setSensorId(sensorMeta)
-                                    .setObsType(obsType)
-                                    .setAvGres(avgres.toString())
-                                    .setObsVal(obsVal)
-                                    .setMsgid(msgId)
-                                    .setAnalyticType("AVG")
-                                    .setArrivalTime(senMlEntry.getArrivalTime())
-                                    .setDataSetType(senMlEntry.getDataSetType()).build();
-                    //averageEntry.setArrivalTime(senMlEntry.getArrivalTime());
+                    AverageEntry averageEntry =
+                            new AverageEntry(
+                                    sensorMeta, sensorID, obsType, avgres.toString(), obsVal, msgId, "AVG", senMlEntry.getDataSetType());
+                    averageEntry.setArrivalTime(senMlEntry.getArrivalTime());
 
                     context.send(
-                            MessageBuilder.forAddress(INBOX, averageEntry.getMsgid())
-                                    .withCustomType(AVERAGE_ENTRY_PROTOBUF_TYPE, averageEntry)
-                                    .build());
+                            MessageBuilder.forAddress(INBOX, String.valueOf(averageEntry.getMsgid()))
+                                    .withCustomType(AVERAGE_ENTRY_JSON_TYPE, averageEntry).build());
                 } else {
                     if (l.isWarnEnabled()) l.warn("Error in BlockWindowAverageBolt");
                     throw new RuntimeException();

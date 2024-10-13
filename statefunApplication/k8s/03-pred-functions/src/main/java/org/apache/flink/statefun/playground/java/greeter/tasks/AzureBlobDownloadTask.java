@@ -16,11 +16,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AzureBlobDownloadTask extends AbstractTask<String, byte[]> {
 
     // static fields common to all threads
-    private  final Object SETUP_LOCK = new Object();
-    private  boolean doneSetup = false;
-    private  int useMsgField;
+    private final Object SETUP_LOCK = new Object();
+    private boolean doneSetup = false;
+    private int useMsgField;
 
-    private  String[] fileNames;
+    private String[] fileNames;
 
 
     public void setup(Logger l_, Properties p_) {

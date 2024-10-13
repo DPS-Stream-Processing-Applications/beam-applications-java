@@ -2,7 +2,6 @@ package org.apache.flink.statefun.playground.java.greeter.tasks;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -102,7 +101,7 @@ public class LinearRegressionPredictor extends AbstractTask<String, Float> {
                 return super.setLastResult(Float.MIN_VALUE);
             }
 
-            return  super.setLastResult((float) prediction);
+            return super.setLastResult((float) prediction);
         }).exceptionally(ex -> {
             l.error("Error fetching model or making prediction", ex);
             return super.setLastResult(Float.MIN_VALUE);

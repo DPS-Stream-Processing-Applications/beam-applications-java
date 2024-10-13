@@ -1,12 +1,5 @@
 package org.apache.flink.statefun.playground.java.greeter.functions;
 
-import org.apache.flink.statefun.sdk.java.Context;
-import org.apache.flink.statefun.sdk.java.StatefulFunction;
-import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
-import org.apache.flink.statefun.sdk.java.TypeName;
-import org.apache.flink.statefun.sdk.java.message.Message;
-
-import java.util.concurrent.CompletableFuture;
 /*
 public class ReadDatabaseFn implements StatefulFunction {
 

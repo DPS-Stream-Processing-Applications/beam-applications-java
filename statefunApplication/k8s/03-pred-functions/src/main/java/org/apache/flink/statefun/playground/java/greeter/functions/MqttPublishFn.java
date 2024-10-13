@@ -1,8 +1,8 @@
 package org.apache.flink.statefun.playground.java.greeter.functions;
 
-import org.apache.flink.statefun.playground.java.greeter.types.generated.DecisionTreeEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.ErrorEstimateEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.MqttPublishEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.DecisionTreeEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.ErrorEstimateEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.MqttPublishEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -26,7 +26,7 @@ public class MqttPublishFn implements StatefulFunction {
     static final TypeName INBOX = TypeName.typeNameFromString("pred/sink");
 
     static final TypeName KAFKA_EGRESS = TypeName.typeNameFromString("pred/publish");
-    private  Logger l;
+    private Logger l;
 
 
     public void initLogger(Logger l_) {
@@ -37,8 +37,8 @@ public class MqttPublishFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         initLogger(LoggerFactory.getLogger("APP"));
         try {
-            if (message.is(DECISION_TREE_ENTRY_PROTOBUF_TYPE)) {
-                DecisionTreeEntry decisionTreeEntry = message.as(DECISION_TREE_ENTRY_PROTOBUF_TYPE);
+            if (message.is(DECISION_TREE_ENTRY_JSON_TYPE)) {
+                DecisionTreeEntry decisionTreeEntry = message.as(DECISION_TREE_ENTRY_JSON_TYPE);
                 String msgId = decisionTreeEntry.getMsgid();
                 String meta = decisionTreeEntry.getMeta();
                 String analyticsType = decisionTreeEntry.getAnalyticType();
@@ -60,28 +60,25 @@ public class MqttPublishFn implements StatefulFunction {
                 }
 
                 if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
-                final MqttPublishEntry mqttPublishEntry =
-                        MqttPublishEntry.newBuilder()
-                                .setMsgid(msgId)
-                                        .setMeta(meta)
-                                                .setObsval(obsVal)
-                                                        .setDataSetType(decisionTreeEntry.getDataSetType()).build();
-
-                //mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
+                MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, decisionTreeEntry.getDataSetType());
+                mqttPublishEntry.setArrivalTime(decisionTreeEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
-                                .withCustomType(MQTT_PUBLISH_ENTRY_PROTOBUF_TYPE, mqttPublishEntry)
+                                .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)
                                 .build());
-                context.send(
-                        KafkaEgressMessage.forEgress(KAFKA_EGRESS)
-                                .withTopic("pred-publish")
-                                .withUtf8Key(String.valueOf(System.currentTimeMillis()))
-                                .withUtf8Value(String.valueOf(temp))
-                                .build());
+                if (mqttPublishEntry.getArrivalTime() != 0L) {
+                    long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
+                    context.send(
+                            KafkaEgressMessage.forEgress(KAFKA_EGRESS)
+                                    .withTopic("pred-publish")
+                                    .withUtf8Key(String.valueOf("latency"))
+                                    .withUtf8Value(String.valueOf(latency))
+                                    .build());
+                }
 
 
-            } else if (message.is(ERROR_ESTIMATE_ENTRY_PROTOBUF_TYPE)) {
-                ErrorEstimateEntry errorEstimateEntry = message.as(ERROR_ESTIMATE_ENTRY_PROTOBUF_TYPE);
+            } else if (message.is(ERROR_ESTIMATE_ENTRY_JSON_TYPE)) {
+                ErrorEstimateEntry errorEstimateEntry = message.as(ERROR_ESTIMATE_ENTRY_JSON_TYPE);
                 String msgId = errorEstimateEntry.getMsgid();
                 String meta = errorEstimateEntry.getMeta();
                 String analyticsType = errorEstimateEntry.getAnalyticType();
@@ -103,24 +100,21 @@ public class MqttPublishFn implements StatefulFunction {
                 }
 
                 if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
-                final MqttPublishEntry mqttPublishEntry =
-                        MqttPublishEntry.newBuilder()
-                                .setMsgid(msgId)
-                                .setMeta(meta)
-                                .setObsval(obsVal)
-                                .setArrivalTime(errorEstimateEntry.getArrivalTime())
-                                .setDataSetType(errorEstimateEntry.getDataSetType()).build();
-                //mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
+                MqttPublishEntry mqttPublishEntry = new MqttPublishEntry(msgId, meta, obsVal, errorEstimateEntry.getDataSetType());
+                mqttPublishEntry.setArrivalTime(errorEstimateEntry.getArrivalTime());
                 context.send(
                         MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
-                                .withCustomType(MQTT_PUBLISH_ENTRY_PROTOBUF_TYPE, mqttPublishEntry)
+                                .withCustomType(MQTT_PUBLISH_ENTRY_JSON_TYPE, mqttPublishEntry)
                                 .build());
-                context.send(
-                        KafkaEgressMessage.forEgress(KAFKA_EGRESS)
-                                .withTopic("pred-publish")
-                                .withUtf8Key(String.valueOf(System.currentTimeMillis()))
-                                .withUtf8Value(String.valueOf(temp))
-                                .build());
+                if (mqttPublishEntry.getArrivalTime() != 0L) {
+                    long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
+                    context.send(
+                            KafkaEgressMessage.forEgress(KAFKA_EGRESS)
+                                    .withTopic("pred-publish")
+                                    .withUtf8Key(String.valueOf("latency"))
+                                    .withUtf8Value(String.valueOf(latency))
+                                    .build());
+                }
 
             }
         } catch (Exception e) {

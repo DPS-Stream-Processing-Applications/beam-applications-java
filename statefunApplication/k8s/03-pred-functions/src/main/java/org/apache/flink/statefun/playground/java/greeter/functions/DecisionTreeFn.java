@@ -3,8 +3,8 @@ package org.apache.flink.statefun.playground.java.greeter.functions;
 import org.apache.flink.statefun.playground.java.greeter.tasks.AbstractTask;
 import org.apache.flink.statefun.playground.java.greeter.tasks.DecisionTreeClassify;
 import org.apache.flink.statefun.playground.java.greeter.types.BlobReadEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.DecisionTreeEntry;
-import org.apache.flink.statefun.playground.java.greeter.types.generated.SenMlEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.DecisionTreeEntry;
+import org.apache.flink.statefun.playground.java.greeter.types.SenMlEntry;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -34,8 +34,8 @@ public class DecisionTreeFn implements StatefulFunction {
                     .withSupplier(DecisionTreeFn::new)
                     .build();
     static final TypeName INBOX = TypeName.typeNameFromString("pred/mqttPublish");
-    private Logger l;
     DecisionTreeClassify decisionTreeClassify;
+    private Logger l;
     private String dataSetType;
 
     public void initLogger(Logger l_) {
@@ -61,9 +61,9 @@ public class DecisionTreeFn implements StatefulFunction {
 
         try {
             long arrivalTime;
-            if (message.is(SEN_ML_ENTRY_PROTOBUF_TYPE)) {
+            if (message.is(SENML_ENTRY_JSON_TYPE)) {
 
-                SenMlEntry senMlEntry = message.as(SEN_ML_ENTRY_PROTOBUF_TYPE);
+                SenMlEntry senMlEntry = message.as(SENML_ENTRY_JSON_TYPE);
                 setup(senMlEntry.getDataSetType());
                 String sensorMeta = senMlEntry.getMeta();
 
@@ -80,20 +80,12 @@ public class DecisionTreeFn implements StatefulFunction {
                 Float res = decisionTreeClassify.doTask(map);
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        //decisionTreeEntry.setArrivalTime(senMlEntry.getArrivalTime());
-                        final DecisionTreeEntry decisionTreeEntry =
-                                DecisionTreeEntry.newBuilder().
-                                        setMeta(sensorMeta)
-                                        .setObsval(obsVal)
-                                        .setMsgid(msgId)
-                                        .setRes(res.toString())
-                                        .setAnalyticType("DTC")
-                                        .setArrivalTime(senMlEntry.getArrivalTime())
-                                        .setDataSetType(senMlEntry.getDataSetType()).build();
+
+                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", senMlEntry.getDataSetType());
+                        decisionTreeEntry.setArrivalTime(senMlEntry.getArrivalTime());
                         context.send(
-                                MessageBuilder.forAddress(INBOX, decisionTreeEntry.getMsgid())
-                                        .withCustomType(DECISION_TREE_ENTRY_PROTOBUF_TYPE, decisionTreeEntry)
-                                        .build());
+                                MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
+                                        .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry).build());
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBolt");
                         throw new RuntimeException();
@@ -134,20 +126,14 @@ public class DecisionTreeFn implements StatefulFunction {
                 Float res = decisionTreeClassify.doTask(map);
                 if (res != null) {
                     if (res != Float.MIN_VALUE) {
-                        //decisionTreeEntry.setArrivalTime(arrivalTime);
-                        final DecisionTreeEntry decisionTreeEntry =
-                                DecisionTreeEntry.newBuilder().
-                                        setMeta(sensorMeta)
-                                        .setObsval(obsVal)
-                                        .setMsgid(msgId)
-                                        .setRes(res.toString())
-                                        .setAnalyticType("DTC")
-                                        .setArrivalTime(arrivalTime)
-                                        .setDataSetType(blobReadEntry.getDataSetType()).build();
+
+                        DecisionTreeEntry decisionTreeEntry = new DecisionTreeEntry(sensorMeta, obsVal, msgId, res.toString(), "DTC", blobReadEntry.getDataSetType());
+                        decisionTreeEntry.setArrivalTime(arrivalTime);
                         context.send(
                                 MessageBuilder.forAddress(INBOX, String.valueOf(decisionTreeEntry.getMsgid()))
-                                        .withCustomType(DECISION_TREE_ENTRY_PROTOBUF_TYPE, decisionTreeEntry)
+                                        .withCustomType(DECISION_TREE_ENTRY_JSON_TYPE, decisionTreeEntry)
                                         .build());
+
                     } else {
                         if (l.isWarnEnabled()) l.warn("Error in DecisionTreeClassifyBolt");
                         throw new RuntimeException("Error when classifying");

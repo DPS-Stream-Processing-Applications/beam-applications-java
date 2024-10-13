@@ -165,10 +165,10 @@ public class FlinkJob {
                 .via((BlobUploadEntry input) -> input.getFileName()));
 
     PCollection<Long> latencies =
-            blobUpload.apply(
-                    "Format ErrorEstimateEntry to Arrival Time",
-                    MapElements.into(TypeDescriptors.longs())
-                            .via((BlobUploadEntry input) -> input.getArrivalTime()));
+        blobUpload.apply(
+            "Format ErrorEstimateEntry to Arrival Time",
+            MapElements.into(TypeDescriptors.longs())
+                .via((BlobUploadEntry input) -> input.getArrivalTime()));
 
     publish.apply(new WriteStringSink("train-publish"));
     latencies.apply("Sink", ParDo.of(new Sink()));

@@ -1,8 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.beam;
 
-import org.apache.beam.sdk.metrics.Distribution;
 import org.apache.beam.sdk.metrics.Gauge;
-import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.slf4j.Logger;

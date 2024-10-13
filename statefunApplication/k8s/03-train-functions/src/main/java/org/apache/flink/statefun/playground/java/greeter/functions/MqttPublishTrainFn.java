@@ -44,11 +44,12 @@ public class MqttPublishTrainFn implements StatefulFunction {
                     MessageBuilder.forAddress(INBOX, String.valueOf(mqttPublishEntry.getMsgid()))
                             .withCustomType(MqttPublish_ENTRY_JSON_TYPE, mqttPublishEntry)
                             .build());
+            long latency = System.currentTimeMillis() - mqttPublishEntry.getArrivalTime();
             context.send(
                     KafkaEgressMessage.forEgress(KAFKA_EGRESS)
                             .withTopic("pred-publish")
-                            .withUtf8Key(String.valueOf(System.currentTimeMillis()))
-                            .withUtf8Value(String.valueOf(filename))
+                            .withUtf8Key("latency")
+                            .withUtf8Value(String.valueOf(latency))
                             .build());
 
 

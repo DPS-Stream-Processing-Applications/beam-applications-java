@@ -125,8 +125,8 @@ spec:
     spec:
       containers:
         - name: master
-          image: apache/flink-statefun:3.2.0
-          imagePullPolicy: IfNotPresent
+          image: jungerindy/3.4-snapshot
+          imagePullPolicy: Always
           env:
             - name: ROLE
               value: master
@@ -197,8 +197,8 @@ spec:
     spec:
       containers:
         - name: worker
-          image: apache/flink-statefun:3.2.0
-          imagePullPolicy: IfNotPresent
+          image: jungerindy/3.4-snapshot
+          imagePullPolicy: Always
           env:
             - name: ROLE
               value: worker

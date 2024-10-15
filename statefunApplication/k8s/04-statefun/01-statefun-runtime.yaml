@@ -31,7 +31,7 @@ data:
 
     #Monitoring
     metrics.reporters: prom
-    metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+    metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
     metrics.reporter.prom.port: 9999
     # Added for latency tracking
     taskmanager.latency-tracking-interval: 30000  # 30000 milliseconds (30 seconds)
@@ -122,6 +122,7 @@ spec:
       labels:
         app: statefun
         component: master
+        release: prometheus
     spec:
       containers:
         - name: master
@@ -194,6 +195,7 @@ spec:
       labels:
         app: statefun
         component: worker
+        relase: prometheus
     spec:
       containers:
         - name: worker

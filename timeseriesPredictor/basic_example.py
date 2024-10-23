@@ -195,9 +195,14 @@ def test_stationarity(time_series):
 def main():
     path_cpu_load = "/home/jona/Documents/Bachelor_thesis/Documentation/Measurements/240916/p_t_c_5/flink_taskmanager_Status_JVM_CPU_Load.csv"
     path_cpu_time = "/home/jona/Documents/Bachelor_thesis/Documentation/Measurements/240916/p_f_c_40/flink_taskmanager_Status_JVM_CPU_Time.csv"
-    list_of_metrics = [path_cpu_time]
+    path_busy_time = ("/home/jona/Documents/Bachelor_thesis/Documentation/Measurements/240916/p_t_s_5/flink_taskmanager_job_task_busyTimeMsPerSecond.csv", "busyTime")
+    path_backPressureTime = ""
+    path_idle_time = ("/home/jona/Documents/Bachelor_thesis/Documentation/Measurements/240916/p_t_s_5/flink_taskmanager_job_task_idleTimeMsPerSecond.csv", "idleTime")
+
+
+    list_of_metrics = [path_idle_time]
     for path_metric in list_of_metrics:
-        original_data = load_data_metrics(path_metric)
+        original_data = load_data_metrics(path_metric[0])
         length_org_data = original_data.size
         length_train_dataset = int(length_org_data * 0.8)
         intervals = original_data.head(length_train_dataset)
@@ -219,7 +224,7 @@ def main():
                 forecast_original, index=res.index, columns=["Predicted data"]
             )
             plot_data_and_prediction(
-                original_data, forecast_df, "CPU_Time", type_of_model
+                original_data, forecast_df,path_metric[1], type_of_model
             )
             errors = compute_errors(original_data, forecast_df)
             print("Error Metrics:")

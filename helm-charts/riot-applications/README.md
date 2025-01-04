@@ -1,38 +1,49 @@
 # Kubernetes setup
 
->[!WARNING]
-> Make sure the `Certificate Manager` is installed as well as the `Flink` operator helm chart, before attempting to install this custom chart.
-> All other dependencies are handled via this helm chart.
-```bash
-helm install riot-applications .
-```
-
 # Certificate Manager
 
 Install the certificate manager first:
 
 ```bash
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+helm repo add jetstack https://charts.jetstack.io
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.15.0 \
+  --set crds.enabled=true
+```
+# Custom Helm Chart
+>[!WARNING]
+> Make sure the `Certificate Manager` is installed before attempting to install this custom chart.
+> All other dependencies are handled via this helm chart.
+
+The custom helm chart of this repository manages all the dependencies and templates for the riot applications. 
+
+```bash
+helm install riot-applications .
 ```
 
-# Flink
+# Manual Setup
+## Flink
 
 Installing the `Flink` operator and deploying a session cluster:
 ```bash
 helm repo add flink-operator-repo https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/
-helm install  flink-operator flink-operator-repo/flink-kubernetes-operator
-# INFO: If the cert-manager installation failed, use --set webhook.create=false
-helm install  flink-operator flink-operator-repo/flink-kubernetes-operator --set webhook.create=false
+helm install flink-operator flink-operator-repo/flink-kubernetes-operator
 ```
+> [!TIP]
+> If the cert-manager installation failed, use `--set webhook.create=false`
 
 ```bash
 kubectl apply -f templates/flink-session-cluster-deployment.yaml
 ```
-# Kafka
+## Kafka
 Installing the kafka operator as well as setting up the topics:
 ```bash
-helm repo add strimzi https://strimzi.io/charts/
-helm install kafka-operator strimzi/strimzi-kafka-operator
+helm install \
+  kafka-operator oci://quay.io/strimzi-helm/strimzi-kafka-operator \
+  --version 0.41.
 
 kubectl apply -f templates/kafka-cluster.yaml
 kubectl apply -f templates/kafka-topic-senml-source.yaml 

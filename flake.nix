@@ -31,6 +31,7 @@
           shellHook = ''
             export PATH=$PATH:${pkgs.flink}/opt/flink/bin
             export PS1="(nix-shell) $PS1" # NOTE: To communicate that a nix shell is active
+            export KUBECONFIG=$(pwd)/.kube/config
           '';
         };
       };

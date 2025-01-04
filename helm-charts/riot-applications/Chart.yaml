@@ -7,10 +7,6 @@ version: 0.2.0
 appVersion: "0.1.0"
 
 dependencies:
-  - name: cert-manager
-    repository: "https://charts.jetstack.io"
-    version: "1.8.2"
-
   - name: flink-kubernetes-operator
     version: "1.8.0"
     repository: "https://downloads.apache.org/flink/flink-kubernetes-operator-1.8.0/"

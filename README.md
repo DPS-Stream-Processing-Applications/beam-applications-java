@@ -66,6 +66,22 @@ Use the `k3d-cluster-config.yaml` file of this project to set up a preconfigured
 See the following [guide on how to use a config file](https://k3d.io/v5.0.0/usage/configfile/#usage).
 Follow the [quick start guide](https://k3d.io/v5.6.3/#quick-start) to set up an empty cluster.
 
+### Connecting To a Remote Cluster
+To make it as easy as possible to deploy the applications on a remote cluster follow the following steps:
+
+### Kube Config of Remote Host
+Kubectl needs a config file to know where the cluster is located an which credentials to use to connect to it. It's easiest to just copy the existing `config` file from the remote server node.
+Using a Jump Host the following scp command will work:
+```bash
+scp -o "ProxyJump <proxy_user>@<proxy_ip>" <host_user>@<host_ip>:~/.kube/config ./.kube/config
+```
+
+#### SSH Tunnel
+`kubectl` uses port 6443 to communicate with a cluster. You can forward this port on the remote host through the Jump Host.
+
+```bash
+ssh -J <proxy_user>@<proxy_ip> -L 6443:<host_ip>:6443 <host_user>@<host_ip> -N &
+```
 
 ### Helm Deployment
 All the applications of this repository depend on external resources like an Apache `Kafka` cluster as well as a `mongoDB` database.
@@ -87,4 +103,5 @@ nix develop # INFO: Not needed if already in a nix shell or using direnv.
 ./gradlew build
 flink run ./etl/build/FlinkJob.jar
 ```
+
 

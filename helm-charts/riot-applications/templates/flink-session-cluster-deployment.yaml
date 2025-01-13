@@ -4,18 +4,20 @@ metadata:
   namespace: default
   name: flink-session-cluster
 spec:
+  mode: standalone
   image: flink:1.18
   flinkVersion: v1_18
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
     metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
     metrics.reporter.prom.port: "9249"
+    # jobmanager.scheduler: adaptive
+    # scheduler-mode: reactive
+    job.autoscaler.enabled: "false"
+    execution.checkpointing.interval: "10s"
   serviceAccount: flink
   podTemplate:
     metadata:
-      # INFO:
-      # The label is required by Prometheus.
-      # Check https://github.com/prometheus-operator/kube-prometheus/issues/1392#issuecomment-1411719953.
       labels:
         release: prometheus
     spec:
@@ -26,11 +28,26 @@ spec:
             - containerPort: 9249
               name: metrics
               protocol: TCP
+          volumeMounts:
+            - name: flink-job-dir
+              mountPath: /flink-jobs/
+      volumes:
+        - name: flink-job-dir
+          hostPath:
+            path: /tmp/flink-job
+            type: DirectoryOrCreate
   jobManager:
     resource:
-      memory: "2048m"
-      cpu: 1
+      memory: "4096m"
+      cpu: 2
   taskManager:
     resource:
-      memory: "2048m"
+      memory: "2048m" 
       cpu: 1
+  # job:
+  #   jarURI: local:///flink-jobs/FlinkJob.jar
+  #   parallelism: 1
+  #   upgradeMode: stateless
+  #   state: running
+  #   args:
+  #     - "--experiRunId=TAXI"

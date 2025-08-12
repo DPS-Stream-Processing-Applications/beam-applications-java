@@ -1,0 +1,18 @@
+package at.ac.uibk.dps.streamprocessingapplications.riotbenchsinglejob;
+
+import org.apache.beam.runners.flink.FlinkPipelineOptions;
+import org.apache.beam.runners.flink.FlinkRunner;
+import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.*;
+
+public class FlinkJobFIT {
+
+  public static void main(String[] args) {
+    FlinkPipelineOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(FlinkPipelineOptions.class);
+    options.setRunner(FlinkRunner.class);
+    options.setJobName("ETL-FIT");
+
+    PipelineBuilder.buildFITPipeline(options).run();
+  }
+}

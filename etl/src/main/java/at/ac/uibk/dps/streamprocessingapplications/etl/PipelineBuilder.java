@@ -21,7 +21,7 @@ import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class PipelineBuilder {
-  static Pipeline buildTAXIPipeline(FlinkPipelineOptions options) {
+  public static Pipeline buildTAXIPipeline(FlinkPipelineOptions options) {
     Pipeline pipeline = Pipeline.create(options);
 
     PCollection<String> etl_strings =
@@ -46,7 +46,7 @@ public class PipelineBuilder {
     return pipeline;
   }
 
-  static Pipeline buildFITPipeline(FlinkPipelineOptions options) {
+  public static Pipeline buildFITPipeline(FlinkPipelineOptions options) {
     Pipeline pipeline = Pipeline.create(options);
 
     PCollection<String> etl_strings =
@@ -71,7 +71,7 @@ public class PipelineBuilder {
     return pipeline;
   }
 
-  static Pipeline buildGRIDPipeline(FlinkPipelineOptions options) {
+  public static Pipeline buildGRIDPipeline(FlinkPipelineOptions options) {
     Pipeline pipeline = Pipeline.create(options);
 
     PCollection<String> etl_strings =

@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.tasks.ReadFromDatabaseTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.ReadFromDatabaseTask;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

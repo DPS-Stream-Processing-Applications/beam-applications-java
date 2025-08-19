@@ -1,9 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.BlobReadEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.DecisionTreeClassify;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.BlobReadEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.DecisionTreeEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.DecisionTreeClassify;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

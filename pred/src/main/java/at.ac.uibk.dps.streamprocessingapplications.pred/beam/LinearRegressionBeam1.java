@@ -1,9 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.LinearRegressionEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.LinearRegressionPredictor;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.LinearRegressionEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.SenMlEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.LinearRegressionPredictor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;

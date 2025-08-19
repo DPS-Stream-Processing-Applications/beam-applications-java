@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.kafka;
 
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;

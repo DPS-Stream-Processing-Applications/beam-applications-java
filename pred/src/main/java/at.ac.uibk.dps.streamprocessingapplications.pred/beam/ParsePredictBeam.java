@@ -1,9 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.SenMlEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.SenMlParse;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.SenMlEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.SourceEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.SenMlParse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

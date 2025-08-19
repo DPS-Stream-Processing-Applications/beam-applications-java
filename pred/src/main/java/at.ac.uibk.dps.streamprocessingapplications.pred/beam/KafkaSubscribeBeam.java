@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.MqttSubscribeEntry;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;

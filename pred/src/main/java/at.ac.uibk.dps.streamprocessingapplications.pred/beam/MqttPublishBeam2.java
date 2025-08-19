@@ -1,9 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.DecisionTreeEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTPublishTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.DecisionTreeEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.MqttPublishEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.MQTTPublishTask;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;

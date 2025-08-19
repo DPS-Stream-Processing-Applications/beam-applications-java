@@ -1,7 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.ErrorEstimateEntry;
-import at.ac.uibk.dps.streamprocessingapplications.entity.LinearRegressionEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.ErrorEstimateEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.LinearRegressionEntry;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;

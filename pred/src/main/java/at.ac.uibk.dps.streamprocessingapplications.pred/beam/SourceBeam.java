@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.SourceEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.SourceEntry;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

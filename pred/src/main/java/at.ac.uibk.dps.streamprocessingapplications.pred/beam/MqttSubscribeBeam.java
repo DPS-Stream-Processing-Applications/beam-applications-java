@@ -1,8 +1,8 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttSubscribeEntry;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.MQTTSubscribeTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.MqttSubscribeEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.MQTTSubscribeTask;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;

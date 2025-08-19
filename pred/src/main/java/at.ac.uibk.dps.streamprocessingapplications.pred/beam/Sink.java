@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.pred.beam;
 
-import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
+import at.ac.uibk.dps.streamprocessingapplications.pred.entity.MqttPublishEntry;
 import org.apache.beam.sdk.metrics.Gauge;
 import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.transforms.DoFn;

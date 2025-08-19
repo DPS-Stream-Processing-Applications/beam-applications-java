@@ -3,7 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.pred.kafka;
 import static java.time.Duration.ofMillis;
 import static java.util.Collections.singleton;
 
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
+import at.ac.uibk.dps.streamprocessingapplications.pred.tasks.AbstractTask;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;

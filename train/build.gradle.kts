@@ -30,7 +30,7 @@ tasks {
     destinationDirectory.set(file("build"))
     // INFO: This manifest configuration gets inherited by the `shadowJar` task.
     manifest {
-      val mainClass = "at.ac.uibk.dps.streamprocessingapplications.FlinkJob"
+      val mainClass = "at.ac.uibk.dps.streamprocessingapplications.train.FlinkJob"
       attributes(
           "Main-Class" to mainClass,
       )

@@ -18,10 +18,7 @@ dependencies {
 }
 
 tasks {
-  // Ensure compileJava waits for etl/pred shaded jars
-  named("compileJava") {
-    dependsOn(":etl:shadowJar", ":stats:shadowJar", ":train:shadowJar", ":pred:shadowJar")
-  }
+  // named("compileJava") { dependsOn(":etl", ":stats", ":train", ":pred") }
 
   // INFO: The `shadowJar` task replaces the default jar.
   jar {
@@ -32,10 +29,18 @@ tasks {
     manifest {
       /* NOTE:
        * Allows the mainClass to be overridden using `-PmainClass=<custom_main_class>`
+       *
+       * val target: String = project.findProperty("target")?.toString() ?: "FIT"
        */
+      val target: String = project.findProperty("target")?.toString() ?: ""
+
       val mainClass =
-          project.findProperty("mainClass")?.toString()
-              ?: "at.ac.uibk.dps.streamprocessingapplications.riotbenchsinglejob.FlinkJob"
+          when (target.uppercase()) {
+            "FIT" -> "at.ac.uibk.dps.streamprocessingapplications.riotbenchsinglejob.FlinkJobFIT"
+            "TAXI" -> "at.ac.uibk.dps.streamprocessingapplications.riotbenchsinglejob.FlinkJobTAXI"
+            else ->
+                throw GradleException("Unknown target '$target'. Use -Ptarget=FIT or -Ptarget=TAXI")
+          }
       attributes(
           "Main-Class" to mainClass,
       )

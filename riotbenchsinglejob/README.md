@@ -1,46 +1,21 @@
 # Build
-The default build of this job is a monolithic job `ETL` which can be configured via the `--experiRunId` command line option later.
 
-```bash
-../gradlew build
-```
-
-You can also build the job for the specific dataset. Far this the -P
-
-If you want to build the dedicated jobs for each dataset, you can do so by overriding `mainClass` with the `-PmainClass` option.
-Available main classes are:
-
+This combined pipeline was implemented for 2 Datasets, `TAXI` and `FIT`
 ## TAXI
 
 ```bash
-../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobTAXI
+./gradlew riotbenchsinglejob:build -Ptarget=TAXI
 
 ```
 
 ## FIT
 
 ```bash
-../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobFIT
+./gradlew riotbenchsinglejob:build -Ptarget=FIT
 ```
 
-## GRID
-
-```bash
-../gradlew build -PmainClass=at.ac.uibk.dps.streamprocessingapplications.etl.FlinkJobGRID
-```
-
-# Run
-
-If you chose the default build you can now specify the dataset via the `--experiRunId` option.
-Available options: `TAXI`, `FIT` and `GRID`.
-
-Example with `TAXI`.
-```bash
-flink run ./build/FlinkJob.jar --experiRunId=TAXI
-```
-
-For the specific builds you can just omit the `experiRunId` option.
-
+# Run 
+The pipeline requires the database URL to be passed as a CLI argument. Use the following command to read the URL from the Kubernetes deployment.
 ```bash
 flink run ./build/FlinkJob.jar
 ```

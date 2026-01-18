@@ -18,8 +18,8 @@ repositories {
  */
 val kafkaClientsVersion = "3.7.0"
 
-val flinkVersion = "1.18"
-val beamVersion = "2.57.0"
+val flinkVersion = "1.19"
+val beamVersion = "2.67.0"
 val slf4jVersion = "1.7.32"
 val log4jVersion = "2.23.1"
 val junitJupiterVersion = "5.10.3"

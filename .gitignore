@@ -16,4 +16,5 @@ build
 # Ignore log files
 *.log
 
-.kube/config
+*.png
+*.zip

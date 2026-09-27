@@ -8,7 +8,6 @@
 # Run
 > [!WARNING]
 > Make sure the kubernetes port is forwarded before you try running this program!
-Because gradle handles interrupts differently, we launch the producer standalone.
 
 ```bash
 ../gradlew build

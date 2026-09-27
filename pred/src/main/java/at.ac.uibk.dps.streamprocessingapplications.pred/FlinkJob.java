@@ -90,6 +90,8 @@ public class FlinkJob {
     options.setStreaming(true);
     options.setLatencyTrackingInterval(5L);
     options.setJobName("PRED");
+    options.setOperatorChaining(false);
+    options.setAttachedMode(false); // INFO: Required to deploy as Application Cluster
 
     Pipeline p = Pipeline.create(options);
 

@@ -55,6 +55,8 @@ public class FlinkJob {
             .as(FlinkPipelineOptionsExperiRunId.class);
     pipelineOptions.setRunner(FlinkRunner.class);
     pipelineOptions.setJobName("STATS");
+    pipelineOptions.setOperatorChaining(false);
+    pipelineOptions.setAttachedMode(false); // INFO: Required to deploy as Application Cluster
     Pipeline pipeline;
 
     switch (experiRunId) {
